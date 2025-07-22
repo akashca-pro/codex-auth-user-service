@@ -4,7 +4,7 @@
  * @interface
  */
 
-interface IUpdateUserRequestDTO {
+export interface IUpdateUserRequestDTO {
 
     username? : string;
     email? : string;
