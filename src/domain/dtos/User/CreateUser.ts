@@ -10,4 +10,5 @@ export interface ICreateUserRequestDTO {
     lastName : string;
     password : string;
     country : string;
+    role : 'user' | 'admin'
 }
