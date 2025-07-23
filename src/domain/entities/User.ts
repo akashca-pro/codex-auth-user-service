@@ -1,66 +1,98 @@
-import { ICreateUserRequestDTO } from '../dtos/User/CreateUser'
-import { IUpdateUserRequestDTO } from '../dtos/User/UpdateUser'
 import { AuthProvider } from '../enums/AuthProvider'
-import { UserRole } from '../enums/UserRole'
 import { Email } from '../valueObjects/Email'
-
+import { BaseUser, IBaseUserProps } from './BaseUser'
 
 /**
- * Interface representing the structure of a user.
- *
- * @interface
+ * Interface representing the structure of a regular user.
+ * It extends IBaseUserProps and adds specific properties for a RegularUser.
  */
-export interface UserInterface {
-  username: string
-  email: Email
-  password?: string
-  googleId? : string
-  firstName: string
-  lastName?: string
-  avatar?: string
-  country: string
-  preferredLanguage?: string
-  easySolved: number
-  mediumSolved: number
-  hardSolved: number
-  totalSubmission: number
-  streak: number
+export interface IRegularUserProps extends IBaseUserProps {
+    isVerified: boolean;
+    isArchived: boolean;
+    preferredLanguage?: string;
+    easySolved: number;
+    mediumSolved: number;
+    hardSolved: number;
+    totalSubmission: number;
+    streak: number;
 }
 
-
 /**
- * Class representing a user.
- * 
- * @class
+ * Class representing a regular user, extending BaseUser and providing full user details.
  */
-export class UserEntity {
-    private _props : UserInterface
+export class RegularUserEntity extends BaseUser { 
+  private readonly _isVerified: boolean;
+  private readonly _isArchived: boolean;
+  private readonly _preferredLanguage?: string;
+  private readonly _easySolved: number;
+  private readonly _mediumSolved: number;
+  private readonly _hardSolved: number;
+  private readonly _totalSubmission: number;
+  private readonly _streak: number;
+  private readonly _createdAt: Date;
+  private readonly _updatedAt: Date;
 
-    /**
-     * Create a new user instance based on the provided data.
-     * 
-     * @static
-     * @param {ICreateUserRequestDTO} data - The data to create a user.
-     * @returns {UserEntity} The created user instance.
-     */
-  static create(data: ICreateUserRequestDTO) : UserEntity {
-    const emailVO = new Email({ address: data.email })
 
-    const newUser: UserInterface = {
-      username: data.username,
-      email: emailVO,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      country: data.country,
-      easySolved: 0,
-      mediumSolved: 0,
-      hardSolved: 0,
-      totalSubmission: 0,
-      streak: 0,
-    }
+  constructor(props: IRegularUserProps) {
+    // Pass properties belonging to BaseUser directly to the super constructor
+    super(
+      props.userId,
+      props.username,
+      props.email,
+      props.role,
+      props.firstName,
+      props.country,
+      props.authProvider,
+      props.createdAt,
+      props.updatedAt,
+      props.avatar,
+      props.lastName,
+      props.oAuthId,
+      props.password,
+    );
 
-    return new UserEntity(newUser)
+    // Assign properties specific to RegularUserEntity
+    this._isVerified = props.isVerified ?? false;
+    this._isArchived = props.isArchived ?? false;
+    this._preferredLanguage = props.preferredLanguage;
+    this._easySolved = props.easySolved ?? 0;
+    this._mediumSolved = props.mediumSolved ?? 0;
+    this._hardSolved = props.hardSolved ?? 0;
+    this._totalSubmission = props.totalSubmission ?? 0;
+    this._streak = props.streak ?? 0;
+  }
+
+  // Getters for RegularUserEntity specific properties
+  get isVerified(): boolean {
+    return this._isVerified;
+  }
+
+  get isArchived(): boolean {
+    return this._isArchived;
+  }
+
+  get preferredLanguage(): string | undefined {
+    return this._preferredLanguage;
+  }
+
+  get easySolved(): number {
+    return this._easySolved;
+  }
+
+  get mediumSolved(): number {
+    return this._mediumSolved;
+  }
+
+  get hardSolved(): number {
+    return this._hardSolved;
+  }
+
+  get totalSubmission(): number {
+    return this._totalSubmission;
+  }
+
+  get streak(): number {
+    return this._streak;
   }
 
 }

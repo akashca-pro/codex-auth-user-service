@@ -1,12 +1,14 @@
 import { AuthProvider } from "../enums/AuthProvider";
 import { UserRole } from "../enums/UserRole";
+import { Email } from "../valueObjects/Email";
 
 /**
  * Interface for BaseUser properties.
  */
-interface BaseUserProps {
+export interface IBaseUserProps {
+  userId : string;
   username: string;
-  email: string;
+  email: Email;
   role: UserRole;
   firstName: string;
   country: string;
@@ -15,6 +17,8 @@ interface BaseUserProps {
   lastName?: string;
   oAuthId?: string;
   password?: string;
+  createdAt : Date;
+  updatedAt : Date;
 }
 
 /**
@@ -23,48 +27,29 @@ interface BaseUserProps {
  * @class
  */
 export abstract class BaseUser {
-  public readonly username: string;
-  public readonly email: string;
-  public readonly role: UserRole;
-  public readonly firstName: string;
-  public readonly country: string;
-  public readonly authProvider: AuthProvider;
-  public readonly avatar?: string;
-  public readonly lastName?: string;
-  public readonly oAuthId?: string;
-  public readonly password?: string;
-
-  constructor(props: BaseUserProps) {
-    const {
-      username,
-      email,
-      role,
-      firstName,
-      country,
-      authProvider,
-      avatar,
-      lastName,
-      oAuthId,
-      password,
-    } = props;
-
-    if (authProvider === AuthProvider.LOCAL && !password) {
+  
+  constructor(
+    protected readonly userId : string,
+    protected readonly username: string,
+    protected readonly email: Email,
+    protected readonly role: UserRole,
+    protected readonly firstName: string,
+    protected readonly country: string,
+    protected readonly authProvider: AuthProvider,
+    protected readonly createdAt : Date,
+    protected readonly updatedAt : Date,
+    protected readonly avatar?: string,
+    protected readonly lastName?: string,
+    protected readonly oAuthId?: string,
+    protected readonly password?: string
+  ) {
+    if (this.authProvider === AuthProvider.LOCAL && !this.password) {
       throw new Error("Password is required for Local auth provider");
     }
 
-    if (authProvider !== AuthProvider.LOCAL && !oAuthId) {
-      throw new Error(`oAuthId is required for ${authProvider} providers`);
+    if (this.authProvider !== AuthProvider.LOCAL && !this.oAuthId) {
+      throw new Error(`oAuthId is required for ${this.authProvider} providers`);
     }
-
-    this.username = username;
-    this.email = email;
-    this.role = role;
-    this.firstName = firstName;
-    this.country = country;
-    this.authProvider = authProvider;
-    this.avatar = avatar;
-    this.lastName = lastName;
-    this.oAuthId = oAuthId;
-    this.password = password;
   }
+
 }
