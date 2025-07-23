@@ -4,13 +4,13 @@
  * @interface
  */
 export interface PublicUserDTO {
-  username: string
-  avatar?: string
-  country: string
-  preferredLanguage?: string
-  easySolved: number
-  mediumSolved: number
-  hardSolved: number
-  totalSubmission: number
-  streak: number
+  username: string;
+  avatar?: string;
+  country: string;
+  preferredLanguage?: string;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  totalSubmission: number;
+  streak: number;
 }

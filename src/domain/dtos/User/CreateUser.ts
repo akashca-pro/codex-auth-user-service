@@ -6,12 +6,12 @@ import { UserAuthentication } from "@/domain/valueObjects/UserAuthentication"
  * @interface
  */
 export interface ICreateUserRequestDTO {
-    username : string
-    email : string
-    firstName : string
-    lastName? : string
-    country : string
-    authentication : UserAuthentication
-    avatar? : string    
+    username : string;
+    email : string;
+    firstName : string;
+    lastName? : string;
+    country : string;
+    authentication : UserAuthentication;
+    avatar? : string;    
 }
 

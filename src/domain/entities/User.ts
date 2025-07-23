@@ -2,7 +2,7 @@ import { ICreateUserRequestDTO } from '../dtos/User/CreateUser';
 import { IUpdateUserRequestDTO } from '../dtos/User/UpdateUser';
 import { UserRole } from '../enums/UserRole';
 import { Email } from '../valueObjects/Email';
-import { UserAuthentication } from '../valueObjects/UserAuthentication';
+import { LocalAuthentication, UserAuthentication } from '../valueObjects/UserAuthentication';
 import { BaseUser } from './BaseUser'
 import { IBaseUserProps } from './BaseUser'
 /**

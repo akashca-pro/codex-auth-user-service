@@ -1,5 +1,5 @@
 import { EmailErrorType } from "../enums/email/ErrorType";
-
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 /**
  * Type representing the properties needed to create an Email instance
  * 
@@ -37,10 +37,9 @@ export class Email {
     constructor(props : EmailProps){
         if(
             props.address === null ||
-            !props.address.match(
-              /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-            )
+            !EMAIL_REGEX.test(props.address)
         ) {
+
             throw new Error(EmailErrorType.InvalidEmail);
         }
         this._address = props.address;

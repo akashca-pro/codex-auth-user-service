@@ -8,13 +8,13 @@ import { UserAuthentication } from "@/domain/valueObjects/UserAuthentication"
  */
 export interface IUpdateUserRequestDTO {
 
-    username? : string
-    email? : string
-    firstName? : string
-    lastName? : string
-    password? : string
-    country? : string
-    avatar? : string
-    authentication : UserAuthentication,
-    updatedAt : Date
+    username? : string;
+    email? : string;
+    firstName? : string;
+    lastName? : string;
+    password? : string;
+    country? : string;
+    avatar? : string;
+    authentication : UserAuthentication;
+    updatedAt : Date;
 }
