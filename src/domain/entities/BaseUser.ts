@@ -1,21 +1,11 @@
-import { AuthProvider } from "../enums/AuthProvider";
 import { UserRole } from "../enums/UserRole";
 import { Email } from "../valueObjects/Email";
+import { UserAuthentication } from "../valueObjects/UserAuthentication";
 
-type LocalAuthUser = {
-  authProvider: AuthProvider.LOCAL;
-  password: string;
-  oAuthId?: never;
-};
-
-type OAuthUser = {
-  authProvider: Exclude<AuthProvider, AuthProvider.LOCAL>;
-  oAuthId: string;
-  password?: never;
-};
-
-// Common fields
-interface CommonUserFields {
+/**
+ * Interface representing the base structure of user
+ */
+export interface IBaseUserProps<T extends UserAuthentication = UserAuthentication>{
   userId: string;
   username: string;
   email: Email;
@@ -24,43 +14,82 @@ interface CommonUserFields {
   country: string;
   createdAt: Date;
   updatedAt: Date;
+  authentication: T;
   avatar?: string;
   lastName?: string;
 }
 
-// Final BaseUserProps type using discriminated union
-export type IBaseUserProps = CommonUserFields & (LocalAuthUser | OAuthUser);
-
-
 /**
- * Class representing the base user details that both entity should have.
- *
- * @class
+ * Abstract class representing the base user details.
  */
-export abstract class BaseUser {
-  
-  constructor(
-    protected readonly userId : string,
-    protected readonly username: string,
-    protected readonly email: Email,
-    protected readonly role: UserRole,
-    protected readonly firstName: string,
-    protected readonly country: string,
-    protected readonly authProvider: AuthProvider,
-    protected readonly createdAt : Date,
-    protected readonly updatedAt : Date,
-    protected readonly avatar?: string,
-    protected readonly lastName?: string,
-    protected readonly oAuthId?: string,
-    protected readonly password?: string
-  ) {
-    if (this.authProvider === AuthProvider.LOCAL && !this.password) {
-      throw new Error("Password is required for Local auth provider");
-    }
+export abstract class BaseUser<T extends UserAuthentication = UserAuthentication> {
+  protected readonly _userId: string;
+  protected readonly _username: string;
+  protected readonly _email: Email;
+  protected readonly _role: UserRole;
+  protected readonly _firstName: string;
+  protected readonly _country: string;
+  protected readonly _createdAt: Date;
+  protected readonly _updatedAt: Date;
+  protected readonly _authentication: T;
+  protected readonly _avatar?: string;
+  protected readonly _lastName?: string;
 
-    if (this.authProvider !== AuthProvider.LOCAL && !this.oAuthId) {
-      throw new Error(`oAuthId is required for ${this.authProvider} providers`);
-    }
+  constructor(props: IBaseUserProps<T>) {
+    this._userId = props.userId;
+    this._username = props.username;
+    this._email = props.email;
+    this._role = props.role;
+    this._firstName = props.firstName;
+    this._country = props.country;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+    this._authentication = props.authentication;
+    this._avatar = props.avatar;
+    this._lastName = props.lastName;
   }
 
+  get userId(): string {
+    return this._userId;
+  }
+
+  get username(): string {
+    return this._username;
+  }
+
+  get email(): Email {
+    return this._email;
+  }
+
+  get role(): UserRole {
+    return this._role;
+  }
+
+  get firstName(): string {
+    return this._firstName;
+  }
+
+  get country(): string {
+    return this._country;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
+  get authentication(): T {
+    return this._authentication;
+  }
+
+  get avatar(): string | undefined {
+    return this._avatar;
+  }
+
+  get lastName(): string | undefined {
+    return this._lastName;
+  }
 }

@@ -1,32 +1,32 @@
+import { ICreateUserRequestDTO } from '../dtos/User/CreateUser';
+import { IUpdateUserRequestDTO } from '../dtos/User/UpdateUser';
+import { UserRole } from '../enums/UserRole';
+import { Email } from '../valueObjects/Email';
+import { UserAuthentication } from '../valueObjects/UserAuthentication';
 import { BaseUser } from './BaseUser'
 import { IBaseUserProps } from './BaseUser'
-
 /**
- * Type represents the type of the Regular user
- * It includes IBaseUserProps props and adds specific properties for a RegularUser.
+ * Interface represents the additional props of a Regular user
+ * It includes IBaseUserProps props.
  * 
  * @interface
  */
-export type IRegularUserProps = IBaseUserProps & {
-    isVerified: boolean;
-    isArchived: boolean;
-    preferredLanguage?: string;
-    easySolved: number;
-    mediumSolved: number;
-    hardSolved: number;
-    totalSubmission: number;
-    streak: number;
+export interface IRegularUserProps <T extends UserAuthentication> extends IBaseUserProps<T>  {
+  isArchived: boolean;
+  preferredLanguage?: string;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  totalSubmission: number;
+  streak: number;
 }
 
 /**
  * Class representing a regular user, extending BaseUser and providing full user details.
  * 
  * @class
- * @param {IRegularUserProps}
- * @returns {RegularUserEntity}
  */
-export class RegularUserEntity extends BaseUser { 
-  private readonly _isVerified: boolean;
+export class RegularUserEntity <T extends UserAuthentication> extends BaseUser <T> { 
   private readonly _isArchived: boolean;
   private readonly _preferredLanguage?: string;
   private readonly _easySolved: number;
@@ -35,41 +35,73 @@ export class RegularUserEntity extends BaseUser {
   private readonly _totalSubmission: number;
   private readonly _streak: number;
 
+  /**
+   * Create a user instance based on the provided data
+   * 
+   * @param {IRegularUserProps} data - The provided data to create instance of a user
+   * @returns {RegularUserEntity}
+   */
+  static create<T extends UserAuthentication>(
+    data : ICreateUserRequestDTO & {authentication : T}) : RegularUserEntity<T> {
 
-  constructor(props: IRegularUserProps) {
-    // Pass properties belonging to BaseUser directly to the super constructor
-    super(
-      props.userId,
-      props.username,
-      props.email,
-      props.role,
-      props.firstName,
-      props.country,
-      props.authProvider,
-      props.createdAt,
-      props.updatedAt,
-      props.avatar,
-      props.lastName,
-      props.oAuthId,
-      props.password,
-    );
+    const now = new Date();
+    const uuid = crypto.randomUUID()
 
-    // Assign properties specific to RegularUserEntity
-    this._isVerified = props.isVerified ?? false;
-    this._isArchived = props.isArchived ?? false;
+  return new RegularUserEntity({
+    userId: uuid,
+    username: data.username,
+    email: new Email({ address: data.email }),
+    firstName: data.firstName,
+    lastName: data.lastName,
+    avatar: data.avatar,
+    country: data.country,
+    authentication: data.authentication,
+    role: UserRole.USER,
+    createdAt: now,
+    updatedAt: now,
+
+    // Default values specific to regular users
+    isArchived: false,
+    preferredLanguage: 'js',
+    easySolved: 0,
+    mediumSolved: 0,
+    hardSolved: 0,
+    totalSubmission: 0,
+    streak: 0
+  });
+  }
+  
+  /**
+   * Updates the user data instance with provided data
+   * 
+   * @param {IUpdateUserRequestDTO} updatedData - The data to be updated
+   * @returns {IUpdateUserRequestDTO} - The updated data
+   */
+  static update(updatedData : IUpdateUserRequestDTO) : IUpdateUserRequestDTO {
+    if(updatedData.email){
+        updatedData.email = new Email({ address : updatedData.email }).address;
+    }
+    updatedData.updatedAt = new Date();
+    return updatedData
+  }
+
+  /**
+   * @constructor
+   * @param {IRegularUserProps} props 
+   */
+  private constructor(props: IRegularUserProps<T>) {
+    super(props);
+
+    this._isArchived = props.isArchived 
     this._preferredLanguage = props.preferredLanguage;
-    this._easySolved = props.easySolved ?? 0;
-    this._mediumSolved = props.mediumSolved ?? 0;
-    this._hardSolved = props.hardSolved ?? 0;
-    this._totalSubmission = props.totalSubmission ?? 0;
-    this._streak = props.streak ?? 0;
+    this._easySolved = props.easySolved 
+    this._mediumSolved = props.mediumSolved 
+    this._hardSolved = props.hardSolved 
+    this._totalSubmission = props.totalSubmission 
+    this._streak = props.streak 
   }
 
   // Getters for RegularUserEntity specific properties
-  get isVerified(): boolean {
-    return this._isVerified;
-  }
-
   get isArchived(): boolean {
     return this._isArchived;
   }
