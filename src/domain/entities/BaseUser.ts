@@ -2,24 +2,35 @@ import { AuthProvider } from "../enums/AuthProvider";
 import { UserRole } from "../enums/UserRole";
 import { Email } from "../valueObjects/Email";
 
-/**
- * Interface for BaseUser properties.
- */
-export interface IBaseUserProps {
-  userId : string;
+type LocalAuthUser = {
+  authProvider: AuthProvider.LOCAL;
+  password: string;
+  oAuthId?: never;
+};
+
+type OAuthUser = {
+  authProvider: Exclude<AuthProvider, AuthProvider.LOCAL>;
+  oAuthId: string;
+  password?: never;
+};
+
+// Common fields
+interface CommonUserFields {
+  userId: string;
   username: string;
   email: Email;
   role: UserRole;
   firstName: string;
   country: string;
-  authProvider: AuthProvider;
+  createdAt: Date;
+  updatedAt: Date;
   avatar?: string;
   lastName?: string;
-  oAuthId?: string;
-  password?: string;
-  createdAt : Date;
-  updatedAt : Date;
 }
+
+// Final BaseUserProps type using discriminated union
+export type IBaseUserProps = CommonUserFields & (LocalAuthUser | OAuthUser);
+
 
 /**
  * Class representing the base user details that both entity should have.

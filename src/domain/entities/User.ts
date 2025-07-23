@@ -1,12 +1,13 @@
-import { AuthProvider } from '../enums/AuthProvider'
-import { Email } from '../valueObjects/Email'
-import { BaseUser, IBaseUserProps } from './BaseUser'
+import { BaseUser } from './BaseUser'
+import { IBaseUserProps } from './BaseUser'
 
 /**
- * Interface representing the structure of a regular user.
- * It extends IBaseUserProps and adds specific properties for a RegularUser.
+ * Type represents the type of the Regular user
+ * It includes IBaseUserProps props and adds specific properties for a RegularUser.
+ * 
+ * @interface
  */
-export interface IRegularUserProps extends IBaseUserProps {
+export type IRegularUserProps = IBaseUserProps & {
     isVerified: boolean;
     isArchived: boolean;
     preferredLanguage?: string;
@@ -19,6 +20,10 @@ export interface IRegularUserProps extends IBaseUserProps {
 
 /**
  * Class representing a regular user, extending BaseUser and providing full user details.
+ * 
+ * @class
+ * @param {IRegularUserProps}
+ * @returns {RegularUserEntity}
  */
 export class RegularUserEntity extends BaseUser { 
   private readonly _isVerified: boolean;
@@ -29,8 +34,6 @@ export class RegularUserEntity extends BaseUser {
   private readonly _hardSolved: number;
   private readonly _totalSubmission: number;
   private readonly _streak: number;
-  private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
 
 
   constructor(props: IRegularUserProps) {
