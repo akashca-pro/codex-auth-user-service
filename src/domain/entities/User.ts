@@ -43,12 +43,11 @@ export class RegularUserEntity <T extends UserAuthentication> extends BaseUser <
    */
   static create<T extends UserAuthentication>(
     data : ICreateUserRequestDTO & {authentication : T}) : RegularUserEntity<T> {
-
+    const id = crypto.randomUUID();
     const now = new Date();
-    const uuid = crypto.randomUUID()
 
   return new RegularUserEntity({
-    userId: uuid,
+    userId: id,
     username: data.username,
     email: new Email({ address: data.email }),
     firstName: data.firstName,
@@ -81,7 +80,6 @@ export class RegularUserEntity <T extends UserAuthentication> extends BaseUser <
     if(updatedData.email){
         updatedData.email = new Email({ address : updatedData.email }).address;
     }
-    updatedData.updatedAt = new Date();
     return updatedData
   }
 
