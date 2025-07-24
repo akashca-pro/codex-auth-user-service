@@ -9,6 +9,7 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { OtpType } from "@/domain/enums/OtpType";
 import { IAuthenticateLocalAuthUserUseCase } from "../AuthenticateLocalAuthUser";
+import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
 
 /**
  * Use case for authenticating a user.

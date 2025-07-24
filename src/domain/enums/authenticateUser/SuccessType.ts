@@ -2,7 +2,7 @@
  * Enum representing success types related to user authentication.
  * 
  */
-enum AuthSuccessType {
+export enum AuthSuccessType {
 
     /**
      * Message indicating otp sent to the user's email for verification.
