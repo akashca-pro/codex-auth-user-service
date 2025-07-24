@@ -2,7 +2,6 @@ import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { ICreateUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
-import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Interface for the repository handling user data.
