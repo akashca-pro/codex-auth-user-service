@@ -144,7 +144,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
     }
   }
 
-  constructor(props: IUserProps<T>) {
+  private constructor(props: IUserProps<T>) {
     this._userId = props.userId;
     this._username = props.username;
     this._email = props.email;
