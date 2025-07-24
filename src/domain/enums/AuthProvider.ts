@@ -4,6 +4,13 @@
  * @enum
  */
 export enum AuthProvider {
+  /**
+   * Representing Google oAuth user
+   */
   GOOGLE = 'GOOGLE',
+
+  /**
+   * Representing Local auth user
+   */
   LOCAL = 'LOCAL',
 }

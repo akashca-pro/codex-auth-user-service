@@ -15,6 +15,5 @@ export interface IUpdateUserRequestDTO {
     password? : string;
     country? : string;
     avatar? : string;
-    authentication : UserAuthentication;
     updatedAt : Date;
 }

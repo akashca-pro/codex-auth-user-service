@@ -15,6 +15,12 @@ export default [
         project: './tsconfig.json',
         sourceType: 'module',
       },
+      env: {
+        node: true, 
+      },
+      globals: {
+        console: true, 
+      },
     },
     plugins: {
       '@typescript-eslint': tseslint,
@@ -22,8 +28,11 @@ export default [
       'unused-imports': unusedImportsPlugin,
     },
     rules: {
-      'prettier/prettier': 'warn',
+      'prettier/prettier': ['warn', {
+        singleQuote: true,
+      }],
       'unused-imports/no-unused-imports': 'warn',
+      'no-console': 'off', 
     },
   },
 ];

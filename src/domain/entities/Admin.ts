@@ -1,3 +1,4 @@
+import { IUpdateUserRequestDTO } from "../dtos/User/UpdateUser";
 import { UserAuthentication } from "../valueObjects/UserAuthentication";
 import { BaseUser } from "./BaseUser";
 import { IBaseUserProps } from './BaseUser'
@@ -20,6 +21,14 @@ export class AdminUserEntity<T extends UserAuthentication > extends BaseUser<T> 
 
     return new AdminUserEntity(data);
   }
+
+//   /**
+//    * 
+//    * @param {IUpdateUserRequestDTO} data - The data to update a user
+//    */
+//   static update(data : IUpdateUserRequestDTO) : IUpdateUserRequestDTO {
+
+//   }
 
   private constructor(props: IBaseUserProps<T>) {
     super(props);

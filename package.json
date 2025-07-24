@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-"scripts": {
-  "lint": "eslint .",
-  "lint:fix": "eslint . --fix",
-  "format": "prettier --write './src/**/*.{ts,tsx,js,json,md}'",
-  "test": "jest"
-},
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write './src/**/*.{ts,tsx,js,json,md}'",
+    "test": "jest",
+    "dev": "ts-node-esm src/index.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
