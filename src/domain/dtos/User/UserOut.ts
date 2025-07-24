@@ -12,15 +12,15 @@ export interface IUserOutRequestDTO {
     role : UserRole;
     email : string;
     firstName : string;
-    lastName? : string;
-    avatar? : string;
+    lastName : string | null;
+    avatar : string | null;
     country : string;
-    preferredLanguage? : string;
-    easySolved?: number;
-    mediumSolved?: number;
-    hardSolved?: number;
-    totalSubmission?: number;
-    streak?: number;
+    preferredLanguage : string | null;
+    easySolved: number | null;
+    mediumSolved: number | null;
+    hardSolved: number | null;
+    totalSubmission: number | null;
+    streak: number | null;
     createdAt : Date;
     updatedAt : Date;
 }

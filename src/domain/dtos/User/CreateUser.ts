@@ -9,8 +9,8 @@ export interface ICreateUserRequestDTO {
   username: string;
   email: string;
   firstName: string;
-  lastName?: string;
-  avatar?: string;
+  lastName : string | null;
+  avatar : string | null;
   country: string;
   authentication: UserAuthentication;
 };

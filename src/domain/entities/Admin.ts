@@ -17,15 +17,15 @@ export interface IAdminUserOutDTO {
   userId: string;
   username: string;
   firstName: string;
-  lastName?: string;
-  avatar?: string;
+  lastName: string | null;
+  avatar : string | null;
   email: string;
   country: string;
   role: UserRole;
   authProvider: AuthProvider;
   isVerified: boolean;
-  password?: string;     
-  oAuthId?: string;       
+  password : string | null;     
+  oAuthId : string | null;       
   createdAt: Date;
   updatedAt: Date;
 }
@@ -92,8 +92,8 @@ export class AdminUserEntity<T extends UserAuthentication > extends BaseUser<T> 
       role : this.role,
       isVerified : auth.isVerified,
       authProvider : auth.authProvider,
-      password : auth instanceof LocalAuthentication ? auth.password : undefined,
-      oAuthId : auth instanceof OAuthAuthentication ? auth.oAuthId : undefined,
+      password : auth instanceof LocalAuthentication ? auth.password : null,
+      oAuthId : auth instanceof OAuthAuthentication ? auth.oAuthId : null,
       createdAt : this.createdAt,
       updatedAt : this.updatedAt
     }

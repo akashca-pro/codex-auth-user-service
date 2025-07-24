@@ -13,7 +13,7 @@ import { IBaseUserProps } from './BaseUser'
  */
 export interface IRegularUserProps <T extends UserAuthentication> extends IBaseUserProps<T>  {
   isArchived: boolean;
-  preferredLanguage?: string;
+  preferredLanguage : string | null;
   easySolved: number;
   mediumSolved: number;
   hardSolved: number;
@@ -28,7 +28,7 @@ export interface IRegularUserProps <T extends UserAuthentication> extends IBaseU
  */
 export class RegularUserEntity <T extends UserAuthentication> extends BaseUser <T> { 
   private readonly _isArchived: boolean;
-  private readonly _preferredLanguage?: string;
+  private readonly _preferredLanguage : string | null;
   private readonly _easySolved: number;
   private readonly _mediumSolved: number;
   private readonly _hardSolved: number;
@@ -104,11 +104,11 @@ export class RegularUserEntity <T extends UserAuthentication> extends BaseUser <
     return this._isArchived;
   }
 
-  get preferredLanguage(): string | undefined {
+  get preferredLanguage(): string | null {
     return this._preferredLanguage;
   }
 
-  get easySolved(): number {
+  get easySolved(): number  {
     return this._easySolved;
   }
 

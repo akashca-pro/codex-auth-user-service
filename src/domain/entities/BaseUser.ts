@@ -7,16 +7,16 @@ import { UserAuthentication } from "../valueObjects/UserAuthentication";
  */
 export interface IBaseUserProps<T extends UserAuthentication = UserAuthentication>{
   userId: string;
+  role: UserRole;
   username: string;
   email: Email;
-  role: UserRole;
+  authentication: T;
   firstName: string;
+  lastName: string | null;
   country: string;
+  avatar : string | null;
   createdAt: Date;
   updatedAt: Date;
-  authentication: T;
-  avatar?: string;
-  lastName?: string;
 }
 
 /**
@@ -32,8 +32,8 @@ export abstract class BaseUser<T extends UserAuthentication = UserAuthentication
   protected readonly _createdAt: Date;
   protected readonly _updatedAt: Date;
   protected readonly _authentication: T;
-  protected readonly _avatar?: string;
-  protected readonly _lastName?: string;
+  protected readonly _avatar: string | null;
+  protected readonly _lastName: string | null;
 
   constructor(props: IBaseUserProps<T>) {
     this._userId = props.userId;
@@ -85,11 +85,11 @@ export abstract class BaseUser<T extends UserAuthentication = UserAuthentication
     return this._authentication;
   }
 
-  get avatar(): string | undefined {
+  get avatar(): string | null {
     return this._avatar;
   }
 
-  get lastName(): string | undefined {
+  get lastName(): string | null {
     return this._lastName;
   }
 }

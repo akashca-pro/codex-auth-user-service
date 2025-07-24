@@ -4,9 +4,9 @@
  * @enum
  */
 export enum UserRole {
-/**
- * Role indicating a regular user
- */
+  /**
+   * Role indicating a regular user
+   */
   USER = 'USER',
 
   /**
