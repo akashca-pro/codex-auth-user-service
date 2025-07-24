@@ -6,7 +6,7 @@ import { UserRole } from "@/domain/enums/UserRole";
  * 
  * @interface
  */
-export interface IRegularUserInRequestDTO {
+export interface IUserInRequestDTO {
     userId : string;
     role : UserRole;
     email : string;

@@ -9,16 +9,16 @@ export interface ITokenService {
     /**
      * Generate a new access token.
      * 
-     * @param {object} payload 
-     * @returns {string}
+     * @param {object} payload - The payload should contain user's identity.
+     * @returns {string} - The generated access token.
      */
     generateAccessToken(payload : object) : string;
 
     /**
      * Generate a new refresh token.
      * 
-     * @param {string} payload 
-     * @return {string}
+     * @param {string} payload - The payload should contain user's identities.
+     * @return {string} - The generated refresh token.
      */
     generateRefreshToken(payload : object) : string;
 }

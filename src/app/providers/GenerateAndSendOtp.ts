@@ -9,29 +9,32 @@ import { OtpType } from "@/domain/enums/OtpType"
 export interface IOtpService {
 
     /**
-     * Generate and send otp for specific requirement to the user
+     * Generate and send otp for specific requirement to the user.
      * 
-     * @param {string} email 
-     * @param {OtpType} type 
+     * @async
+     * @param {string} email - The email of the requesting user.
+     * @param {OtpType} type - The type of the otp based on request.
      * @returns {Promise<void>}
      */
     generateAndSendOtp(email : string, type : OtpType) : Promise<void>
 
     /**
-     * Verify Otp that sent to the user based on the type
+     * Verify Otp that sent to the user based on the type.
      * 
-     * @param {string} email 
-     * @param {OtpType} type 
-     * @param {string} otp
+     * @async
+     * @param {string} email - The email of the requesting user.
+     * @param {OtpType} type - The type of the otp based on request.
+     * @param {string} otp - The otp which sent to the user via email.
      * @returns {Promise<boolean>}
      */
     verifyOtp(email : string, type : OtpType, otp : string) : Promise<boolean>
 
     /**
-     * Clear otp the sent to the user
+     * Clear otp the sent to the user.
      * 
-     * @param {string} email 
-     * @param {string} type 
+     * @async
+     * @param {string} email - The email of the requesting user.
+     * @param {OtpType} type - The type of the otp based on request.
      * @return {Promise<void>}
      */
     clearOtp(email : string, type : OtpType) : Promise<void> 

@@ -7,19 +7,21 @@
 export interface IPasswordHasher {
 
     /**
-     * Hashes the provided password
+     * Hashes the provided password.
      * 
-     * @param {string} password 
-     * @returns {Promise<string>}
+     * @async
+     * @param {string} password - The password to be hashed.
+     * @returns {Promise<string>} - The hashed password.
      */
     hashPassword(password : string) : Promise<string>;
 
     /**
-     * Compares provided password with hashed password
+     * Compares provided password with hashed password.
      * 
-     * @param {string} password 
-     * @param {string} hashedPassword 
-     * @return {Promise<boolean>}
+     * @async
+     * @param {string} password - The password to be compared.
+     * @param {string} hashedPassword - The hashed password.
+     * @return {Promise<boolean>} - A boolean indicating whether the password matches.
      */
     comparePasswords(password : string, hashedPassword : string) : Promise<boolean>;
 }
