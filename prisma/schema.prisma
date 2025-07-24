@@ -31,9 +31,9 @@ model User {
   lastName          String?
   avatar            String?
   email             String   @unique
-  provider          AuthProvider
+  authProvider      AuthProvider
   password          String?
-  googleId          String?  @unique
+  oAuthId           String?  @unique
   country           String   
   isVerified        Boolean  @default(false)
   isArchived        Boolean  @default(false)

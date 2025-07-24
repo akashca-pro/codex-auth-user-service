@@ -1,26 +1,19 @@
 import { AuthProvider } from "@/domain/enums/AuthProvider";
-import { UserRole } from "@/domain/enums/UserRole";
 
 /**
- * Data Transfer Object (DTO) representing the input user data.
+ * The Data Transfer Object (DTO) representing the output user data
  * 
  * @interface
  */
-export interface IRegularUserInRequestDTO {
+export interface IUserOutRequestDTO {
     userId : string;
-    role : UserRole;
-    email : string;
     username : string;
+    email : string;
     firstName : string;
     lastName? : string;
     avatar? : string;
-    authProvider : AuthProvider;
-    password? : string;
-    oAuthId? : string;
     country : string;
-    isVerified : boolean;
-    isArchived : boolean;
-    preferredLanguage?: string;
+    preferredLanguage? : string;
     easySolved?: number;
     mediumSolved?: number;
     hardSolved?: number;

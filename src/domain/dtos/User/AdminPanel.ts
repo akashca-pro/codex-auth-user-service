@@ -11,8 +11,8 @@ export interface IAdminUserDTO {
   username: string;
   email: string;
   isVerified: boolean;
-  provider: AuthProvider;
-  googleId?: string;
+  authProvider: AuthProvider;
+  oAuthId?: string;
   isArchived: boolean;
   role: UserRole;
   country: string;
