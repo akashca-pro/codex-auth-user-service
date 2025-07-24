@@ -26,15 +26,16 @@ enum AuthProvider {
 
 model User {
   id                String   @id @default(uuid())
+  role              UserRole @default(USER)
   username          String   @unique
+  email             String   @unique
   firstName         String
   lastName          String?
   avatar            String?
-  email             String   @unique
+  country           String   
   authProvider      AuthProvider
   password          String?
   oAuthId           String?  @unique
-  country           String   
   isVerified        Boolean  @default(false)
   isArchived        Boolean  @default(false)
   preferredLanguage String?
@@ -43,7 +44,6 @@ model User {
   hardSolved        Int?
   totalSubmission   Int?
   streak            Int?
-  role              UserRole @default(USER)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

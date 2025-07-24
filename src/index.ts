@@ -1,14 +1,30 @@
-import { AdminUserEntity } from "./domain/entities/Admin";
-import { LocalAuthentication } from "./domain/valueObjects/UserAuthentication";
+import { User } from "./domain/entities/User";
+import { AuthProvider } from "./domain/enums/AuthProvider";
+import { UserRole } from "./domain/enums/UserRole";
+import { LocalAuthentication, OAuthAuthentication } from "./domain/valueObjects/UserAuthentication";
 
-const admin = AdminUserEntity.create({
-    username : 'coder',
-     firstName : 'akash',
-     lastName : 'ca',
-     country : "ind",
-     email : "akashanil@gmail.com",
-     authentication : new LocalAuthentication('Akashanil'),
-     avatar : 'picture'
+const user = User.create({
+   role : UserRole.USER,
+   username : 'coder',
+   email : 'akash12@gmail.com',
+   authentication : new LocalAuthentication('password'),
+   avatar : 'picture',
+   firstName : 'aka',
+   lastName : 'ca',
+   country : 'india'
 })
 
-console.log(admin);
+
+const admin = User.create({
+    role : UserRole.ADMIN,
+    username : 'owner',
+    email : 'admin@gmail.com',
+    authentication : new OAuthAuthentication(AuthProvider.GOOGLE,'asdfds'),
+    avatar : 'photo',
+    country : 'india',
+    firstName : 'admin',
+    lastName : '123',
+})
+
+console.log('user',user);
+console.log('admin',admin);
