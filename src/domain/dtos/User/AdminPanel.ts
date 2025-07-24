@@ -6,7 +6,7 @@ import { UserRole } from '../../enums/UserRole'
  *
  * @interface
  */
-export interface AdminUserDTO {
+export interface IAdminUserDTO {
   userId: string;
   username: string;
   email: string;
