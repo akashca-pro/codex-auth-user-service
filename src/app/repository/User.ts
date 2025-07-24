@@ -25,20 +25,27 @@ export interface IUserRepository {
      * 
      * @async
      * @param {string} email - The email address of the user.
-     * @param {UserRole} role - The role of the user.
      * @returns {Promse<IUserOutRequestDTO | unknown>} - The found user data or undefined if not.
      */
-    findByEmail(email : string, role : UserRole) : Promise<IUserOutRequestDTO | unknown>;
+    findByEmail(email : string) : Promise<IUserOutRequestDTO | unknown>;
 
     /**
      * Find a user by their userId and role.
      * 
      * @async
      * @param {string} userId - The id of the user.
-     * @param {UserRole} role - The role of the user.
      * @returns { Promise<IUserOutRequestDTO | unknown> } - The found user data or undefined if not.
      */
-    findById(userId : string, role  : UserRole) : Promise<IUserOutRequestDTO | unknown>;
+    findById(userId : string) : Promise<IUserOutRequestDTO | unknown>;
+
+    /**
+     * Find a user by their userId and role.
+     * 
+     * @async
+     * @param {string} username - The username of the user.
+     * @returns { Promise<IUserOutRequestDTO | unknown> } - The found user data or undefined if not.
+     */
+    findByUsername(username : string) : Promise<IUserOutRequestDTO | unknown>;
 
     /**
      * Retrieves a paginated list of all users.
