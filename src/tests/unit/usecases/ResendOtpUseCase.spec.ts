@@ -68,14 +68,14 @@ describe("ResendOtpUseCase", () => {
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(email);
   });
 
-it("should return error if user is already verified", async () => {
-  mockUserRepository.findByEmail.mockResolvedValue(mockUser);
+    it("should return error if user is already verified", async () => {
+    mockUserRepository.findByEmail.mockResolvedValue(mockUser);
 
-  const response = await resendOtpUseCase.execute(email);
+    const response = await resendOtpUseCase.execute(email);
 
-  expect(response.success).toBe(false);
-  expect(response.data.message).toBe(UserErrorType.AlreadyVerified);
-});
+    expect(response.success).toBe(false);
+    expect(response.data.message).toBe(UserErrorType.AlreadyVerified);
+    });
 
   it("should resend OTP successfully for unverified user", async () => {
     mockUserRepository.findByEmail.mockResolvedValue({
