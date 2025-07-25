@@ -36,6 +36,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
     ){}
 
     /**
+     * Executes the VerifySignupOtp use case.
      * 
      * @param  {IVerifySignUpOtp} credentials - The user credentials for veriying otp
      * @returns {ResponseDTO} - The response data.
@@ -45,7 +46,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
             const user = await this.userRepository.findByEmail(email) 
             
             if(!user){
-                return {data : { message : AuthenticateUserErrorType.AccountNotFount }, success : false}
+                return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
             }
 
             const isOtpVerified = await this.otpService.verifyOtp(email,OtpType.SIGNUP,otp);

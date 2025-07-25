@@ -13,4 +13,9 @@ export enum UserSuccessType {
    * Success type indicating that the user verified account and sign up successfully
    */
   SignupSuccess = 'Sign up success',
+
+  /**
+   * Success type indicating that otp is sent to the user's email address
+   */
+  OtpSendSuccess = 'Otp sent to the registered email address'
 }

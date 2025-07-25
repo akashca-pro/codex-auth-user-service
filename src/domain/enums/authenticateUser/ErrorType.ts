@@ -8,7 +8,7 @@ export enum AuthenticateUserErrorType {
   /**
    * Error type indicating that the user account not found.
    */
-  AccountNotFount = 'Account not found',
+  AccountNotFound = 'Account not found',
 
   /**
    * Error type indicating that the provided email or password is incorrect.
