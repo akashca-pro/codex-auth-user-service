@@ -31,8 +31,8 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
      * Executes the ResendOtpUseCase use case.
      * 
      * @async
-     * @param {string} email - Email of the user
-     * @returns {Promise<ResponseDTO>}
+     * @param {string} email - Email of the user.
+     * @returns {Promise<ResponseDTO>} - The response data.
      */
     async execute(email: string): Promise<ResponseDTO> {
         try {
