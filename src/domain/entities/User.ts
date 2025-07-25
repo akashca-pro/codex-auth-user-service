@@ -54,6 +54,8 @@ export class User<T extends UserAuthentication = UserAuthentication> {
   private _totalSubmission: number | null;
   private _streak: number | null;
 
+  private _updatedFields : Partial<IUpdateUserRequestDTO> = {}
+
   
   /**
    * Create a user instance based on the provided data
@@ -97,106 +99,115 @@ export class User<T extends UserAuthentication = UserAuthentication> {
   }
 
   /**
-   * Serialize the user data to use in repository.
-   * 
-   * @returns {IUserInRequestDTO}
-   */
-  toObject() : IUserInRequestDTO {
-    const auth = this.authentication;
-    return {
-      userId : this.userId,
-      role : this.role,
-      username : this.username,
-      email : this.email.address,
-      firstName : this.firstName,
-      lastName : this.lastName,
-      avatar : this.avatar,
-      country : this.country,
-      authProvider : auth.authProvider,
-      password : auth instanceof LocalAuthentication ? auth.password : null,
-      oAuthId : auth instanceof OAuthAuthentication ? auth.oAuthId : null,
-      isVerified : auth.isVerified,
-      isArchived: false,
-      preferredLanguage: this.preferredLanguage,
-      easySolved : this.easySolved,
-      mediumSolved: this.mediumSolved,
-      hardSolved: this.hardSolved,
-      totalSubmission: this.totalSubmission,
-      streak: this.streak,
-      createdAt : this.createdAt,
-      updatedAt : this.updatedAt
-    }
-  }
-
-  /**
    * Updates the user instance with provided data.
    * 
    * @param {IUpdateUserRequestDTO} updatedData - The data to update a user.
    */ 
-  update(
-    updatedData : IUpdateUserRequestDTO,
-  ){
-    const isAdmin = this._role === UserRole.ADMIN;
+update(updatedData: IUpdateUserRequestDTO) {
+  const isAdmin = this._role === UserRole.ADMIN;
 
-    if (updatedData.username) {
-      this._username = updatedData.username;
-    }
-
-    if (updatedData.firstName) {
-      this._firstName = updatedData.firstName;
-    }
-
-    if (updatedData.lastName !== undefined) {
-      this._lastName = updatedData.lastName;
-    }
-
-    if (updatedData.avatar !== undefined) {
-      this._avatar = updatedData.avatar;
-    }
-
-    if (updatedData.country) {
-      this._country = updatedData.country;
-    }
-
-    if (updatedData.preferredLanguage !== undefined && !isAdmin) {
-      this._preferredLanguage = updatedData.preferredLanguage;
-    }
-
-    if (updatedData.easySolved !== undefined && !isAdmin) {
-      this._easySolved = updatedData.easySolved;
-    }
-
-    if (updatedData.mediumSolved !== undefined && !isAdmin) {
-      this._mediumSolved = updatedData.mediumSolved;
-    }
-
-    if (updatedData.hardSolved !== undefined && !isAdmin) {
-      this._hardSolved = updatedData.hardSolved;
-    }
-
-    if (updatedData.totalSubmission !== undefined && !isAdmin) {
-      this._totalSubmission = updatedData.totalSubmission;
-    }
-
-    if (updatedData.streak !== undefined && !isAdmin) {
-      this._streak = updatedData.streak;
-    }
-
-    if (updatedData.isVerified) {
-      this._authentication.markAsVerified();
-    }
-
-    if (updatedData.password) {
-      if (this._authentication instanceof LocalAuthentication) {
-        this._authentication.changePassword(updatedData.password);
-      } else {
-        throw new Error(EntityErrorType.CannotSetPassword);
-      }
-    }
-
-    this._updatedAt = new Date();
-
+  if (
+    updatedData.username &&
+    this.trackUpdate('username', this._username, updatedData.username)
+  ) {
+    this._username = updatedData.username;
   }
+
+  if (
+    updatedData.firstName &&
+    this.trackUpdate('firstName', this._firstName, updatedData.firstName)
+  ) {
+    this._firstName = updatedData.firstName;
+  }
+
+  if (
+    updatedData.lastName !== undefined &&
+    this.trackUpdate('lastName', this._lastName, updatedData.lastName)
+  ) {
+    this._lastName = updatedData.lastName;
+  }
+
+  if (
+    updatedData.avatar !== undefined &&
+    this.trackUpdate('avatar', this._avatar, updatedData.avatar)
+  ) {
+    this._avatar = updatedData.avatar;
+  }
+
+  if (
+    updatedData.country &&
+    this.trackUpdate('country', this._country, updatedData.country)
+  ) {
+    this._country = updatedData.country;
+  }
+
+  // Role-based checks
+  if (
+    !isAdmin &&
+    updatedData.preferredLanguage !== undefined &&
+    this.trackUpdate('preferredLanguage', this._preferredLanguage, updatedData.preferredLanguage)
+  ) {
+    this._preferredLanguage = updatedData.preferredLanguage;
+  }
+
+  if (
+    !isAdmin &&
+    updatedData.easySolved !== undefined &&
+    this.trackUpdate('easySolved', this._easySolved, updatedData.easySolved)
+  ) {
+    this._easySolved = updatedData.easySolved;
+  }
+
+  if (
+    !isAdmin &&
+    updatedData.mediumSolved !== undefined &&
+    this.trackUpdate('mediumSolved', this._mediumSolved, updatedData.mediumSolved)
+  ) {
+    this._mediumSolved = updatedData.mediumSolved;
+  }
+
+  if (
+    !isAdmin &&
+    updatedData.hardSolved !== undefined &&
+    this.trackUpdate('hardSolved', this._hardSolved, updatedData.hardSolved)
+  ) {
+    this._hardSolved = updatedData.hardSolved;
+  }
+
+  if (
+    !isAdmin &&
+    updatedData.totalSubmission !== undefined &&
+    this.trackUpdate('totalSubmission', this._totalSubmission, updatedData.totalSubmission)
+  ) {
+    this._totalSubmission = updatedData.totalSubmission;
+  }
+
+  if (
+    !isAdmin &&
+    updatedData.streak !== undefined &&
+    this.trackUpdate('streak', this._streak, updatedData.streak)
+  ) {
+    this._streak = updatedData.streak;
+  }
+
+  // Boolean-style updates or actions
+  if (updatedData.isVerified && !this._authentication.isVerified) {
+    this._authentication.markAsVerified();
+    this._updatedFields.isVerified = true;
+  }
+
+  if (updatedData.password) {
+    if (this._authentication instanceof LocalAuthentication) {
+      this._authentication.changePassword(updatedData.password);
+      this._updatedFields.password = updatedData.password;
+    } else {
+      throw new Error(EntityErrorType.CannotSetPassword);
+    }
+  }
+
+  this._updatedAt = new Date();
+  this._updatedFields.updatedAt = this._updatedAt;
+}
 
   /**
    * Create a new instance of User entity class based on the pre-existing 
@@ -248,6 +259,55 @@ export class User<T extends UserAuthentication = UserAuthentication> {
         streak: isAdmin ? null : data.streak
       });
   }
+
+    /**
+   * Serialize the user data to use in repository.
+   * 
+   * @returns {IUserInRequestDTO}
+   */
+  toObject() : IUserInRequestDTO {
+    const auth = this.authentication;
+    return {
+      userId : this.userId,
+      role : this.role,
+      username : this.username,
+      email : this.email.address,
+      firstName : this.firstName,
+      lastName : this.lastName,
+      avatar : this.avatar,
+      country : this.country,
+      authProvider : auth.authProvider,
+      password : auth instanceof LocalAuthentication ? auth.password : null,
+      oAuthId : auth instanceof OAuthAuthentication ? auth.oAuthId : null,
+      isVerified : auth.isVerified,
+      isArchived: false,
+      preferredLanguage: this.preferredLanguage,
+      easySolved : this.easySolved,
+      mediumSolved: this.mediumSolved,
+      hardSolved: this.hardSolved,
+      totalSubmission: this.totalSubmission,
+      streak: this.streak,
+      createdAt : this.createdAt,
+      updatedAt : this.updatedAt
+    }
+  }
+
+  getUpdatedFields(): Partial<IUpdateUserRequestDTO> {
+  return this._updatedFields;
+  }
+
+  private trackUpdate<K extends keyof IUpdateUserRequestDTO>(
+    key: K,
+    currentValue: IUpdateUserRequestDTO[K],
+    newValue: IUpdateUserRequestDTO[K]
+  ): boolean {
+    if (newValue !== undefined && currentValue !== newValue) {
+      this._updatedFields[key] = newValue;
+      return true;
+    }
+    return false;
+  }
+
 
   private constructor(props: IUserProps<T>) {
     this._userId = props.userId;

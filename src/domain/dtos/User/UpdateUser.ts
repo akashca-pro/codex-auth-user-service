@@ -20,4 +20,5 @@ export interface IUpdateUserRequestDTO {
   hardSolved?: number | null;
   totalSubmission?: number | null;
   streak?: number | null; 
+  updatedAt? : Date;
 }

@@ -8,7 +8,6 @@ import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { User } from "@/domain/entities/User";
-import { UserRole } from "@/domain/enums/UserRole";
 
 
 /**
@@ -40,7 +39,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      */
     async execute({ email, otp }: IVerifySignUpOtp): Promise<ResponseDTO> {
         try {
-            const user = this.userRepository.findByEmail(email) 
+            const user = await this.userRepository.findByEmail(email) 
             
             if(!user){
                 return {data : { message : AuthenticateUserErrorType.AccountNotFount }, success : false}
@@ -52,12 +51,11 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 return {data : {message : AuthenticateUserErrorType.InvalidOrExpiredOtp}, success : false}
             }
 
-            const updatedEntity = User.update({
-                role : UserRole.USER,
-                isVerified : true,
-                updatedAt : new Date(),
-            })
-            
+            const userEntity = User.rehydrate(user);
+            userEntity.update({isVerified : true});
+            await this.userRepository.update(user,userEntity.getUpdatedFields())
+
+       
         } catch (error) {
             return { data : { message : SystemErrorType.InternalServerError } , success : false }
         }

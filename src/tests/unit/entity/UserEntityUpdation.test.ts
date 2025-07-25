@@ -29,7 +29,7 @@ describe('User Entity - update method', () => {
     updatedAt: new Date('2024-01-01')
   };
 
-  it('should update personal fields', () => {
+  it('should update personal fields and track them', () => {
     const user = User.rehydrate(baseDTO);
 
     user.update({
@@ -45,9 +45,18 @@ describe('User Entity - update method', () => {
     expect(user.lastName).toBe('Doee');
     expect(user.country).toBe('USA');
     expect(user.avatar).toBeNull();
+
+    const updated = user.getUpdatedFields();
+    expect(updated).toMatchObject({
+      username: 'johnny',
+      firstName: 'Johnny',
+      lastName: 'Doee',
+      country: 'USA',
+      avatar: null,
+    });
   });
 
-  it('should update metrics for regular users', () => {
+  it('should update metrics for regular users and track them', () => {
     const user = User.rehydrate(baseDTO);
 
     user.update({
@@ -65,6 +74,16 @@ describe('User Entity - update method', () => {
     expect(user.hardSolved).toBe(7);
     expect(user.totalSubmission).toBe(200);
     expect(user.streak).toBe(10);
+
+    const updated = user.getUpdatedFields();
+    expect(updated).toMatchObject({
+      preferredLanguage: 'py',
+      easySolved: 20,
+      mediumSolved: 15,
+      hardSolved: 7,
+      totalSubmission: 200,
+      streak: 10,
+    });
   });
 
   it('should NOT update metrics for admins', () => {
@@ -86,28 +105,40 @@ describe('User Entity - update method', () => {
     expect(admin.hardSolved).toBeNull();
     expect(admin.totalSubmission).toBeNull();
     expect(admin.streak).toBeNull();
+
+    const updated = admin.getUpdatedFields();
+    expect(updated).not.toHaveProperty('preferredLanguage');
+    expect(updated).not.toHaveProperty('easySolved');
+    expect(updated).not.toHaveProperty('mediumSolved');
+    expect(updated).not.toHaveProperty('hardSolved');
+    expect(updated).not.toHaveProperty('totalSubmission');
+    expect(updated).not.toHaveProperty('streak');
   });
 
-  it('should call markAsVerified()', () => {
+  it('should call markAsVerified and track isVerified', () => {
     const user = User.rehydrate(baseDTO);
     const spy = jest.spyOn(user['authentication'], 'markAsVerified');
 
     user.update({ isVerified: true });
 
     expect(spy).toHaveBeenCalled();
+
+    const updated = user.getUpdatedFields();
+    expect(updated.isVerified).toBe(true);
   });
 
-it('should update password for local auth', () => {
-  const user = User.rehydrate(baseDTO);
-  
-  const localAuth = user['authentication'] as LocalAuthentication;
-  const spy = jest.spyOn(localAuth, 'changePassword');
+  it('should update password for local auth and track password', () => {
+    const user = User.rehydrate(baseDTO);
+    const localAuth = user['authentication'] as LocalAuthentication;
+    const spy = jest.spyOn(localAuth, 'changePassword');
 
-  user.update({ password: 'newSecret' });
+    user.update({ password: 'newSecret' });
 
-  expect(spy).toHaveBeenCalledWith('newSecret');
-});
+    expect(spy).toHaveBeenCalledWith('newSecret');
 
+    const updated = user.getUpdatedFields();
+    expect(updated.password).toBe('newSecret');
+  });
 
   it('should throw if updating password on non-local auth', () => {
     const oauthDTO = {
@@ -123,12 +154,16 @@ it('should update password for local auth', () => {
       .toThrow(EntityErrorType.CannotSetPassword);
   });
 
-  it('should update updatedAt timestamp', () => {
+  it('should update updatedAt timestamp and track it', () => {
     const user = User.rehydrate(baseDTO);
     const oldUpdatedAt = user.updatedAt;
 
     user.update({ username: 'newname' });
 
     expect(user.updatedAt.getTime()).toBeGreaterThan(oldUpdatedAt.getTime());
+
+    const updated = user.getUpdatedFields();
+    expect(updated.updatedAt).toBeInstanceOf(Date);
+    expect((updated.updatedAt as Date).getTime()).toBeGreaterThan(oldUpdatedAt.getTime());
   });
 });
