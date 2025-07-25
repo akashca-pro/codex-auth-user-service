@@ -6,6 +6,7 @@ import { UserRole } from "../enums/UserRole";
 import { Email } from "../valueObjects/Email";
 import { LocalAuthentication, OAuthAuthentication, UserAuthentication } from "../valueObjects/UserAuthentication";
 import { EntityErrorType } from "../enums/entity/ErrorType";
+import { UserField } from "../enums/user/UserUpdateFields";
 
 /**
  * Interface representing the base structure of user
@@ -108,35 +109,35 @@ update(updatedData: IUpdateUserRequestDTO) {
 
   if (
     updatedData.username &&
-    this.trackUpdate('username', this._username, updatedData.username)
+    this.trackUpdate(UserField.Username, this._username, updatedData.username)
   ) {
     this._username = updatedData.username;
   }
 
   if (
     updatedData.firstName &&
-    this.trackUpdate('firstName', this._firstName, updatedData.firstName)
+    this.trackUpdate(UserField.FirstName, this._firstName, updatedData.firstName)
   ) {
     this._firstName = updatedData.firstName;
   }
 
   if (
     updatedData.lastName !== undefined &&
-    this.trackUpdate('lastName', this._lastName, updatedData.lastName)
+    this.trackUpdate(UserField.LastName, this._lastName, updatedData.lastName)
   ) {
     this._lastName = updatedData.lastName;
   }
 
   if (
     updatedData.avatar !== undefined &&
-    this.trackUpdate('avatar', this._avatar, updatedData.avatar)
+    this.trackUpdate(UserField.Avatar, this._avatar, updatedData.avatar)
   ) {
     this._avatar = updatedData.avatar;
   }
 
   if (
     updatedData.country &&
-    this.trackUpdate('country', this._country, updatedData.country)
+    this.trackUpdate(UserField.Country, this._country, updatedData.country)
   ) {
     this._country = updatedData.country;
   }
@@ -145,7 +146,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.preferredLanguage !== undefined &&
-    this.trackUpdate('preferredLanguage', this._preferredLanguage, updatedData.preferredLanguage)
+    this.trackUpdate(UserField.PreferredLanguage, this._preferredLanguage, updatedData.preferredLanguage)
   ) {
     this._preferredLanguage = updatedData.preferredLanguage;
   }
@@ -153,7 +154,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.easySolved !== undefined &&
-    this.trackUpdate('easySolved', this._easySolved, updatedData.easySolved)
+    this.trackUpdate(UserField.EasySolved, this._easySolved, updatedData.easySolved)
   ) {
     this._easySolved = updatedData.easySolved;
   }
@@ -161,7 +162,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.mediumSolved !== undefined &&
-    this.trackUpdate('mediumSolved', this._mediumSolved, updatedData.mediumSolved)
+    this.trackUpdate(UserField.MediumSolved, this._mediumSolved, updatedData.mediumSolved)
   ) {
     this._mediumSolved = updatedData.mediumSolved;
   }
@@ -169,7 +170,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.hardSolved !== undefined &&
-    this.trackUpdate('hardSolved', this._hardSolved, updatedData.hardSolved)
+    this.trackUpdate(UserField.HardSolved, this._hardSolved, updatedData.hardSolved)
   ) {
     this._hardSolved = updatedData.hardSolved;
   }
@@ -177,7 +178,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.totalSubmission !== undefined &&
-    this.trackUpdate('totalSubmission', this._totalSubmission, updatedData.totalSubmission)
+    this.trackUpdate(UserField.TotalSubmission, this._totalSubmission, updatedData.totalSubmission)
   ) {
     this._totalSubmission = updatedData.totalSubmission;
   }
@@ -185,12 +186,11 @@ update(updatedData: IUpdateUserRequestDTO) {
   if (
     !isAdmin &&
     updatedData.streak !== undefined &&
-    this.trackUpdate('streak', this._streak, updatedData.streak)
+    this.trackUpdate(UserField.Streak, this._streak, updatedData.streak)
   ) {
     this._streak = updatedData.streak;
   }
 
-  // Boolean-style updates or actions
   if (updatedData.isVerified && !this._authentication.isVerified) {
     this._authentication.markAsVerified();
     this._updatedFields.isVerified = true;

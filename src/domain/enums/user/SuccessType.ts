@@ -8,4 +8,9 @@ export enum UserSuccessType {
    * Success type indicating that the user was deleted successfully.
    */
   UserDeleted = 'User deleted with success!',
+
+  /**
+   * Success type indicating that the user verified account and sign up successfully
+   */
+  SignupSuccess = 'Sign up success',
 }

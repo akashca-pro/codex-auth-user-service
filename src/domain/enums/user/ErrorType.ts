@@ -18,4 +18,14 @@ export enum UserErrorType {
    * Error type indicating that no users were found.
    */
   UserNotFound = 'Users not found',
+
+  /**
+   * Error type indicating that error encountered while issuing access token
+   */
+  AccessTokenIssueError = 'Error issuing access token',
+
+  /**
+   * Error type indicating that error encountered while issuing refresh token.
+   */
+  RefreshTokenIssueError = 'Error issuing refresh token',
 }

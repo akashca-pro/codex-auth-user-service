@@ -8,6 +8,9 @@ import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { User } from "@/domain/entities/User";
+import { UserRole } from "@/generated/prisma";
+import { UserErrorType } from "@/domain/enums/user/ErrorType";
+import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 
 
 /**
@@ -53,8 +56,28 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
 
             const userEntity = User.rehydrate(user);
             userEntity.update({isVerified : true});
-            await this.userRepository.update(user,userEntity.getUpdatedFields())
+            await this.userRepository.update(user,userEntity.getUpdatedFields());
+            await this.otpService.clearOtp(email,OtpType.SIGNUP);
 
+            const payload = {
+                userId : user.userId,
+                email : user.email,
+                role : UserRole.USER
+            }
+
+            const accessToken = this.tokenService.generateAccessToken(payload);
+            const refreshToken = this.tokenService.generateRefreshToken(payload);
+
+            if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
+            if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
+
+            return { 
+                data : { 
+                    accessToken,
+                    refreshToken,
+                    message : UserSuccessType.SignupSuccess },
+                success : true
+            }
        
         } catch (error) {
             return { data : { message : SystemErrorType.InternalServerError } , success : false }
