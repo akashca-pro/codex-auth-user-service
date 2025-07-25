@@ -14,7 +14,7 @@ export abstract class UserAuthentication {
 
   /**
    * @constructor
-   * @param {AuthProvider} authProvider - The authentication provider (LOCAL, GOOGLE, etc.)
+   * @param {AuthProvider} _authProvider - The authentication provider (LOCAL, GOOGLE, etc.)
    */
   protected constructor(protected readonly _authProvider: AuthProvider) {}
 
@@ -94,14 +94,14 @@ export class OAuthAuthentication extends UserAuthentication {
 
   /**
    * @constructor
-   * @param {Exclude<AuthProvider, AuthProvider.LOCAL>} provider - The OAuth provider (e.g., GOOGLE)
+   * @param {Exclude<AuthProvider, AuthProvider.LOCAL>} authProvider - The OAuth provider (e.g., GOOGLE)
    * @param {string} oAuthId - The user's external OAuth ID
    */
   constructor(
-    provider: Exclude<AuthProvider, AuthProvider.LOCAL>,
+    authProvider: Exclude<AuthProvider, AuthProvider.LOCAL>,
     oAuthId: string
   ) {
-    super(provider);
+    super(authProvider);
     this._oAuthId = oAuthId;
   }
 

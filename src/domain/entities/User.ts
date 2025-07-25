@@ -1,5 +1,7 @@
+import { AuthProvider } from "../enums/AuthProvider"; 
 import { ICreateUserOutDTO, ICreateUserRequestDTO } from "../dtos/User/CreateUser";
 import { IUpdateUserRequestDTO } from "../dtos/User/UpdateUser";
+import { IUserInRequestDTO } from "../dtos/User/UserIn";
 import { UserRole } from "../enums/UserRole";
 import { Email } from "../valueObjects/Email";
 import { LocalAuthentication, OAuthAuthentication, UserAuthentication } from "../valueObjects/UserAuthentication";
@@ -122,6 +124,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
 
   /**
    * Updates the user instance with provided data.
+   * Role of the user and UpdatedAt field is required to update.
    * 
    * @param {IUpdateUserRequestDTO} updatedData - The data to update a user.
    * @returns {IUpdateUserRequestDTO} - The updated data of the user
@@ -133,6 +136,8 @@ export class User<T extends UserAuthentication = UserAuthentication> {
       updatedData.email = new Email({address : updatedData.email}).address
     }
 
+    
+
     return {
       ...updatedData,
       preferredLanguage : isAdmin ?  null : updatedData.preferredLanguage,
@@ -142,6 +147,43 @@ export class User<T extends UserAuthentication = UserAuthentication> {
       totalSubmission : isAdmin ?  null : updatedData.totalSubmission,
       streak : isAdmin ?  null : updatedData.streak  
     }
+  }
+
+  static rehydrate <T extends UserAuthentication = UserAuthentication > (
+    data : IUserInRequestDTO & {authentication : T}
+  ) : IUserInRequestDTO {
+
+    const isAdmin = data.role === UserRole.ADMIN;
+
+    const authentication = AuthProvider.LOCAL === data.authProvider
+    ? new LocalAuthentication(data.password as string) 
+    : new OAuthAuthentication(AuthProvider.GOOGLE, data.oAuthId as string)
+
+    const instance = new User({
+        userId: data.userId,
+        username: data.username,
+        email: new Email({ address: data.email }),
+        firstName: data.firstName,
+        lastName: data.lastName,
+        avatar: data.avatar,
+        country: data.country,
+        authentication,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        isArchived: false,
+        
+        // These values are specific based on role
+
+        role: isAdmin ? UserRole.ADMIN : UserRole.USER,
+        preferredLanguage: isAdmin ? null : 'js' ,
+        easySolved: isAdmin ? null : 0,
+        mediumSolved: isAdmin ? null : 0,
+        hardSolved: isAdmin ? null : 0,
+        totalSubmission: isAdmin ? null : 0,
+        streak: isAdmin ? null : 0
+      })
+
+      return instance.toObject();
   }
 
   private constructor(props: IUserProps<T>) {

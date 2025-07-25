@@ -12,6 +12,8 @@ import { ResponseDTO } from "@/domain/dtos/Response";
 export interface IAuthenticateLocalAuthUserUseCase {
 
     /**
+     * executes the authentication usecase.
+     * 
      * @async
      * @param {IAuthenticateLocalAuthUserDTO} credentials - The user credentials for authentication.
      * @returns {Promise<ResponseDTO>} - The response data 

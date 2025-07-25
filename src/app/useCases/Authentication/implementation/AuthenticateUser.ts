@@ -10,6 +10,7 @@ import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { OtpType } from "@/domain/enums/OtpType";
 import { IAuthenticateLocalAuthUserUseCase } from "../AuthenticateLocalAuthUser";
 import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
+import { SystemErrorType } from "@/domain/enums/ErrorType";
 
 /**
  * Use case for authenticating a user.
@@ -42,6 +43,7 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
         password
     } : IAuthenticateLocalAuthUserDTO) : Promise<ResponseDTO> {
 
+        try {
         const user = (await this.userRepository.findByEmail(
             email
         )) as IUserInRequestDTO | null
@@ -91,6 +93,10 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
             data : { accessToken , refreshToken, message : AuthSuccessType.AuthenticationSuccess },
             success : true
          }
+
+        } catch (error) {
+            return { data : { message : SystemErrorType.InternalServerError } , success : false };
+        }
 
     }
 }
