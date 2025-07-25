@@ -22,6 +22,11 @@ export enum UserSuccessType {
   /**
    * Success type indicating that the new token issued based on refreshToken payload.
    */
-  TokenIssued = 'Access token issued'
+  TokenIssued = 'Access token issued',
+
+  /**
+   * Success type indicating that the password has been reset successfully.
+   */
+  PasswordChangedSuccessfully = 'Password updated',
 
 }

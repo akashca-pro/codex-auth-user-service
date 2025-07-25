@@ -260,7 +260,7 @@ update(updatedData: IUpdateUserRequestDTO) {
       });
   }
 
-    /**
+  /**
    * Serialize the user data to use in repository.
    * 
    * @returns {IUserInRequestDTO}
