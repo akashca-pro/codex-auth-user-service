@@ -17,5 +17,11 @@ export enum UserSuccessType {
   /**
    * Success type indicating that otp is sent to the user's email address
    */
-  OtpSendSuccess = 'Otp sent to the registered email address'
+  OtpSendSuccess = 'Otp sent to the registered email address',
+
+  /**
+   * Success type indicating that the new token issued based on refreshToken payload.
+   */
+  TokenIssued = 'Access token issued'
+
 }

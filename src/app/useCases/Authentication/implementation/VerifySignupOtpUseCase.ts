@@ -4,13 +4,13 @@ import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { ITokenService } from "@/app/providers/GenerateTokens";
 import { IVerifySignUpOtp } from "@/domain/dtos/Authenticate/VerifyOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { User } from "@/domain/entities/User";
 import { UserRole } from "@/generated/prisma";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 
 
 /**
@@ -60,7 +60,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
             await this.userRepository.update(user,userEntity.getUpdatedFields());
             await this.otpService.clearOtp(email,OtpType.SIGNUP);
 
-            const payload = {
+            const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
                 email : user.email,
                 role : UserRole.USER

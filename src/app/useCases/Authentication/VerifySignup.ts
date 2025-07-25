@@ -18,6 +18,10 @@ export interface IVerifySignUpOtpUseCase {
      * @async
      * @param {IVerifySignUpOtp} credentials - The user credentials for verification.
      * @returns {Promise<ResponseDTO>} - The response data.
+     * 
+     * @remarks
+     * This method is responsible for handling the logic of verifying the signup otp
+     * based on the provided credentials.
      */
     execute({email, otp} : IVerifySignUpOtp) : Promise<ResponseDTO>;
 }

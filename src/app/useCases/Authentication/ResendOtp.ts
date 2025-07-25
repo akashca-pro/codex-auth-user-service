@@ -16,6 +16,10 @@ export interface IResendOtpUseCase {
      * @async
      * @param {string} email - Email address of the user.
      * @returns {Promise<ResponseDTO>}
+     * 
+     * @remarks
+     * This method is responsible for handling the logic of Resend Otp
+     * based on the user email
      */
     execute(email : string) : Promise<ResponseDTO>
 

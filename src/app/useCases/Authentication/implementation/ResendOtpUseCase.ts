@@ -6,7 +6,6 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
-import { SystemErrorType } from "@/domain/enums/ErrorType";
 
 /**
  * Use case for resend otp.

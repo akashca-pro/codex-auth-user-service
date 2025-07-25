@@ -9,6 +9,7 @@ import { OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
 import { UserRole } from "@/domain/enums/UserRole";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 
 /**
  * Use case for authenticating a user.
@@ -61,7 +62,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
 
             await this.userRepository.create(user);
 
-            const payload = {
+            const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
                 email : user.email,
                 role : user.role

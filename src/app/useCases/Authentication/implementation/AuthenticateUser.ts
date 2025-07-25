@@ -10,7 +10,7 @@ import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { OtpType } from "@/domain/enums/OtpType";
 import { IAuthenticateLocalAuthUserUseCase } from "../AuthenticateLocalAuthUser";
 import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
-import { SystemErrorType } from "@/domain/enums/ErrorType";
+import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 
 /**
  * Use case for authenticating a user.
@@ -83,7 +83,7 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
             }
         }
 
-        const payload = {
+        const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
             role : user.role
