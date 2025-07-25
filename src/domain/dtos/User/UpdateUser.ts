@@ -1,5 +1,3 @@
-import { UserRole } from "@/domain/enums/UserRole";
-
 
 /**
  * Data Transfer Object (DTO) representing the request to update user 
@@ -14,13 +12,12 @@ export interface IUpdateUserRequestDTO {
   avatar? : string | null;
   email?: string;
   country?: string;
-  role: UserRole;
-  isVerified : boolean;
+  password? : string,
+  isVerified? : boolean;
   preferredLanguage? : string | null;
   easySolved?: number | null;
   mediumSolved?: number | null;
   hardSolved?: number | null;
   totalSubmission?: number | null;
-  streak?: number | null;  
-  updatedAt: Date;
+  streak?: number | null; 
 }

@@ -1,10 +1,11 @@
 import { AuthProvider } from "../enums/AuthProvider"; 
-import { ICreateUserOutDTO, ICreateUserRequestDTO } from "../dtos/User/CreateUser";
+import { ICreateUserRequestDTO } from "../dtos/User/CreateUser";
 import { IUpdateUserRequestDTO } from "../dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "../dtos/User/UserIn";
 import { UserRole } from "../enums/UserRole";
 import { Email } from "../valueObjects/Email";
 import { LocalAuthentication, OAuthAuthentication, UserAuthentication } from "../valueObjects/UserAuthentication";
+import { EntityErrorType } from "../enums/entity/ErrorType";
 
 /**
  * Interface representing the base structure of user
@@ -35,33 +36,33 @@ export interface IUserProps<T extends UserAuthentication = UserAuthentication>{
  */
 export class User<T extends UserAuthentication = UserAuthentication> {
   private readonly _userId: string;
-  private readonly _username: string;
-  private readonly _email: Email;
   private readonly _role: UserRole;
-  private readonly _firstName: string;
-  private readonly _country: string;
   private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
-  private readonly _authentication: T;
-  private readonly _avatar: string | null;
-  private readonly _lastName: string | null;
-  private readonly _isArchived: boolean;
-  private readonly _preferredLanguage : string | null;
-  private readonly _easySolved: number | null;
-  private readonly _mediumSolved: number | null;
-  private readonly _hardSolved: number | null;
-  private readonly _totalSubmission: number | null;
-  private readonly _streak: number | null;
+  private _username: string;
+  private _email: Email;
+  private _firstName: string;
+  private _country: string;
+  private _updatedAt: Date;
+  private _authentication: T;
+  private _avatar: string | null;
+  private _lastName: string | null;
+  private _isArchived: boolean;
+  private _preferredLanguage : string | null;
+  private _easySolved: number | null;
+  private _mediumSolved: number | null;
+  private _hardSolved: number | null;
+  private _totalSubmission: number | null;
+  private _streak: number | null;
 
   
   /**
    * Create a user instance based on the provided data
    * 
-   * @param {IUserProps} data - The provided data to create instance of a user (normal or admin)
-   * @returns {ICreateUserOutDTO} - The created user
+   * @param {IUserProps} data - The provided data to create instance of a user (normal or admin).
+   * @returns {IUserInRequestDTO} - The created user details.
    */
   static create<T extends UserAuthentication>(
-    data : ICreateUserRequestDTO & {authentication : T}) : ICreateUserOutDTO {
+    data : ICreateUserRequestDTO & {authentication : T}) : IUserInRequestDTO {
     const id = crypto.randomUUID();
     const now = new Date();
 
@@ -95,7 +96,12 @@ export class User<T extends UserAuthentication = UserAuthentication> {
 
   }
 
-  toObject() : ICreateUserOutDTO {
+  /**
+   * Serialize the user data to use in repository.
+   * 
+   * @returns {IUserInRequestDTO}
+   */
+  toObject() : IUserInRequestDTO {
     const auth = this.authentication;
     return {
       userId : this.userId,
@@ -124,42 +130,101 @@ export class User<T extends UserAuthentication = UserAuthentication> {
 
   /**
    * Updates the user instance with provided data.
-   * Role of the user and UpdatedAt field is required to update.
    * 
    * @param {IUpdateUserRequestDTO} updatedData - The data to update a user.
-   * @returns {IUpdateUserRequestDTO} - The updated data of the user
    */ 
-  static update(updatedData : IUpdateUserRequestDTO) : IUpdateUserRequestDTO {
-    const isAdmin = updatedData.role === UserRole.ADMIN;
+  update(
+    updatedData : IUpdateUserRequestDTO,
+  ){
+    const isAdmin = this._role === UserRole.ADMIN;
 
-    if(updatedData.email){
-      updatedData.email = new Email({address : updatedData.email}).address
+    if (updatedData.username) {
+      this._username = updatedData.username;
     }
 
-    
-
-    return {
-      ...updatedData,
-      preferredLanguage : isAdmin ?  null : updatedData.preferredLanguage,
-      easySolved : isAdmin ?  null : updatedData.easySolved,
-      mediumSolved : isAdmin ?  null : updatedData.mediumSolved,
-      hardSolved : isAdmin ?  null : updatedData.hardSolved,
-      totalSubmission : isAdmin ?  null : updatedData.totalSubmission,
-      streak : isAdmin ?  null : updatedData.streak  
+    if (updatedData.firstName) {
+      this._firstName = updatedData.firstName;
     }
+
+    if (updatedData.lastName !== undefined) {
+      this._lastName = updatedData.lastName;
+    }
+
+    if (updatedData.avatar !== undefined) {
+      this._avatar = updatedData.avatar;
+    }
+
+    if (updatedData.country) {
+      this._country = updatedData.country;
+    }
+
+    if (updatedData.preferredLanguage !== undefined && !isAdmin) {
+      this._preferredLanguage = updatedData.preferredLanguage;
+    }
+
+    if (updatedData.easySolved !== undefined && !isAdmin) {
+      this._easySolved = updatedData.easySolved;
+    }
+
+    if (updatedData.mediumSolved !== undefined && !isAdmin) {
+      this._mediumSolved = updatedData.mediumSolved;
+    }
+
+    if (updatedData.hardSolved !== undefined && !isAdmin) {
+      this._hardSolved = updatedData.hardSolved;
+    }
+
+    if (updatedData.totalSubmission !== undefined && !isAdmin) {
+      this._totalSubmission = updatedData.totalSubmission;
+    }
+
+    if (updatedData.streak !== undefined && !isAdmin) {
+      this._streak = updatedData.streak;
+    }
+
+    if (updatedData.isVerified) {
+      this._authentication.markAsVerified();
+    }
+
+    if (updatedData.password) {
+      if (this._authentication instanceof LocalAuthentication) {
+        this._authentication.changePassword(updatedData.password);
+      } else {
+        throw new Error(EntityErrorType.CannotSetPassword);
+      }
+    }
+
+    this._updatedAt = new Date();
+
   }
 
-  static rehydrate <T extends UserAuthentication = UserAuthentication > (
-    data : IUserInRequestDTO & {authentication : T}
-  ) : IUserInRequestDTO {
+  /**
+   * Create a new instance of User entity class based on the pre-existing 
+   * user data in the repository
+   * 
+   * @static
+   * @param {IUserInRequestDTO} data - The data from user repository.
+   */
+  static rehydrate(
+    data : IUserInRequestDTO 
+  ) : User {
 
     const isAdmin = data.role === UserRole.ADMIN;
 
-    const authentication = AuthProvider.LOCAL === data.authProvider
-    ? new LocalAuthentication(data.password as string) 
-    : new OAuthAuthentication(AuthProvider.GOOGLE, data.oAuthId as string)
+    let authentication;
 
-    const instance = new User({
+    if (data.authProvider === AuthProvider.LOCAL) {
+      if (!data.password) {
+        throw new Error(EntityErrorType.MissingPassword);
+      }
+      authentication = new LocalAuthentication(data.password);
+    } else if (data.oAuthId) {
+      authentication = new OAuthAuthentication(data.authProvider, data.oAuthId);
+    } else {
+      throw new Error(`${EntityErrorType.MissingOAuthId} ${data.authProvider}`);
+    }
+
+    return new User({
         userId: data.userId,
         username: data.username,
         email: new Email({ address: data.email }),
@@ -175,15 +240,13 @@ export class User<T extends UserAuthentication = UserAuthentication> {
         // These values are specific based on role
 
         role: isAdmin ? UserRole.ADMIN : UserRole.USER,
-        preferredLanguage: isAdmin ? null : 'js' ,
-        easySolved: isAdmin ? null : 0,
-        mediumSolved: isAdmin ? null : 0,
-        hardSolved: isAdmin ? null : 0,
-        totalSubmission: isAdmin ? null : 0,
-        streak: isAdmin ? null : 0
-      })
-
-      return instance.toObject();
+        preferredLanguage: isAdmin ? null : data.preferredLanguage ,
+        easySolved: isAdmin ? null : data.easySolved,
+        mediumSolved: isAdmin ? null : data.mediumSolved,
+        hardSolved: isAdmin ? null : data.hardSolved,
+        totalSubmission: isAdmin ? null : data.totalSubmission,
+        streak: isAdmin ? null : data.streak
+      });
   }
 
   private constructor(props: IUserProps<T>) {
