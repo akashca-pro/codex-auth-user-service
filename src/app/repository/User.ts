@@ -14,10 +14,10 @@ export interface IUserRepository {
      * Create a new user with provided data.
      * 
      * @async
-     * @param {ICreateUserRequestDTO} data - The user data to be created.
+     * @param {IUserInRequestDTO} data - The user data that is created.
      * @returns {Promise<IUserInRequestDTO>} - The created user data.
      */
-    create(data : ICreateUserRequestDTO) : Promise<IUserInRequestDTO>;
+    create(data : IUserInRequestDTO) : Promise<IUserInRequestDTO>;
 
     /**
      * Find a user by their email address and role.

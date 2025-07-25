@@ -17,7 +17,7 @@ export interface IUserInRequestDTO {
     authProvider : AuthProvider;
     password : string | null;
     oAuthId : string | null;
-    country : string;
+    country : string | null;
     isVerified : boolean;
     isArchived : boolean;
     preferredLanguage : string | null;

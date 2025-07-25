@@ -14,6 +14,6 @@ export interface ICreateUserRequestDTO {
   firstName: string;
   lastName : string | null;
   avatar : string | null;
-  country: string;
+  country: string | null;
   authentication: UserAuthentication;
 };

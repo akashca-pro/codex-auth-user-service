@@ -20,9 +20,12 @@ import { SystemErrorType } from "@/domain/enums/ErrorType";
  */
 export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCase {
     /**
-     * 
      * Creates an instance of AuthenticateUserUseCase.
      * 
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
+     * @param {ITokenService} tokenService - Token service provider for generating token.
+     * @param {IOtpService} otpService - Otp service provider for verification.
      * @contructor
      */
     constructor(
@@ -33,7 +36,7 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
     ){}
 
     /**
-     * Executes the authentication use case.
+     * Executes the local authentication use case.
      * 
      * @param {IAuthenticateLocalAuthUserDTO} credentials - The user credentials for authentication.
      * @returns {Promise<ResponseDTO>} - The response data. 
@@ -90,12 +93,15 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
         const refreshToken = this.tokenService.generateRefreshToken(payload);
 
         return { 
-            data : { accessToken , refreshToken, message : AuthSuccessType.AuthenticationSuccess },
+            data : { accessToken, 
+                refreshToken, 
+                message : AuthSuccessType.AuthenticationSuccess,
+                userInfo : payload },
             success : true
          }
 
-        } catch (error) {
-            return { data : { message : SystemErrorType.InternalServerError } , success : false };
+        } catch (error : any) {
+            return { data : { message : error.message } , success : false };
         }
 
     }

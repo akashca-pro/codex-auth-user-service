@@ -11,7 +11,7 @@ export interface IUpdateUserRequestDTO {
   lastName?: string | null;
   avatar? : string | null;
   email?: string;
-  country?: string;
+  country?: string | null;
   password? : string,
   isVerified? : boolean;
   preferredLanguage? : string | null;

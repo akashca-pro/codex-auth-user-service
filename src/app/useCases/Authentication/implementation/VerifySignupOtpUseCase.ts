@@ -24,10 +24,10 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
     /**
      * Creates an instance of VerifySignUpOtpUseCase.
      * 
-     * @async
-     * @param userRepository - The repository of the user.
-     * @param otpService - Otp service provider for verification.
-     * @param tokenService - Token service provider for generating token.
+     * 
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IOtpService} otpService - Otp service provider for verification.
+     * @param {ITokenService} tokenService - Token service provider for generating token.
      */
     constructor (
         private userRepository : IUserRepository,
@@ -76,12 +76,14 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 data : { 
                     accessToken,
                     refreshToken,
-                    message : UserSuccessType.SignupSuccess },
+                    message : UserSuccessType.SignupSuccess,
+                    userInfo : payload
+                 },    
                 success : true
             }
        
-        } catch (error) {
-            return { data : { message : SystemErrorType.InternalServerError } , success : false }
+        } catch (error : any) {
+            return { data : { message : error.message } , success : false };
         }
     }
 

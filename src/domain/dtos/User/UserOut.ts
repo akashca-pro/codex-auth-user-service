@@ -14,7 +14,7 @@ export interface IUserOutRequestDTO {
     firstName : string;
     lastName : string | null;
     avatar : string | null;
-    country : string;
+    country : string | null;
     preferredLanguage : string | null;
     easySolved: number | null;
     mediumSolved: number | null;

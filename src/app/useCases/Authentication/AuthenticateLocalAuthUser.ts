@@ -2,10 +2,10 @@ import { IAuthenticateLocalAuthUserDTO } from "@/domain/dtos/Authenticate/Authen
 import { ResponseDTO } from "@/domain/dtos/Response";
 
 /**
- * Interface for the use case of authenticating a user.
+ * Interface for the use case of authenticating a local auth user.
  *
  * This interface defines the contract for a use case responsible for authenticating
- * a user based on the provided credentials.
+ * a local auth user based on the provided credentials.
  *
  * @interface
  */

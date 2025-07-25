@@ -32,7 +32,7 @@ model User {
   firstName         String
   lastName          String?
   avatar            String?
-  country           String   
+  country           String?   
   authProvider      AuthProvider
   password          String?
   oAuthId           String?  @unique

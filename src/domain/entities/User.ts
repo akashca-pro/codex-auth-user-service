@@ -19,7 +19,7 @@ export interface IUserProps<T extends UserAuthentication = UserAuthentication>{
   authentication: T;
   firstName: string;
   lastName: string | null;
-  country: string;
+  country: string | null;
   avatar : string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -42,7 +42,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
   private _username: string;
   private _email: Email;
   private _firstName: string;
-  private _country: string;
+  private _country: string | null;
   private _updatedAt: Date;
   private _authentication: T;
   private _avatar: string | null;
@@ -136,7 +136,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   }
 
   if (
-    updatedData.country &&
+    updatedData.country !== undefined &&
     this.trackUpdate(UserField.Country, this._country, updatedData.country)
   ) {
     this._country = updatedData.country;
@@ -350,7 +350,7 @@ update(updatedData: IUpdateUserRequestDTO) {
     return this._firstName;
   }
 
-  get country(): string {
+  get country(): string | null{
     return this._country;
   }
 

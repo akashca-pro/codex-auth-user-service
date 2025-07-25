@@ -31,4 +31,14 @@ export interface IAuthenticateOAuthUserDTO  {
      * The oAuthId of the user for authentication
      */
     oAuthId : string;
+
+    /**
+     * The firstName of the user 
+     */
+    firstName : string;
+
+    /**
+     * The username of the user.
+     */
+    username : string;
 }

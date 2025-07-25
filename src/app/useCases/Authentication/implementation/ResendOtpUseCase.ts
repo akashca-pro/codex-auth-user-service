@@ -57,8 +57,8 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
 
             return { data : { message : UserSuccessType.OtpSendSuccess }, success : true }
 
-        } catch (error) {
-            return { data : { message : SystemErrorType.InternalServerError } , success : false }
+        } catch (error : any) {
+            return { data : { message : error.message } , success : false };
         }
     }
 
