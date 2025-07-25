@@ -15,7 +15,7 @@ export interface IRefreshTokenEndPointUseCase {
      * Execute the RefreshTokenEndPointUseCase.
      * 
      * @async
-     * @param {ITokenPayLoadDTO} - Token payload of the user
+     * @param {ITokenPayLoadDTO} TokenPayload - Token payload of the user
      * 
      * @remarks
      * This method is responsible for handling the logic of issuing new accessToken
