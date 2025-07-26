@@ -4,7 +4,6 @@ import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { IUserRepository } from "@/app/repository/User";
 import { IAuthenticateLocalAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { OtpType } from "@/domain/enums/OtpType";

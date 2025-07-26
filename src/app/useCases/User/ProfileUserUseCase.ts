@@ -4,7 +4,7 @@ import { ResponseDTO } from "@/domain/dtos/Response";
  * Interface for the use case of Profile data retrieval of the user.
  *
  * This interface defines the contract for a use case responsible for sending
- * the user dashboard details.
+ * the user profile details.
  * 
  * @interface
  */
