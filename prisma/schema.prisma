@@ -25,7 +25,7 @@ enum AuthProvider {
 }
 
 model User {
-  id                String   @id @default(uuid())
+  userId            String   @id               
   role              UserRole @default(USER)
   username          String   @unique
   email             String   @unique
@@ -44,9 +44,9 @@ model User {
   hardSolved        Int?
   totalSubmission   Int?
   streak            Int?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime
+  updatedAt         DateTime
 
- @@index([country])
+  @@index([country])
 }
 
