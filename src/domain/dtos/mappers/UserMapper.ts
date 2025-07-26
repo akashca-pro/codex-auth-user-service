@@ -4,6 +4,7 @@ import { IUserInRequestDTO } from "../User/UserIn";
 import { IUserOutRequestDTO } from "../User/UserOut";
 import { UserRole } from "@/domain/enums/UserRole";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
+import { User as PrismaUser } from '@/generated/prisma'
 import { CreateAdminUserRequestDTO, CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/utils/dto/CreateUser";
 
 export class UserMapper {
@@ -78,6 +79,32 @@ export class UserMapper {
       streak: user.streak,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
+    };
+  }
+
+  static mapPrismaUserToDomain(user : PrismaUser) : IUserInRequestDTO {
+  return {
+      userId: user.userId,
+      role: user.role as UserRole,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      authProvider: user.authProvider as AuthProvider,
+      password: user.password,
+      oAuthId: user.oAuthId,
+      country: user.country,
+      isVerified: user.isVerified,
+      isArchived: user.isArchived,
+      preferredLanguage: user.preferredLanguage,
+      easySolved: user.easySolved,
+      mediumSolved: user.mediumSolved,
+      hardSolved: user.hardSolved,
+      totalSubmission: user.totalSubmission,
+      streak: user.streak,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }
 }

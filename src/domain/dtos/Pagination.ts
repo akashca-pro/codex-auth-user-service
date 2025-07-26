@@ -22,5 +22,5 @@ export interface PaginationDTO {
   /**
    * The last page number in the pagination.
    */
-  last_page: number
+  lastPage: number
 }
