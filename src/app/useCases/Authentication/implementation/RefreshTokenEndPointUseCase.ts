@@ -1,7 +1,7 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { IRefreshTokenEndPointUseCase } from "../RefreshTokenEndpoint";
-import { ITokenService } from "@/app/providers/GenerateTokens";
+import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 
 /**
@@ -15,10 +15,10 @@ export class RefreshTokenEndPointUseCase implements IRefreshTokenEndPointUseCase
     /**
      * Creates an instance of RefreshTokenEndPointUseCase.
      * 
-     * @param {ITokenService} tokenService - Token service provider for generating token.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor(
-        private tokenService : ITokenService
+        private tokenProvider : ITokenProvider
     ){}
 
     /**
@@ -37,7 +37,7 @@ export class RefreshTokenEndPointUseCase implements IRefreshTokenEndPointUseCase
                 role
             }
 
-            const accessToken = this.tokenService.generateAccessToken(payload);
+            const accessToken = this.tokenProvider.generateAccessToken(payload);
 
             return { 
                 data : { 

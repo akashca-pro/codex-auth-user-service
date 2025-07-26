@@ -2,7 +2,7 @@ import { IAuthenticateOAuthUserDTO } from "@/domain/dtos/Authenticate/Authentica
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IAuthenticateOAuthUserUseCase } from "../AuthenticateOAuthUser";
 import { IUserRepository } from "@/app/repository/User";
-import { ITokenService } from "@/app/providers/GenerateTokens";
+import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";
 import { OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
@@ -23,12 +23,12 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
      * Creates an instance of AuthenticateOAuthUserUseCase.
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {ITokenService} tokenService - Token service provider for generating token.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      * @contructor
      */
      constructor(
         private userRepository : IUserRepository,
-        private tokenService : ITokenService
+        private tokenProvider : ITokenProvider
      ){}
 
     /**
@@ -69,8 +69,8 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             }
 
 
-            const accessToken = this.tokenService.generateAccessToken(payload);
-            const refreshToken = this.tokenService.generateRefreshToken(payload);
+            const accessToken = this.tokenProvider.generateAccessToken(payload);
+            const refreshToken = this.tokenProvider.generateRefreshToken(payload);
 
             return { 
                 data : { 

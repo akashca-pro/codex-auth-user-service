@@ -5,7 +5,7 @@
  * 
  * @interface
  */
-export interface ITokenService {
+export interface ITokenProvider {
     /**
      * Generate a new access token.
      * 

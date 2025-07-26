@@ -1,5 +1,5 @@
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
-import { ITokenService } from "@/app/providers/GenerateTokens";
+import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { IUserRepository } from "@/app/repository/User";
 import { IAuthenticateLocalAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
@@ -23,14 +23,14 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
-     * @param {ITokenService} tokenService - Token service provider for generating token.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      * @param {IOtpService} otpService - Otp service provider for verification.
      * @contructor
      */
     constructor(
         private userRepository : IUserRepository,
         private passwordHasher : IPasswordHasher,
-        private tokenService : ITokenService,
+        private tokenProvider : ITokenProvider,
         private otpService : IOtpService
     ){}
 
@@ -88,8 +88,8 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
             role : user.role
         }
 
-        const accessToken = this.tokenService.generateAccessToken(payload);
-        const refreshToken = this.tokenService.generateRefreshToken(payload);
+        const accessToken = this.tokenProvider.generateAccessToken(payload);
+        const refreshToken = this.tokenProvider.generateRefreshToken(payload);
 
         return { 
             data : { accessToken, 

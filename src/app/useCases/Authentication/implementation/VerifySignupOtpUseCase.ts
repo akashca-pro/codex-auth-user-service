@@ -1,7 +1,7 @@
 import { IUserRepository } from "@/app/repository/User";
 import { IVerifySignUpOtpUseCase } from "../VerifySignup";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
-import { ITokenService } from "@/app/providers/GenerateTokens";
+import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { IVerifySignUpOtp } from "@/domain/dtos/Authenticate/VerifyOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
@@ -27,12 +27,12 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IOtpService} otpService - Otp service provider for verification.
-     * @param {ITokenService} tokenService - Token service provider for generating token.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor (
         private userRepository : IUserRepository,
         private otpService : IOtpService,
-        private tokenService : ITokenService
+        private tokenProvider : ITokenProvider
     ){}
 
     /**
@@ -66,8 +66,8 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 role : UserRole.USER
             }
 
-            const accessToken = this.tokenService.generateAccessToken(payload);
-            const refreshToken = this.tokenService.generateRefreshToken(payload);
+            const accessToken = this.tokenProvider.generateAccessToken(payload);
+            const refreshToken = this.tokenProvider.generateRefreshToken(payload);
 
             if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
             if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
