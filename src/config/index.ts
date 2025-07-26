@@ -13,6 +13,7 @@ interface Config {
     GRPC_SERVER_URL : string;
     JWT_REFRESH_TOKEN_EXPIRY : string;
     JWT_ACCESS_TOKEN_EXPIRY : string;
+    NODEMAILER_SERVICE : string;
 }
 
 export const config : Config = {
@@ -26,5 +27,6 @@ export const config : Config = {
      NODEMAILER_PASS : process.env.NODEMAILER_PASS || '',
      GRPC_SERVER_URL : process.env.GRPC_SERVER_URL || '0.0.0.0:50051',
      JWT_ACCESS_TOKEN_EXPIRY : process.env.JWT_ACCESS_TOKEN_EXPIRY || '1d',
-     JWT_REFRESH_TOKEN_EXPIRY : process.env.JWT_REFRESH_TOKEN_EXPIRY || '7d'
+     JWT_REFRESH_TOKEN_EXPIRY : process.env.JWT_REFRESH_TOKEN_EXPIRY || '7d',
+     NODEMAILER_SERVICE : process.env.NODEMAILER_SERVICE || 'gmail'
 }
