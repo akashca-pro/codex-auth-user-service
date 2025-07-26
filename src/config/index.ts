@@ -11,6 +11,8 @@ interface Config {
     ACCESS_TOKEN_SECRET : string;
     REFRESH_TOKEN_SECRET : string;
     GRPC_SERVER_URL : string;
+    JWT_REFRESH_TOKEN_EXPIRY : string;
+    JWT_ACCESS_TOKEN_EXPIRY : string;
 }
 
 export const config : Config = {
@@ -22,5 +24,7 @@ export const config : Config = {
      SERVICE_NAME : require('../../package.json').name || 'auth-user-service',
      NODEMAILER_EMAIL : process.env.NODEMAILER_EMAIL || '',
      NODEMAILER_PASS : process.env.NODEMAILER_PASS || '',
-     GRPC_SERVER_URL : process.env.GRPC_SERVER_URL || '0.0.0.0:50051'
+     GRPC_SERVER_URL : process.env.GRPC_SERVER_URL || '0.0.0.0:50051',
+     JWT_ACCESS_TOKEN_EXPIRY : process.env.JWT_ACCESS_TOKEN_EXPIRY || '1d',
+     JWT_REFRESH_TOKEN_EXPIRY : process.env.JWT_REFRESH_TOKEN_EXPIRY || '7d'
 }
