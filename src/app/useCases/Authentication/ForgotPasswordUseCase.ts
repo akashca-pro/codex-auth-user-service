@@ -14,6 +14,7 @@ export interface IForgotPasswordUseCase {
      * Execute the ForgotPasswordUseCase.
      * 
      * @param {string} email - The email address of the user.
+     * @returns {Promise<ResponseDTO>} - The response data.
      * 
      * @remarks
      * This method is responsible for handling the logic of issuing otp for verifying

@@ -1,4 +1,3 @@
-import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { UserRole } from "@/domain/enums/UserRole";
 import { UserAuthentication } from "@/domain/valueObjects/UserAuthentication";
 

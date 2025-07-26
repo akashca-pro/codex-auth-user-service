@@ -49,7 +49,7 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
         try {
         const user = (await this.userRepository.findByEmail(
             email
-        )) as IUserInRequestDTO | null
+        ))
 
         if(!user){
             return {

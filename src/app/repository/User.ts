@@ -1,5 +1,4 @@
 import { PaginationDTO } from "@/domain/dtos/Pagination";
-import { ICreateUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 

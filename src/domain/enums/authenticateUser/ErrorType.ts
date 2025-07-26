@@ -25,4 +25,9 @@ export enum AuthenticateUserErrorType {
    */
   InvalidOrExpiredOtp = 'Invalid or expired otp',
 
+  /**
+   * Error type indicating that the application encounter error while checking authentication method.
+   */
+  InvalidAuthenticationMethod = 'Invalid authentication method. Expected LocalAuthentication.',
+
 }

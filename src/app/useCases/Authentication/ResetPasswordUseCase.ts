@@ -16,6 +16,7 @@ export interface IResetPasswordUseCase {
      * 
      * @async
      * @param {IResetPasswordDTO} credentials
+     * @returns {Promise<ResponseDTO>} - The response data.
      * 
      * @remarks
      * This method is responsible for handling the logic of validating otp

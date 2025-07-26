@@ -2,7 +2,6 @@ import { ResponseDTO } from "@/domain/dtos/Response";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { IRefreshTokenEndPointUseCase } from "../RefreshTokenEndpoint";
 import { ITokenService } from "@/app/providers/GenerateTokens";
-import { IUserRepository } from "@/app/repository/User";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 
 /**
@@ -26,7 +25,8 @@ export class RefreshTokenEndPointUseCase implements IRefreshTokenEndPointUseCase
      * Executes the RefreshTokenEndPointUseCase use case.
      * 
      * @async
-     * @param {ITokenPayLoadDTO} credentials 
+     * @param {ITokenPayLoadDTO} credentials - The credentials include decoded data from refreshToken.
+     * @returns {ResponseDTO} - The response data.
      */
     async execute({ userId, email, role }: ITokenPayLoadDTO): Promise<ResponseDTO> {
         

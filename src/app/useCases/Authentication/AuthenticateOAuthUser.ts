@@ -16,6 +16,7 @@ export interface IAuthenticateOAuthUserUseCase {
      * 
      * @async
      * @param {IAuthenticateOAuthUserDTO} credentials 
+     * @returns {Promise<ResponseDTO>} - The response data. 
      * 
      * @remarks
      * This method is responsible for handling the logic of authenticating an oAuth user

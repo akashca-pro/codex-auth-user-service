@@ -31,8 +31,11 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     ){}
 
     /**
+     * Executes the reset password use case.
      * 
-     * @param {string} email 
+     * @async
+     * @param {string} email - The email of the user.
+     * @returns {ResponseDTO} - Ther response data.
      */
     async execute({
         email,

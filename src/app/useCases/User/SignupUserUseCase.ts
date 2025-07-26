@@ -1,0 +1,27 @@
+import { ResponseDTO } from "@/domain/dtos/Response";
+import { ICreateUserRequestDTO } from "@/domain/dtos/User/CreateUser";
+
+/**
+ * Interface for the use case of creating a new user.
+ *
+ * This interface defines the contract for a use case responsible for creating
+ * a user and sent otp for verification.
+ *
+ * @interface
+ */
+export interface ISignUpUserUseCase {
+
+    /**
+     * Execute the create user use case.
+     * 
+     * @async
+     * @param {ICreateUserRequestDTO} data - The data for creating a new user.
+     * @returns {ResponseDTO}
+     * 
+     * @remarks
+     * This method is responsible for handling the logic of creation
+     * of a new user.
+     */
+    execute(data : ICreateUserRequestDTO) : Promise<ResponseDTO>
+
+}
