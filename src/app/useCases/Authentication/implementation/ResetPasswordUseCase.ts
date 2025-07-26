@@ -18,7 +18,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
     /**
-     * Executes reset password use case.
+     * Creates an instance of ResetPasswordUseCase.
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.

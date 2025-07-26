@@ -15,7 +15,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
  
     /**
-     * Executes ForgotPasswordUseCase.
+     * Creates an instance of ForgotpasswordUseCase.
      * 
      * 
      * @param {IUserRepository} userRepository - The repository of the user.

@@ -1,5 +1,3 @@
-import { AuthProvider } from "@/domain/enums/AuthProvider";
-import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * The Data Transfer Object (DTO) representing the output user data
@@ -9,7 +7,6 @@ import { UserRole } from "@/domain/enums/UserRole";
 export interface IUserOutRequestDTO {
     userId : string;
     username : string;
-    role : UserRole;
     email : string;
     firstName : string;
     lastName : string | null;

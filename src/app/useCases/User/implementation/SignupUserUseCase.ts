@@ -20,7 +20,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 export class SignupUserUseCase implements ISignUpUserUseCase {
 
     /**
-     * Executes reset password use case.
+     * Creates an instance of SignupUserUseCase.
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
@@ -51,7 +51,6 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
                     success : false
                 }
             }
-
 
             if (!(data.authentication instanceof LocalAuthentication)) {
                 throw new Error(AuthenticateUserErrorType.InvalidAuthenticationMethod);
