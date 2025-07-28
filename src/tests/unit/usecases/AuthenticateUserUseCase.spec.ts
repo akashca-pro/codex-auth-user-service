@@ -2,7 +2,7 @@ import { IOtpService } from "@/app/providers/GenerateAndSendOtp"
 import { ITokenService } from "@/app/providers/GenerateTokens"
 import { IPasswordHasher } from "@/app/providers/PasswordHasher"
 import { IUserRepository } from "@/app/repository/User"
-import { AuthenticateUserUseCase } from "@/app/useCases/Authentication/implementation/AuthenticateUser"
+import { AuthenticateUserUseCase } from "@/app/useCases/Authentication/implementation/AuthenticateLocalUser"
 import { IUserInRequestDTO } from '@/domain/dtos/User/UserIn'
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType"
 import { AuthProvider } from "@/domain/enums/AuthProvider"

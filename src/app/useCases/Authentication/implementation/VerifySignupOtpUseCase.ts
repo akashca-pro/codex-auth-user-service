@@ -1,3 +1,4 @@
+import TYPES from "@/config/inversify/types";
 import { IUserRepository } from "@/app/repository/User";
 import { IVerifySignUpOtpUseCase } from "../VerifySignup";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
@@ -11,6 +12,7 @@ import { UserRole } from "@/generated/prisma";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
+import { inject, injectable } from "inversify";
 
 
 /**
@@ -19,6 +21,7 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
  * @class
  * @implements {IVerifySignUpOtpUseCase}
  */
+@injectable()
 export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
 
     /**
@@ -30,9 +33,14 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor (
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
-        private otpService : IOtpService,
-        private tokenProvider : ITokenProvider
+
+        @inject(TYPES.ITokenProvider)
+        private tokenProvider : ITokenProvider,
+
+        @inject(TYPES.IOtpService)
+        private otpService : IOtpService
     ){}
 
     /**

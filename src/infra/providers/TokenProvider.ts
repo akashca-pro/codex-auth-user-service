@@ -9,7 +9,7 @@ import jwt, { Secret, SignOptions } from "jsonwebtoken";
  * @class
  * @implements {ITokenProvider}
  */
-export class TokenProvider implements ITokenProvider {
+export class JwtTokenProvider implements ITokenProvider {
 
   private accessSecret: Secret = config.ACCESS_TOKEN_SECRET;
   private refreshSecret: Secret = config.REFRESH_TOKEN_SECRET;

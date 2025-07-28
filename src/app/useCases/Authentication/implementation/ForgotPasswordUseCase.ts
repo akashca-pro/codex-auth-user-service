@@ -1,3 +1,4 @@
+import TYPES from "@/config/inversify/types";
 import { IUserRepository } from "@/app/repository/User";
 import { IForgotPasswordUseCase } from "../ForgotPasswordUseCase";
 import { ResponseDTO } from "@/domain/dtos/Response";
@@ -5,6 +6,7 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { injectable, inject } from "inversify";
 
 /**
  * Use case of Forgotpassword use case.
@@ -12,6 +14,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
  * @class
  * @implements {IForgotPasswordUseCase}
  */
+@injectable()
 export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
  
     /**
@@ -22,8 +25,11 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
      * @param {IOtpService} otpService -  - Otp service provider for generate and sent otp.
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
-        private otpService : IOtpService 
+
+        @inject(TYPES.IOtpService)
+        private otpService : IOtpService
     ){}
 
     /**

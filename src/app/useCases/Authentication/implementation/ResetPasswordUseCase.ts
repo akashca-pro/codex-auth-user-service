@@ -1,3 +1,4 @@
+import TYPES from "@/config/inversify/types";
 import { IUserRepository } from "@/app/repository/User";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
@@ -8,6 +9,7 @@ import { IResetPasswordDTO } from "@/domain/dtos/Authenticate/ResetPassword";
 import { IResetPasswordUseCase } from "../ResetPasswordUseCase";
 import { User } from "@/domain/entities/User";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { inject, injectable } from "inversify";
 
 /**
  * Use case for reset password.
@@ -15,6 +17,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
  * @class
  * @implements {IResetPasswordUseCase}
  */
+@injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
     /**
@@ -25,9 +28,14 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
      * @param {IOtpService} otpService - Otp service provider for verification.
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
+
+        @inject(TYPES.IPasswordHasher)
+        private passwordHasher : IPasswordHasher,
+
+        @inject(TYPES.IOtpService)
         private otpService : IOtpService,
-        private passwordHasher : IPasswordHasher
     ){}
 
     /**
@@ -65,7 +73,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
                 password : hashedPassword
             })
 
-            await this.userRepository.update(user,userEntity.getUpdatedFields());
+            await this.userRepository.update(user.userId,userEntity.getUpdatedFields());
 
             return {
                 data : { message : UserSuccessType.PasswordChangedSuccessfully },

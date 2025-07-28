@@ -1,3 +1,5 @@
+import TYPES from "@/config/inversify/types";
+import { injectable, inject } from "inversify";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
@@ -17,7 +19,8 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
  * @class
  * @implements {IAuthenticateLocalAuthUserUseCase}
  */
-export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCase {
+@injectable()
+export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserUseCase {
     /**
      * Creates an instance of AuthenticateUserUseCase.
      * 
@@ -28,9 +31,16 @@ export class AuthenticateUserUseCase implements IAuthenticateLocalAuthUserUseCas
      * @contructor
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
+
+        @inject(TYPES.IPasswordHasher)
         private passwordHasher : IPasswordHasher,
+
+        @inject(TYPES.ITokenProvider)
         private tokenProvider : ITokenProvider,
+
+        @inject(TYPES.IOtpService)
         private otpService : IOtpService
     ){}
 

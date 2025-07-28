@@ -1,3 +1,4 @@
+import TYPES from "@/config/inversify/types";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IResendOtpUseCase } from "../ResendOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
@@ -6,6 +7,7 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { inject, injectable } from "inversify";
 
 /**
  * Use case for resend otp.
@@ -13,6 +15,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
  * @class
  * @implements {IResendOtpUseCase}
  */
+@injectable()
 export class ResendOtpUseCase implements IResendOtpUseCase {
 
     /**
@@ -22,7 +25,10 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
      * @param {IOtpService} otpService - Otp service provider for re-issuing otp.
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
+
+        @inject(TYPES.IOtpService)
         private otpService : IOtpService
     ){}
 

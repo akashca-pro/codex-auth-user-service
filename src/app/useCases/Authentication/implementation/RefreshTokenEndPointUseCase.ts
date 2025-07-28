@@ -1,8 +1,10 @@
+import TYPES from "@/config/inversify/types";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { IRefreshTokenEndPointUseCase } from "../RefreshTokenEndpoint";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { injectable, inject } from "inversify";
 
 /**
  * Use case for issuing new accessToken.
@@ -10,6 +12,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
  * @class
  * @implements {IRefreshTokenEndPointUseCase}
  */
+@injectable()
 export class RefreshTokenEndPointUseCase implements IRefreshTokenEndPointUseCase {
 
     /**
@@ -18,7 +21,8 @@ export class RefreshTokenEndPointUseCase implements IRefreshTokenEndPointUseCase
      * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor(
-        private tokenProvider : ITokenProvider
+        @inject(TYPES.ITokenProvider)
+        private tokenProvider : ITokenProvider,
     ){}
 
     /**

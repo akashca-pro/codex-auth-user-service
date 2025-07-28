@@ -7,7 +7,7 @@ import { IPasswordHasher } from '@/app/providers/PasswordHasher';
  * @class
  * @implements {IPasswordHasher}
  */
-export class PasswordHasher implements IPasswordHasher {
+export class BcryptPasswordHasher implements IPasswordHasher {
     /**
      * The number of salt rounds to use for password hashing.
      *

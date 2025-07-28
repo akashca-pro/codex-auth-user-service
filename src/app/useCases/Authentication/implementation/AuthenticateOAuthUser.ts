@@ -1,3 +1,5 @@
+import TYPES from "@/config/inversify/types";
+import { injectable, inject } from "inversify";
 import { IAuthenticateOAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IAuthenticateOAuthUserUseCase } from "../AuthenticateOAuthUser";
@@ -17,6 +19,7 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
  * @class
  * @implements {IAuthenticateOAuthUserUseCase}
  */
+@injectable()
 export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCase {
 
     /**
@@ -27,7 +30,10 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
      * @contructor
      */
      constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
+
+        @inject(TYPES.ITokenProvider)
         private tokenProvider : ITokenProvider
      ){}
 
