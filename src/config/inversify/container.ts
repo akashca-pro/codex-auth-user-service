@@ -37,6 +37,7 @@ import { GrpcUserSignupHandler } from '@/infra/grpc/handlers/user/signupHandler'
 import { GrpcUserVerifySignupOtpHandler } from '@/infra/grpc/handlers/user/VerifyOtpHandler';
 import { GrpcUserResendOtpHandler } from '@/infra/grpc/handlers/user/ResendOtpHandler';
 import { GrpcUserForgotPasswordHandler } from '@/infra/grpc/handlers/user/ForgotPasswordHandler';
+import { GrpcUserResetPasswordHandler } from '@/infra/grpc/handlers/user/ResetPasswordHandler';
 
 const container = new Container();
 
@@ -94,7 +95,10 @@ container
     .to(GrpcUserResendOtpHandler);
 container   
     .bind<GrpcUserForgotPasswordHandler>(TYPES.GrpcUserForgotPasswordHandler)
-    .to(GrpcUserForgotPasswordHandler)
+    .to(GrpcUserForgotPasswordHandler);
+container
+    .bind<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler)
+    .to(GrpcUserResetPasswordHandler);
 
 /**
  * Admin gRPC handlers.
