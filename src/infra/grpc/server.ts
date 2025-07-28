@@ -1,15 +1,25 @@
 import TYPES from "@/config/inversify/types";
 import container from "@/config/inversify/container";
 import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
-import { AuthAdminServiceService } from "@akashcapro/codex-shared-utils";
+import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/codex-shared-utils";
 import { Server, ServerCredentials } from "@grpc/grpc-js"
-import { GrpcAdminAuthHandler } from "./handlers/admin/AuthHandler";
 import { config } from "@/config";
 
-const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
+import { GrpcAuthHandler } from "./handlers/common/AuthHandler";
+
+import { GrpcUserSignupHandler } from "./handlers/user/signupHandler";
+
+const authHandler = container.get<GrpcAuthHandler>(TYPES.GrpcAuthHandler);
+
+// for users 
+const signupHandler = container.get<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler);
 
 const adminHandlers = {
-    ...adminAuthHandler.getServiceHandler(),
+    ...authHandler.getServiceHandler(),
+}
+
+const userHandlers = {
+    ...signupHandler.getServiceHandler(),
 }
 
 export const startGrpcServer = () => {
@@ -18,6 +28,10 @@ export const startGrpcServer = () => {
 
     server.addService(
         AuthAdminServiceService, adminHandlers);
+
+    server.addService(
+        AuthUserServiceService, userHandlers);
+    
 
     server.bindAsync(
         config.GRPC_SERVER_URL,

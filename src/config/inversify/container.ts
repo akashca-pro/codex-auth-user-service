@@ -32,7 +32,8 @@ import { VerifySignUpOtpUseCase } from '@/app/useCases/Authentication/implementa
 import { IVerifySignUpOtpUseCase } from '@/app/useCases/Authentication/VerifySignup';
 
 // gRPC handlers
-import { GrpcAdminAuthHandler } from '@/infra/grpc/handlers/admin/AuthHandler';
+import { GrpcAuthHandler } from '@/infra/grpc/handlers/common/AuthHandler';
+import { GrpcUserSignupHandler } from '@/infra/grpc/handlers/user/signupHandler';
 
 const container = new Container();
 
@@ -70,10 +71,23 @@ container
     .to(VerifySignUpOtpUseCase);
 
 /**
- * Handlers
+ * Common gRPC handlers.
  */
 container
-    .bind<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler)
-    .to(GrpcAdminAuthHandler);
+    .bind<GrpcAuthHandler>(TYPES.GrpcAuthHandler)
+    .to(GrpcAuthHandler);
+
+/**
+ * User gRPC handlers.
+ */
+container
+    .bind<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler)
+    .to(GrpcUserSignupHandler);
+
+
+/**
+ * Admin gRPC handlers.
+ */
+
 
 export default container;

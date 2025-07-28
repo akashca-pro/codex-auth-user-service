@@ -14,7 +14,9 @@ const TYPES = {
   ProfileUserUseCase : Symbol.for("ProfileUserUseCase"),
   SignUpUserUseCase : Symbol.for("SignUpUserUseCase"),
 
-  GrpcAdminAuthHandler : Symbol.for("GrpcAdminAuthHandler"),  
+  GrpcAuthHandler : Symbol.for("GrpcAuthHandler"),
+  
+  GrpcUserSignupHandler : Symbol.for("GrpcUserSignupHandler"),
 
 };
 

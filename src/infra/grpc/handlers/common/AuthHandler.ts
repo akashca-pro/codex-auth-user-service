@@ -14,7 +14,7 @@ import { inject, injectable } from "inversify";
  * @class
  */
 @injectable()
-export class GrpcAdminAuthHandler {
+export class GrpcAuthHandler {
 
     /**
      * 
