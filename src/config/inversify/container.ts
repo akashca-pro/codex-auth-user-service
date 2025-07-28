@@ -42,7 +42,22 @@ import { GrpcOAuthHandler } from '@/infra/grpc/handlers/common/OAuthHandler';
 import { GrpcRefreshTokenHandler } from '@/infra/grpc/handlers/common/RefreshTokenHandler';
 import { GrpcUserProfileHandler } from '@/infra/grpc/handlers/user/ProfileHandler';
 
+import Redis from 'ioredis';
+import redis from '@/config/redis'
+import { mailer } from "@/config/mailer";
+import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import { Logger } from 'winston';
+
 const container = new Container();
+
+container.bind<Redis>(TYPES.Redis).toConstantValue(redis);
+container.bind<typeof mailer>(TYPES.Mailer).toConstantValue(mailer);
+container.bind<Logger>(TYPES.Logger).toConstantValue(logger);
+
+// Bind providers
+container.bind<IOtpService>(TYPES.IOtpService).toDynamicValue(() => {
+    return new OtpService(redis, mailer, logger);
+}).inSingletonScope();
 
 /**
  * Adapters
@@ -50,7 +65,6 @@ const container = new Container();
 container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 container.bind<IPasswordHasher>(TYPES.IPasswordHasher).to(BcryptPasswordHasher);
 container.bind<ITokenProvider>(TYPES.ITokenProvider).to(JwtTokenProvider);
-container.bind<IOtpService>(TYPES.IOtpService).to(OtpService);
 
 /**
  * UseCases

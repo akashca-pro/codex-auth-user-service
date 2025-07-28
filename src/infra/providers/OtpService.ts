@@ -1,6 +1,5 @@
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { config } from "@/config";
-import TYPES from "@/config/inversify/types";
 import { OtpType } from "@/domain/enums/OtpType";
 import { injectable } from "inversify";
 import Redis from "ioredis";
@@ -14,6 +13,7 @@ import { Logger } from 'winston';
  * @class
  * @implements {IOtpService}
  */
+@injectable()
 export class OtpService implements IOtpService {
 
     /**

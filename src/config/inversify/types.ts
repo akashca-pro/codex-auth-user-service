@@ -4,6 +4,10 @@ const TYPES = {
   ITokenProvider: Symbol.for("ITokenProvider"),
   IOtpService: Symbol.for("IOtpService"),
 
+  Redis : Symbol.for("Redis"),
+  Mailer : Symbol.for("Mailer"),
+  Logger : Symbol.for("Logger"),
+
   AuthenticateLocalUserUseCase: Symbol.for("AuthenticateLocalUserUseCase"),
   AuthenticateOAuthUserUseCase : Symbol.for("AuthenticateOAuthUserUseCase"),
   ForgotPasswordUseCase : Symbol.for("ForgotPasswordUseCase"),
