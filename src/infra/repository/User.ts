@@ -3,7 +3,6 @@ import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { PrismaClient } from "@/generated/prisma";
-import { userSelectFields } from "./prisma/userSelect";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 
@@ -91,7 +90,21 @@ export class UserRepository implements IUserRepository {
                 username : 'asc',
             },
             select : {
-                ...userSelectFields
+                userId: true,
+                username: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                avatar: true,
+                country: true,
+                preferredLanguage: true,
+                easySolved: true,
+                mediumSolved: true,
+                hardSolved: true,
+                totalSubmission: true,
+                streak: true,
+                createdAt: true,
+                updatedAt: true,
             }
         });
 
@@ -127,7 +140,7 @@ export class UserRepository implements IUserRepository {
      * Updates a user with new data.
      *
      * @async
-     * @param {string} user - The user to update.
+     * @param {string} userId - The user to update.
      * @param {IUpdateUserRequestDTO} data - The updated user data.
      * @returns {Promise<IUserOutRequestDTO>} The updated user.
      */
