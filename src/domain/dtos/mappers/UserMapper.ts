@@ -1,63 +1,45 @@
-import { LocalAuthentication, OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
-import { ICreateUserRequestDTO } from "../User/CreateUser";
+import { ICreateLocalUserRequestDTO, ICreateOAuthUserRequestDTO } from "../User/CreateUser";
 import { IUserInRequestDTO } from "../User/UserIn";
 import { IUserOutRequestDTO } from "../User/UserOut";
 import { UserRole } from "@/domain/enums/UserRole";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
 import { User as PrismaUser } from '@/generated/prisma'
-import { CreateAdminUserRequestDTO, CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/utils/dto/CreateUser";
+import { CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/utils/dto/CreateUser";
 
 export class UserMapper {
 
   static toCreateLocalAuthUserDTO(
-    body : CreateLocalAuthUserRequestDTO
-) : ICreateUserRequestDTO {
+    body : CreateLocalAuthUserRequestDTO,
+    role : UserRole
+) : ICreateLocalUserRequestDTO {
 
     return {
         username : body.username,
-        authentication : new LocalAuthentication(body.password),
+        password : body.password,
         avatar : body.avatar ?? null,
         country : body.country,
         email : body.email,
         firstName : body.firstName,
         lastName : body.lastName ?? null,
-        role : UserRole.USER
+        role
     }
 
   }
 
   static toCreateOAuthUser(
-    body : CreateOAuthUserRequestDTO)
-     : ICreateUserRequestDTO {
+    body : CreateOAuthUserRequestDTO,
+    role : UserRole
+  ) : ICreateOAuthUserRequestDTO {
 
     return {
         username : body.username,
-        authentication : new OAuthAuthentication(AuthProvider.GOOGLE,
-            body.oAuthId
-        ),
+        oAuthId : body.oAuthId,
         avatar : body.avatar ?? null,
         country : body.country,
         email : body.email,
         firstName : body.firstName,
         lastName : body.lastName ?? null,
-        role : UserRole.USER
-    }
-
-  }
-
-  static toCreateAdminUserDTO(
-    body : CreateAdminUserRequestDTO) 
-  : ICreateUserRequestDTO {
-
-    return {
-        username : body.username,
-        authentication : new LocalAuthentication(body.password),
-        avatar : body.avatar ?? null,
-        country : body.country,
-        email : body.email,
-        firstName : body.firstName,
-        lastName : body.lastName ?? null,
-        role : UserRole.ADMIN
+        role
     }
 
   }

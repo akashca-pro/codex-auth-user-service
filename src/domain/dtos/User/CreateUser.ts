@@ -6,7 +6,29 @@ import { UserAuthentication } from "@/domain/valueObjects/UserAuthentication";
  *
  * @interface
  */
-export interface ICreateUserRequestDTO {
+export interface ICreateLocalUserRequestDTO {
+  role : UserRole;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName : string | null;
+  avatar : string | null;
+  country: string | null;
+  password : string;
+};
+
+export interface ICreateOAuthUserRequestDTO {
+  role : UserRole;
+  username : string;
+  email : string;
+  firstName : string;
+  lastName : string | null;
+  avatar : string | null;
+  country: string | null;
+  oAuthId : string;
+}
+
+export interface ICreateUserRequestEntityDTO {
   role : UserRole;
   username: string;
   email: string;

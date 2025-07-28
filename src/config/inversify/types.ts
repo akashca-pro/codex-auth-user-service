@@ -21,6 +21,7 @@ const TYPES = {
   GrpcUserResendOtpHandler : Symbol.for("GrpcUserResendOtpHandler"),
   GrpcUserForgotPasswordHandler : Symbol.for("GrpcUserForgotPasswordHandler"),
   GrpcUserResetPasswordHandler : Symbol.for("GrpcUserResetPasswordHandler"),
+  GrpcOAuthHandler : Symbol.for("GrpcOAuthHandler"),
 
 };
 

@@ -1,6 +1,5 @@
 import TYPES from "@/config/inversify/types";
 import { injectable, inject } from "inversify";
-import { IAuthenticateOAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IAuthenticateOAuthUserUseCase } from "../AuthenticateOAuthUser";
 import { IUserRepository } from "@/app/repository/User";
@@ -9,9 +8,9 @@ import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";
 import { OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
-import { UserRole } from "@/domain/enums/UserRole";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
+import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 
 /**
  * Use case for authenticating a user.
@@ -40,13 +39,13 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
     /**
      * Executes the oauth authentication use case.
      * 
-     * @param {IAuthenticateOAuthUserDTO} credentials - The user credentials for authentication.
+     * @param {IAuthenticateOAuthUserDTO} data - The user credentials for authentication.
      * @return {Promise<ResponseDTO>} - The response data.
      */ 
-    async execute({ email, oAuthId, firstName, username, }: IAuthenticateOAuthUserDTO): Promise<ResponseDTO> {
+    async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
         
         try {
-            const userAlreadyExists = await this.userRepository.findByEmail(email)
+            const userAlreadyExists = await this.userRepository.findByEmail(data.email)
 
             if(userAlreadyExists){
                 return {
@@ -56,14 +55,14 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             }
 
             const user = User.create({
-                username,
-                email,
-                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,oAuthId),
-                firstName : firstName,
+                username : data.username,
+                email : data.email,
+                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
+                firstName : data.firstName,
                 avatar : null,
                 country : null,
                 lastName : null,
-                role : UserRole.USER
+                role : data.role
             })
 
             await this.userRepository.create(user);

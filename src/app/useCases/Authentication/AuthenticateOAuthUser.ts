@@ -1,5 +1,5 @@
-import { IAuthenticateOAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
+import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 
 /**
  * Interface for the use case of authenticating an oAuth user.
@@ -15,18 +15,13 @@ export interface IAuthenticateOAuthUserUseCase {
      * Execute the authenticate oauth usecase.
      * 
      * @async
-     * @param {IAuthenticateOAuthUserDTO} credentials 
+     * @param {IAuthenticateOAuthUserDTO} data 
      * @returns {Promise<ResponseDTO>} - The response data. 
      * 
      * @remarks
      * This method is responsible for handling the logic of authenticating an oAuth user
      * based on the provided credentials.
      */
-    execute({
-        email,
-        oAuthId,
-        firstName,
-        username,
-    } : IAuthenticateOAuthUserDTO ) : Promise<ResponseDTO>;
+    execute(data : ICreateOAuthUserRequestDTO ) : Promise<ResponseDTO>;
 
 }

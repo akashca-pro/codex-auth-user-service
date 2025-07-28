@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ICreateUserRequestDTO } from "@/domain/dtos/User/CreateUser";
+import { ICreateLocalUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 
 /**
  * Interface for the use case of creating a new user.
@@ -15,13 +15,13 @@ export interface ISignUpUserUseCase {
      * Execute the create user use case.
      * 
      * @async
-     * @param {ICreateUserRequestDTO} data - The data for creating a new user.
+     * @param {ICreateLocalUserRequestDTO} data - The data for creating a new user.
      * @returns {ResponseDTO}
      * 
      * @remarks
      * This method is responsible for handling the logic of creation
      * of a new user.
      */
-    execute(data : ICreateUserRequestDTO) : Promise<ResponseDTO>
+    execute(data : ICreateLocalUserRequestDTO) : Promise<ResponseDTO>
 
 }

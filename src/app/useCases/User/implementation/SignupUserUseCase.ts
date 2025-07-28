@@ -3,7 +3,7 @@ import { ISignUpUserUseCase } from "../SignupUserUseCase";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ICreateUserRequestDTO } from "@/domain/dtos/User/CreateUser";
+import { ICreateLocalUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";
 import { LocalAuthentication } from "@/domain/valueObjects/UserAuthentication";
@@ -39,7 +39,7 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
      * @param {ICreateUserRequestDTO} data - The user creation request data.
      * @return {ResponseDTO} - The response data.
      */
-    async execute(data: ICreateUserRequestDTO): Promise<ResponseDTO> {
+    async execute(data: ICreateLocalUserRequestDTO): Promise<ResponseDTO> {
         
         try {
         
@@ -52,12 +52,7 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
                 }
             }
 
-            if (!(data.authentication instanceof LocalAuthentication)) {
-                throw new Error(AuthenticateUserErrorType.InvalidAuthenticationMethod);
-            }
-
-            const plainPassword = data.authentication.password;
-            const hashedPassword = await this.passwordHasher.hashPassword(plainPassword);
+            const hashedPassword = await this.passwordHasher.hashPassword(data.password);
 
 
             const userEntity = User.create({

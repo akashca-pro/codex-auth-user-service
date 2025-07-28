@@ -1,5 +1,5 @@
 import { AuthProvider } from "../enums/AuthProvider"; 
-import { ICreateUserRequestDTO } from "../dtos/User/CreateUser";
+import { ICreateUserRequestEntityDTO } from "../dtos/User/CreateUser";
 import { IUpdateUserRequestDTO } from "../dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "../dtos/User/UserIn";
 import { UserRole } from "../enums/UserRole";
@@ -65,7 +65,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
    * @returns {IUserInRequestDTO} - The created user details.
    */
   static create<T extends UserAuthentication>(
-    data : ICreateUserRequestDTO & {authentication : T}) : IUserInRequestDTO {
+    data : ICreateUserRequestEntityDTO & {authentication : T}) : IUserInRequestDTO {
     const id = crypto.randomUUID();
     const now = new Date();
 

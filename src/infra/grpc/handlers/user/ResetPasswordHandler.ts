@@ -1,10 +1,11 @@
 import { IResetPasswordUseCase } from "@/app/useCases/Authentication/ResetPasswordUseCase";
+import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { ChangePasswordRequest, ChangePasswordResponse } from "@akashcapro/codex-shared-utils";
+import { ResetPasswordRequest, ResetPasswordResponse } from "@akashcapro/codex-shared-utils";
 import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 
 
 /**
@@ -21,6 +22,7 @@ export class GrpcUserResetPasswordHandler {
      * @constructor 
      */
     constructor(
+        @inject(TYPES.ResetPasswordUseCase)
         private resetPasswordUseCase : IResetPasswordUseCase
     ){}
 
@@ -31,9 +33,9 @@ export class GrpcUserResetPasswordHandler {
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
-    changePassword = async(
-        call : ServerUnaryCall<ChangePasswordRequest,ChangePasswordResponse>,
-        callback : sendUnaryData<ChangePasswordResponse>
+    ResetPassword = async(
+        call : ServerUnaryCall<ResetPasswordRequest,ResetPasswordResponse>,
+        callback : sendUnaryData<ResetPasswordResponse>
     ) => {
 
         try {
@@ -77,7 +79,7 @@ export class GrpcUserResetPasswordHandler {
      */
     getServiceHandler(): object{
         return {
-            changePassword : this.changePassword.bind(this)
+            resetPassword : this.ResetPassword.bind(this)
         } 
     }
 
