@@ -12,7 +12,9 @@ const TYPES = {
   ResendOtpUseCase : Symbol.for("ResendOtpUseCase"),
   VerifySignUpOtpUseCase : Symbol.for("VerifySignUpOtpUseCase"),
   ProfileUserUseCase : Symbol.for("ProfileUserUseCase"),
-  SignUpUserUseCase : Symbol.for("SignUpUserUseCase")  
+  SignUpUserUseCase : Symbol.for("SignUpUserUseCase"),
+
+  GrpcAdminAuthHandler : Symbol.for("GrpcAdminAuthHandler"),  
 
 };
 
