@@ -17,6 +17,7 @@ const TYPES = {
   GrpcAuthHandler : Symbol.for("GrpcAuthHandler"),
   
   GrpcUserSignupHandler : Symbol.for("GrpcUserSignupHandler"),
+  GrpcUserVerifySignupOtpHandler : Symbol.for("GrpcUserVerifySignupOtpHandler"),
 
 };
 

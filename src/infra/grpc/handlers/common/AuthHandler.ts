@@ -9,7 +9,7 @@ import { inject, injectable } from "inversify";
 
 
 /**
- * Class for handling admin login.
+ * Class for handling login.
  * 
  * @class
  */
@@ -27,7 +27,7 @@ export class GrpcAuthHandler {
     ){}
 
     /**
-     * This method handles the admin authentication use case.
+     * This method handles the authentication use case.
      * 
      * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 

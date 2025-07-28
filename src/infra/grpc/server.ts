@@ -8,18 +8,23 @@ import { config } from "@/config";
 import { GrpcAuthHandler } from "./handlers/common/AuthHandler";
 
 import { GrpcUserSignupHandler } from "./handlers/user/signupHandler";
+import { GrpcUserVerifySignupOtpHandler } from "./handlers/user/VerifyOtpHandler";
 
+// common
 const authHandler = container.get<GrpcAuthHandler>(TYPES.GrpcAuthHandler);
 
 // for users 
-const signupHandler = container.get<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler);
+const userSignupHandler = container.get<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler);
+const userVerifySignupOtpHandler = container.get<GrpcUserVerifySignupOtpHandler>(TYPES.GrpcUserVerifySignupOtpHandler);
 
 const adminHandlers = {
     ...authHandler.getServiceHandler(),
 }
 
 const userHandlers = {
-    ...signupHandler.getServiceHandler(),
+    ...authHandler.getServiceHandler(),
+    ...userSignupHandler.getServiceHandler(),
+    ...userVerifySignupOtpHandler
 }
 
 export const startGrpcServer = () => {
@@ -31,7 +36,6 @@ export const startGrpcServer = () => {
 
     server.addService(
         AuthUserServiceService, userHandlers);
-    
 
     server.bindAsync(
         config.GRPC_SERVER_URL,

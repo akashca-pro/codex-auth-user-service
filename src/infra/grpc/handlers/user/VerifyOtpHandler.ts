@@ -1,47 +1,49 @@
-import { ISignUpUserUseCase } from "@/app/useCases/User/SignupUserUseCase";
+import { IVerifySignUpOtpUseCase } from "@/app/useCases/Authentication/VerifySignup";
 import TYPES from "@/config/inversify/types";
-import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { SignupRequest, SignupResponse } from "@akashcapro/codex-shared-utils";
+import { VerifyOtpRequest, VerifyOtpResponse } from "@akashcapro/codex-shared-utils";
 import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
-
 /**
- * Class for handling admin login.
+ * Class for handling verify otp after signup.
  * 
  * @class
  */
 @injectable()
-export class GrpcUserSignupHandler {
+export class GrpcUserVerifySignupOtpHandler {
 
     /**
      * 
-     * @param {ISignUpUserUseCase} signUpUserUseCase - The Usecase for creation of the user.
+     * @param {IVerifySignUpOtpUseCase} verifySignupOtpUseCase - The Usecase for verify otp of the user.
      * @constructor
      */
     constructor(
-        @inject(TYPES.SignUpUserUseCase)
-        private signUpUserUseCase : ISignUpUserUseCase
+        @inject(TYPES.VerifySignUpOtpUseCase)
+        private verifySignupOtpUseCase : IVerifySignUpOtpUseCase
     ){}
 
     /**
-     * This method handles the ISignUpUserUseCase use case.
+     * This method handles the verify sign otp use case.
      * 
      * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
-    signup = async (
-        call : ServerUnaryCall<SignupRequest,SignupResponse>,
-        callback : sendUnaryData<SignupResponse>
+    verifyOtp = async (
+        call : ServerUnaryCall<VerifyOtpRequest,VerifyOtpResponse>,
+        callback : sendUnaryData<VerifyOtpResponse>
     ) : Promise<void> => {
+
         try {
+            
             const req = call.request;
-            const userData = UserMapper.toCreateLocalAuthUserDTO(req);
-            const result = await this.signUpUserUseCase.execute(userData);
+            const result = await this.verifySignupOtpUseCase.execute({
+                email : req.email,
+                otp : req.otp
+            });
 
             if(!result.success){
                 return callback({
@@ -59,13 +61,14 @@ export class GrpcUserSignupHandler {
                 message : SystemErrorType.InternalServerError
             },null);
         }
+
     }
 
     /**
      * Returns the bound handler method for the gRPC service.
      *
      * @remarks
-     * This method ensures that the `signup` handler maintains the correct `this` context
+     * This method ensures that the `verifyOtp` handler maintains the correct `this` context
      * when passed to the gRPC server. This is especially important since gRPC handlers
      * are called with a different execution context.
      *
@@ -73,7 +76,7 @@ export class GrpcUserSignupHandler {
      */
     getServiceHandler(): object{
         return {
-            signup : this.signup.bind(this)
+            verifyOtp : this.verifyOtp.bind(this)
         } 
     }
 
