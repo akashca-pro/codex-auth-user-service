@@ -8,7 +8,7 @@ const TYPES = {
   AuthenticateOAuthUserUseCase : Symbol.for("AuthenticateOAuthUserUseCase"),
   ForgotPasswordUseCase : Symbol.for("ForgotPasswordUseCase"),
   ResetPasswordUseCase : Symbol.for("ResetPasswordUseCase"),
-  RefreshTokenEndpointUseCase : Symbol.for("RefreshTokenEndpointUseCase"),
+  RefreshTokenUseCase : Symbol.for("RefreshTokenUseCase"),
   ResendOtpUseCase : Symbol.for("ResendOtpUseCase"),
   VerifySignUpOtpUseCase : Symbol.for("VerifySignUpOtpUseCase"),
   ProfileUserUseCase : Symbol.for("ProfileUserUseCase"),
@@ -22,6 +22,8 @@ const TYPES = {
   GrpcUserForgotPasswordHandler : Symbol.for("GrpcUserForgotPasswordHandler"),
   GrpcUserResetPasswordHandler : Symbol.for("GrpcUserResetPasswordHandler"),
   GrpcOAuthHandler : Symbol.for("GrpcOAuthHandler"),
+  GrpcRefreshTokenHandler : Symbol.for("GrpcRefreshTokenHandler"),
+  GrpcUserProfileHandler : Symbol.for("GrpcUserProfileHandler")
 
 };
 

@@ -9,7 +9,7 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
  *
  * @interface
  */
-export interface IRefreshTokenEndPointUseCase {
+export interface IRefreshTokenUseCase {
 
     /**
      * Execute the RefreshTokenEndPointUseCase.

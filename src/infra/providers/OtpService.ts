@@ -1,6 +1,8 @@
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { config } from "@/config";
+import TYPES from "@/config/inversify/types";
 import { OtpType } from "@/domain/enums/OtpType";
+import { injectable } from "inversify";
 import Redis from "ioredis";
 import { randomInt } from "node:crypto";
 import { Transporter } from "nodemailer";

@@ -13,30 +13,38 @@ import { GrpcUserResendOtpHandler } from "./handlers/user/ResendOtpHandler";
 import { GrpcUserForgotPasswordHandler } from "./handlers/user/ForgotPasswordHandler";
 import { GrpcUserResetPasswordHandler } from "./handlers/user/ResetPasswordHandler";
 import { GrpcOAuthHandler } from "./handlers/common/OAuthHandler";
+import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
+import { GrpcUserProfileHandler } from "./handlers/user/ProfileHandler";
 
 // common
 const authHandler = container.get<GrpcAuthHandler>(TYPES.GrpcAuthHandler);
-const oAuthHandler = container.get<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler)
+const oAuthHandler = container.get<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler);
+const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
 
-// for users 
+// users 
 const userSignupHandler = container.get<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler);
 const userVerifySignupOtpHandler = container.get<GrpcUserVerifySignupOtpHandler>(TYPES.GrpcUserVerifySignupOtpHandler);
 const userResendOtpHandler = container.get<GrpcUserResendOtpHandler>(TYPES.GrpcUserResendOtpHandler);
 const userForgotPasswordHandler = container.get<GrpcUserForgotPasswordHandler>(TYPES.GrpcUserForgotPasswordHandler);
 const userResetPasswordHandler = container.get<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler);
+const userProfileHandler = container.get<GrpcUserProfileHandler>(TYPES.GrpcUserProfileHandler);
 
 const adminHandlers = {
     ...authHandler.getServiceHandler(),
+    ...refreshToken.getServiceHandler()
 }
 
 const userHandlers = {
     ...authHandler.getServiceHandler(),
     ...oAuthHandler.getServiceHandler(),
+    ...refreshToken.getServiceHandler(),
     ...userSignupHandler.getServiceHandler(),
     ...userVerifySignupOtpHandler.getServiceHandler(),
     ...userResendOtpHandler.getServiceHandler(),
     ...userForgotPasswordHandler.getServiceHandler(),
-    ...userResetPasswordHandler.getServiceHandler()
+    ...userResetPasswordHandler.getServiceHandler(),
+
+    ...userProfileHandler.getServiceHandler()
 }
 
 export const startGrpcServer = () => {

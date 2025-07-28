@@ -1,51 +1,41 @@
-import { IRefreshTokenUseCase } from "@/app/useCases/Authentication/RefreshTokenUseCase";
+import { IProfileUserUseCase } from "@/app/useCases/User/ProfileUserUseCase";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { RefreshTokenRequest, RefreshTokenResponse } from "@akashcapro/codex-shared-utils";
+import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-shared-utils";
 import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
+
 /**
- * Class for handling Refresh token.
+ * Class for handling Profile use case.
  * 
  * @class
  */
 @injectable()
-export class GrpcRefreshTokenHandler {
-
+export class GrpcUserProfileHandler {
 
     /**
+     * This method handles the IProfileUserUseCase use case.
      * 
-     * @param {IRefreshTokenUseCase} refreshTokenUseCase - The use case of refresh token.
+     * @param {IProfileUserUseCase} profileUseCase 
      * @constructor
      */
     constructor(
-        @inject(TYPES.GrpcRefreshTokenHandler)
-        private refreshTokenUseCase : IRefreshTokenUseCase
+        @inject(TYPES.ProfileUserUseCase)
+        private profileUseCase : IProfileUserUseCase
     ){}
 
-    /**
-     * This method handles the refreshToken use case.
-     * 
-     * @async
-     * @param {ServerUnaryCall} call - This contain the request from the grpc. 
-     * @param {sendUnaryData} callback - The sends the grpc response.
-     */
-    refreshToken = async (
-        call : ServerUnaryCall<RefreshTokenRequest,RefreshTokenResponse>,
-        callback : sendUnaryData<RefreshTokenResponse>
+    profile = async (
+        call : ServerUnaryCall<UserProfileRequest,UserProfileResponse>,
+        callback : sendUnaryData<UserProfileResponse>
     ) => {
 
         try {
             
-            const req = call.request;
-            const result = await this.refreshTokenUseCase.execute({
-                userId : req.userId,
-                email : req.email,
-                role : req.role
-            });
+            const req = call.request;   
+            const result = await this.profileUseCase.execute(req.userId);
 
             if(!result.success){
                 return callback({
@@ -55,6 +45,7 @@ export class GrpcRefreshTokenHandler {
             }
 
             return callback(null,result.data.message);
+            
 
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);
@@ -70,7 +61,7 @@ export class GrpcRefreshTokenHandler {
      * Returns the bound handler method for the gRPC service.
      *
      * @remarks
-     * This method ensures that the `refreshToken` handler maintains the correct `this` context
+     * This method ensures that the `profile` handler maintains the correct `this` context
      * when passed to the gRPC server. This is especially important since gRPC handlers
      * are called with a different execution context.
      *
@@ -78,9 +69,9 @@ export class GrpcRefreshTokenHandler {
      */
     getServiceHandler(): object{
         return {
-            refreshToken : this.refreshToken.bind(this)
+            profile : this.profile.bind(this)
         } 
     }
 
-
 }
+

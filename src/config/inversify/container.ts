@@ -24,8 +24,8 @@ import { IForgotPasswordUseCase } from '@/app/useCases/Authentication/ForgotPass
 import { ForgotpasswordUseCase } from '@/app/useCases/Authentication/implementation/ForgotPasswordUseCase';
 import { IResetPasswordUseCase } from '@/app/useCases/Authentication/ResetPasswordUseCase';
 import { ResetPasswordUseCase } from '@/app/useCases/Authentication/implementation/ResetPasswordUseCase';
-import { IRefreshTokenEndPointUseCase } from '@/app/useCases/Authentication/RefreshTokenEndpoint';
-import { RefreshTokenEndPointUseCase } from '@/app/useCases/Authentication/implementation/RefreshTokenEndPointUseCase';
+import { IRefreshTokenUseCase } from '@/app/useCases/Authentication/RefreshTokenUseCase';
+import { RefreshTokenUseCase } from '@/app/useCases/Authentication/implementation/RefreshTokenUseCase';
 import { IResendOtpUseCase } from '@/app/useCases/Authentication/ResendOtp';
 import { ResendOtpUseCase } from '@/app/useCases/Authentication/implementation/ResendOtpUseCase';
 import { VerifySignUpOtpUseCase } from '@/app/useCases/Authentication/implementation/VerifySignupOtpUseCase';
@@ -39,6 +39,8 @@ import { GrpcUserResendOtpHandler } from '@/infra/grpc/handlers/user/ResendOtpHa
 import { GrpcUserForgotPasswordHandler } from '@/infra/grpc/handlers/user/ForgotPasswordHandler';
 import { GrpcUserResetPasswordHandler } from '@/infra/grpc/handlers/user/ResetPasswordHandler';
 import { GrpcOAuthHandler } from '@/infra/grpc/handlers/common/OAuthHandler';
+import { GrpcRefreshTokenHandler } from '@/infra/grpc/handlers/common/RefreshTokenHandler';
+import { GrpcUserProfileHandler } from '@/infra/grpc/handlers/user/ProfileHandler';
 
 const container = new Container();
 
@@ -66,8 +68,8 @@ container
     .bind<IResetPasswordUseCase>(TYPES.ResetPasswordUseCase)
     .to(ResetPasswordUseCase);
 container
-    .bind<IRefreshTokenEndPointUseCase>(TYPES.RefreshTokenEndpointUseCase)
-    .to(RefreshTokenEndPointUseCase);
+    .bind<IRefreshTokenUseCase>(TYPES.RefreshTokenUseCase)
+    .to(RefreshTokenUseCase);
 container
     .bind<IResendOtpUseCase>(TYPES.ResendOtpUseCase)
     .to(ResendOtpUseCase);
@@ -84,6 +86,9 @@ container
 container
     .bind<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler)
     .to(GrpcOAuthHandler);
+container
+    .bind<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler)
+    .to(GrpcRefreshTokenHandler);
 
 /**
  * User gRPC handlers.
@@ -103,6 +108,9 @@ container
 container
     .bind<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler)
     .to(GrpcUserResetPasswordHandler);
+container
+    .bind<GrpcUserProfileHandler>(TYPES.GrpcUserProfileHandler)
+    .to(GrpcUserProfileHandler);
 
 /**
  * Admin gRPC handlers.
