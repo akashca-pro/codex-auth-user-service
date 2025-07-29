@@ -75,7 +75,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 userId : user.userId,
                 email : user.email,
                 role : UserRole.USER,
-                jti : randomUUID()
+                tokenId : randomUUID()
             }
 
             const accessToken = this.tokenProvider.generateAccessToken(payload);
@@ -89,7 +89,11 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                     accessToken,
                     refreshToken,
                     message : UserSuccessType.SignupSuccess,
-                    userInfo : payload
+                    userInfo : {
+                    userId : user.userId,
+                    email : user.email,
+                    role : user.role
+                    }
                  },    
                 success : true
             }

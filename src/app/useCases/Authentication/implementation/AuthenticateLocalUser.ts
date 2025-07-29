@@ -99,7 +99,7 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             userId : user.userId,
             email : user.email,
             role : user.role,
-            jti : randomUUID()
+            tokenId : randomUUID()
         }
 
         const accessToken = this.tokenProvider.generateAccessToken(payload);
@@ -109,7 +109,12 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             data : { accessToken, 
                 refreshToken, 
                 message : AuthSuccessType.AuthenticationSuccess,
-                userInfo : payload },
+                userInfo : {
+                    userId : user.userId,
+                    email : user.email,
+                    role : user.role
+                } 
+            },
             success : true
          }
 

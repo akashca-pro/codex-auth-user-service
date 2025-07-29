@@ -22,5 +22,5 @@ export interface ITokenPayLoadDTO {
     /**
      * Unique id for token.
      */
-    jti : string;
+    tokenId : string;
 }

@@ -72,7 +72,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
                 userId : user.userId,
                 email : user.email,
                 role : user.role,
-                jti : randomUUID()
+                tokenId : randomUUID()
             }
 
 
@@ -84,8 +84,12 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
                     accessToken,
                     refreshToken,
                     message : UserSuccessType.SignupSuccess,
-                    userInfo : payload
-                 },    
+                    userInfo : {
+                    userId : user.userId,
+                    email : user.email,
+                    role : user.role
+                }
+                },    
                 success : true
             }
 

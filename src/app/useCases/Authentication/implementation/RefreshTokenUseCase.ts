@@ -40,7 +40,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 userId,
                 email,
                 role,
-                jti : randomUUID()
+                tokenId : randomUUID()
             }
 
             const accessToken = this.tokenProvider.generateAccessToken(payload);
@@ -49,7 +49,11 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 data : { 
                     accessToken,
                     message : UserSuccessType.TokenIssued,
-                    userInfo : payload
+                    userInfo : {
+                    userId,
+                    email,
+                    role 
+                    }
                  },    
                 success : true
             }
