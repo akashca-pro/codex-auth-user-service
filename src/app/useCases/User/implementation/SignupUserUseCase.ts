@@ -10,6 +10,8 @@ import { LocalAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { inject, injectable } from "inversify";
+import TYPES from "@/config/inversify/types";
 
 /**
  * Use case for Creating a user.
@@ -17,6 +19,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
  * @class
  * @implements {ISignUpUserUseCase}
  */
+@injectable()
 export class SignupUserUseCase implements ISignUpUserUseCase {
 
     /**
@@ -27,8 +30,13 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
      * @param {IOtpService} otpService - Otp service provider for verification.
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository,
+
+        @inject(TYPES.IPasswordHasher)
         private passwordHasher : IPasswordHasher,
+
+        @inject(TYPES.IOtpService)
         private otpService : IOtpService
     ){}
 
@@ -61,7 +69,11 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
             })
             await this.userRepository.create(userEntity);
 
+       console.log("User created. Sending OTP...");
+
             await this.otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
+
+        console.log("OTP sent successfully");
 
             return {
                 data : { message : UserSuccessType.OtpSendSuccess } , success : true

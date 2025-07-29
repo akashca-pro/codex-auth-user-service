@@ -5,9 +5,10 @@ import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { UserRole } from "@/domain/enums/UserRole";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { OAuthLoginRequest, OAuthLoginResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 
 /**
@@ -20,7 +21,7 @@ export class GrpcOAuthHandler {
 
     
     constructor(
-        @inject(TYPES.GrpcOAuthHandler)
+        @inject(TYPES.AuthenticateOAuthUserUseCase)
         private oAuthUseCase : IAuthenticateOAuthUserUseCase
     ){}
 
@@ -35,7 +36,8 @@ export class GrpcOAuthHandler {
         call : ServerUnaryCall<OAuthLoginRequest,OAuthLoginResponse>,
         callback : sendUnaryData<OAuthLoginResponse>
     ) : Promise<void> => {
-
+        const startTime = Date.now(); // for latency
+        const method = 'OAuthLogin'
         try {
 
             const req = call.request;
@@ -44,16 +46,19 @@ export class GrpcOAuthHandler {
             const result = await this.oAuthUseCase.execute(userData);
 
             if(!result.success){
+                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime);
+            return callback(null,result.data);
             
-        } catch (error) {
+        } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime);
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

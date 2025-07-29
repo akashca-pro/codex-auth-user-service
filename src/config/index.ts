@@ -23,7 +23,7 @@ export const config : Config = {
      REFRESH_TOKEN_SECRET : process.env.JWT_REFRESH_TOKEN_SECRET || 'jwt_secret',
      PORT : Number(process.env.PORT) || 3001,
      REDIS_URL : process.env.REDIS_URL || 'redis_url',
-     SERVICE_NAME : require('../../package.json').name || 'auth-user-service',
+     SERVICE_NAME :  'auth-user-service',
      NODEMAILER_EMAIL : process.env.NODEMAILER_EMAIL || '',
      NODEMAILER_PASS : process.env.NODEMAILER_PASS || '',
      GRPC_SERVER_URL : process.env.GRPC_SERVER_URL || '0.0.0.0:50051',

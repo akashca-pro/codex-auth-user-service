@@ -12,6 +12,8 @@ import { OtpType } from "@/domain/enums/OtpType";
 import { IAuthenticateLocalAuthUserUseCase } from "../AuthenticateLocalAuthUser";
 import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
+import logger from "@/utils/logger";
+import { SystemErrorType } from "@/domain/enums/ErrorType";
 
 /**
  * Use case for authenticating a user.
@@ -110,7 +112,8 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
          }
 
         } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+            logger.error(error);
+            return { data : { message : SystemErrorType.InternalServerError } , success : false };
         }
 
     }

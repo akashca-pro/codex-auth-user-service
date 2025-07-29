@@ -65,7 +65,9 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
 
             const userEntity = User.rehydrate(user);
             userEntity.update({isVerified : true});
-            await this.userRepository.update(user.userId,userEntity.getUpdatedFields());
+            console.log(userEntity.getUpdatedFields());
+            const res = await this.userRepository.update(user.userId,userEntity.getUpdatedFields());
+            console.log(res);
             await this.otpService.clearOtp(email,OtpType.SIGNUP);
 
             const payload : ITokenPayLoadDTO = {

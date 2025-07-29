@@ -14,6 +14,7 @@ export interface IUpdateUserRequestDTO {
   country?: string | null;
   password? : string,
   isVerified? : boolean;
+  isArchived? : boolean;
   preferredLanguage? : string | null;
   easySolved?: number | null;
   mediumSolved?: number | null;

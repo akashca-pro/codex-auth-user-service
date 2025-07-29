@@ -1,20 +1,20 @@
 import TYPES from "@/config/inversify/types";
 import container from "@/config/inversify/container";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/codex-shared-utils";
 import { Server, ServerCredentials } from "@grpc/grpc-js"
 import { config } from "@/config";
 
 import { GrpcAuthHandler } from "./handlers/common/AuthHandler";
 
-import { GrpcUserSignupHandler } from "./handlers/user/signupHandler";
+import { GrpcUserSignupHandler } from "./handlers/user/SignupHandler";
 import { GrpcUserVerifySignupOtpHandler } from "./handlers/user/VerifyOtpHandler";
 import { GrpcUserResendOtpHandler } from "./handlers/user/ResendOtpHandler";
 import { GrpcUserForgotPasswordHandler } from "./handlers/user/ForgotPasswordHandler";
 import { GrpcUserResetPasswordHandler } from "./handlers/user/ResetPasswordHandler";
 import { GrpcOAuthHandler } from "./handlers/common/OAuthHandler";
 import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
-import { GrpcUserProfileHandler } from "./handlers/user/ProfileHandler";
+import { GrpcProfileHandler } from "./handlers/common/ProfileHandler";
 
 // common
 const authHandler = container.get<GrpcAuthHandler>(TYPES.GrpcAuthHandler);
@@ -27,7 +27,7 @@ const userVerifySignupOtpHandler = container.get<GrpcUserVerifySignupOtpHandler>
 const userResendOtpHandler = container.get<GrpcUserResendOtpHandler>(TYPES.GrpcUserResendOtpHandler);
 const userForgotPasswordHandler = container.get<GrpcUserForgotPasswordHandler>(TYPES.GrpcUserForgotPasswordHandler);
 const userResetPasswordHandler = container.get<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler);
-const userProfileHandler = container.get<GrpcUserProfileHandler>(TYPES.GrpcUserProfileHandler);
+const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHandler);
 
 const adminHandlers = {
     ...authHandler.getServiceHandler(),

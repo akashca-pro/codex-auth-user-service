@@ -5,13 +5,14 @@ import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { UserRole } from "@/domain/enums/UserRole";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { SignupRequest, SignupResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 
 /**
- * Class for handling admin login.
+ * Class for handling user signup.
  * 
  * @class
  */
@@ -29,7 +30,7 @@ export class GrpcUserSignupHandler {
     ){}
 
     /**
-     * This method handles the ISignUpUserUseCase use case.
+     * This method handles the signup user use case.
      * 
      * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
@@ -39,22 +40,33 @@ export class GrpcUserSignupHandler {
         call : ServerUnaryCall<SignupRequest,SignupResponse>,
         callback : sendUnaryData<SignupResponse>
     ) : Promise<void> => {
+
+        const startTime = Date.now(); // for latency
+        const method = 'signup'
+
         try {
             const req = call.request;
             const userData = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
             const result = await this.signUpUserUseCase.execute(userData);
-
+        
             if(!result.success){
+                grpcMetricsCollector(method,result.data.message,startTime)
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime)
 
-        } catch (error) {
+            return callback(null,result.data);
+
+        } catch (error : any) {
+
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime)
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

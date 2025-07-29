@@ -33,26 +33,32 @@ import { IVerifySignUpOtpUseCase } from '@/app/useCases/Authentication/VerifySig
 
 // gRPC handlers
 import { GrpcAuthHandler } from '@/infra/grpc/handlers/common/AuthHandler';
-import { GrpcUserSignupHandler } from '@/infra/grpc/handlers/user/signupHandler';
+import { GrpcUserSignupHandler } from '@/infra/grpc/handlers/user/SignupHandler';
 import { GrpcUserVerifySignupOtpHandler } from '@/infra/grpc/handlers/user/VerifyOtpHandler';
 import { GrpcUserResendOtpHandler } from '@/infra/grpc/handlers/user/ResendOtpHandler';
 import { GrpcUserForgotPasswordHandler } from '@/infra/grpc/handlers/user/ForgotPasswordHandler';
 import { GrpcUserResetPasswordHandler } from '@/infra/grpc/handlers/user/ResetPasswordHandler';
 import { GrpcOAuthHandler } from '@/infra/grpc/handlers/common/OAuthHandler';
 import { GrpcRefreshTokenHandler } from '@/infra/grpc/handlers/common/RefreshTokenHandler';
-import { GrpcUserProfileHandler } from '@/infra/grpc/handlers/user/ProfileHandler';
+import { GrpcProfileHandler } from '@/infra/grpc/handlers/common/ProfileHandler';
 
 import Redis from 'ioredis';
 import redis from '@/config/redis'
 import { mailer } from "@/config/mailer";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { Logger } from 'winston';
+import { PrismaClient } from '@/generated/prisma';
+import { ISignUpUserUseCase } from '@/app/useCases/User/SignupUserUseCase';
+import { SignupUserUseCase } from '@/app/useCases/User/implementation/SignupUserUseCase';
+import { IProfileUseCase } from '@/app/useCases/User/ProfileUserUseCase';
+import { ProfileUseCase } from '@/app/useCases/User/implementation/ProfileUserUseCase';
 
 const container = new Container();
 
 container.bind<Redis>(TYPES.Redis).toConstantValue(redis);
 container.bind<typeof mailer>(TYPES.Mailer).toConstantValue(mailer);
 container.bind<Logger>(TYPES.Logger).toConstantValue(logger);
+container.bind<PrismaClient>(TYPES.PrismaClient).toConstantValue(new PrismaClient());
 
 // Bind providers
 container.bind<IOtpService>(TYPES.IOtpService).toDynamicValue(() => {
@@ -90,6 +96,12 @@ container
 container
     .bind<IVerifySignUpOtpUseCase>(TYPES.VerifySignUpOtpUseCase)
     .to(VerifySignUpOtpUseCase);
+container
+    .bind<ISignUpUserUseCase>(TYPES.SignUpUserUseCase)
+    .to(SignupUserUseCase);
+container
+    .bind<IProfileUseCase>(TYPES.ProfileUseCase)
+    .to(ProfileUseCase)
 
 /**
  * Common gRPC handlers.
@@ -123,12 +135,11 @@ container
     .bind<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler)
     .to(GrpcUserResetPasswordHandler);
 container
-    .bind<GrpcUserProfileHandler>(TYPES.GrpcUserProfileHandler)
-    .to(GrpcUserProfileHandler);
+    .bind<GrpcProfileHandler>(TYPES.GrpcProfileHandler)
+    .to(GrpcProfileHandler);
 
 /**
  * Admin gRPC handlers.
  */
-
 
 export default container;

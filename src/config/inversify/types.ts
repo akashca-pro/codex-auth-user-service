@@ -7,6 +7,7 @@ const TYPES = {
   Redis : Symbol.for("Redis"),
   Mailer : Symbol.for("Mailer"),
   Logger : Symbol.for("Logger"),
+  PrismaClient : Symbol.for("PrismaClient"),
 
   AuthenticateLocalUserUseCase: Symbol.for("AuthenticateLocalUserUseCase"),
   AuthenticateOAuthUserUseCase : Symbol.for("AuthenticateOAuthUserUseCase"),
@@ -15,7 +16,7 @@ const TYPES = {
   RefreshTokenUseCase : Symbol.for("RefreshTokenUseCase"),
   ResendOtpUseCase : Symbol.for("ResendOtpUseCase"),
   VerifySignUpOtpUseCase : Symbol.for("VerifySignUpOtpUseCase"),
-  ProfileUserUseCase : Symbol.for("ProfileUserUseCase"),
+  ProfileUseCase : Symbol.for("ProfileUseCase"),
   SignUpUserUseCase : Symbol.for("SignUpUserUseCase"),
 
   GrpcAuthHandler : Symbol.for("GrpcAuthHandler"),
@@ -27,7 +28,7 @@ const TYPES = {
   GrpcUserResetPasswordHandler : Symbol.for("GrpcUserResetPasswordHandler"),
   GrpcOAuthHandler : Symbol.for("GrpcOAuthHandler"),
   GrpcRefreshTokenHandler : Symbol.for("GrpcRefreshTokenHandler"),
-  GrpcUserProfileHandler : Symbol.for("GrpcUserProfileHandler")
+  GrpcProfileHandler : Symbol.for("GrpcProfileHandler"),
 
 };
 

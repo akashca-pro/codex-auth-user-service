@@ -3,9 +3,10 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { VerifyOtpRequest, VerifyOtpResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 /**
  * Class for handling verify otp after signup.
@@ -36,7 +37,8 @@ export class GrpcUserVerifySignupOtpHandler {
         call : ServerUnaryCall<VerifyOtpRequest,VerifyOtpResponse>,
         callback : sendUnaryData<VerifyOtpResponse>
     ) : Promise<void> => {
-
+        const startTime = Date.now(); // for latency
+        const method = 'verifyOtp'
         try {
             
             const req = call.request;
@@ -46,16 +48,19 @@ export class GrpcUserVerifySignupOtpHandler {
             });
 
             if(!result.success){
+                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime)
+            return callback(null,result.data);
 
-        } catch (error) {
+        } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime)
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

@@ -1,8 +1,10 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IProfileUserUseCase } from "../ProfileUserUseCase";
+import { IProfileUseCase } from "../ProfileUserUseCase";
 import { IUserRepository } from "@/app/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
+import { inject, injectable } from "inversify";
+import TYPES from "@/config/inversify/types";
 
 /**
  * Use case for retrieving profile of a user.
@@ -10,7 +12,8 @@ import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
  * @class
  * @implements {IProfileUserUseCase}
  */
-export class ProfileUserUseCase implements IProfileUserUseCase {
+@injectable()
+export class ProfileUseCase implements IProfileUseCase {
 
     /**
      * Creates an instance of ProfileUserUseCase.
@@ -18,6 +21,7 @@ export class ProfileUserUseCase implements IProfileUserUseCase {
      * @param {IUserRepository} userRepository - The repository of the user.
      */
     constructor(
+        @inject(TYPES.IUserRepository)
         private userRepository : IUserRepository
     ){}
 
@@ -38,6 +42,7 @@ export class ProfileUserUseCase implements IProfileUserUseCase {
             }
 
             const response = UserMapper.toOutDTO(user);
+            console.log(response)
 
             return { 
                 data : response , success : true

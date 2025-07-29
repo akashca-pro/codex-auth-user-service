@@ -3,9 +3,10 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { RefreshTokenRequest, RefreshTokenResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 /**
  * Class for handling Refresh token.
@@ -22,7 +23,7 @@ export class GrpcRefreshTokenHandler {
      * @constructor
      */
     constructor(
-        @inject(TYPES.GrpcRefreshTokenHandler)
+        @inject(TYPES.RefreshTokenUseCase)
         private refreshTokenUseCase : IRefreshTokenUseCase
     ){}
 
@@ -37,7 +38,8 @@ export class GrpcRefreshTokenHandler {
         call : ServerUnaryCall<RefreshTokenRequest,RefreshTokenResponse>,
         callback : sendUnaryData<RefreshTokenResponse>
     ) => {
-
+        const startTime = Date.now(); // for latency
+        const method = 'refreshToken'
         try {
             
             const req = call.request;
@@ -48,16 +50,20 @@ export class GrpcRefreshTokenHandler {
             });
 
             if(!result.success){
+                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime);            
+            return callback(null,result.data);
 
-        } catch (error) {
+        } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime);
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

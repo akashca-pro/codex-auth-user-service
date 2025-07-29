@@ -3,9 +3,10 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { ForgotPasswordRequest, ForgotPasswordResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 /**
  * Class for handling forgot password.
@@ -25,27 +26,39 @@ export class GrpcUserForgotPasswordHandler {
         private forgotPasswordUseCase : IForgotPasswordUseCase
     ){}
 
+    /**
+     * This method handles the forgot password use case.
+     * 
+     * @async
+     * @param {ServerUnaryCall} call - This contain the request from the grpc. 
+     * @param {sendUnaryData} callback - The sends the grpc response.
+     */
     forgotPassword = async (
         call : ServerUnaryCall<ForgotPasswordRequest,ForgotPasswordResponse>,
         callback : sendUnaryData<ForgotPasswordResponse>
     ) => {
-
+        const startTime = Date.now(); // for latency
+        const method = 'forgotPassword'
         try {
             
             const req = call.request;
             const result = await this.forgotPasswordUseCase.execute(req.email);
 
             if(!result.success){
+                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime);
+            return callback(null,result.data);
 
-        } catch (error) {
+        } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime);
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

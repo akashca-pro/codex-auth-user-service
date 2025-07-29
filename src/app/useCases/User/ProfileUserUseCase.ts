@@ -8,7 +8,7 @@ import { ResponseDTO } from "@/domain/dtos/Response";
  * 
  * @interface
  */
-export interface IProfileUserUseCase{
+export interface IProfileUseCase{
 
 
     /**

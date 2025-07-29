@@ -1,11 +1,12 @@
-import { IProfileUserUseCase } from "@/app/useCases/User/ProfileUserUseCase";
+import { IProfileUseCase } from "@/app/useCases/User/ProfileUserUseCase";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-shared-utils";
-import logger from "@akashcapro/codex-shared-utils/dist/utils/logger";
+import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 
 /**
@@ -14,17 +15,17 @@ import { inject, injectable } from "inversify";
  * @class
  */
 @injectable()
-export class GrpcUserProfileHandler {
+export class GrpcProfileHandler {
 
     /**
-     * This method handles the IProfileUserUseCase use case.
+     * This method handles the profile use case.
      * 
      * @param {IProfileUserUseCase} profileUseCase 
      * @constructor
      */
     constructor(
-        @inject(TYPES.ProfileUserUseCase)
-        private profileUseCase : IProfileUserUseCase
+        @inject(TYPES.ProfileUseCase)
+        private profileUseCase : IProfileUseCase
     ){}
 
     profile = async (
@@ -32,23 +33,32 @@ export class GrpcUserProfileHandler {
         callback : sendUnaryData<UserProfileResponse>
     ) => {
 
+        const startTime = Date.now(); // for latency
+        const method = 'profile'
         try {
             
             const req = call.request;   
             const result = await this.profileUseCase.execute(req.userId);
 
             if(!result.success){
+
+                grpcMetricsCollector(method,result.data.message,startTime)
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
                     message : result.data.message
                 },null)
             }
 
-            return callback(null,result.data.message);
+            grpcMetricsCollector(method,result.data.message,startTime)
+
+            return callback(null,{ ...result.data });
             
 
-        } catch (error) {
+        } catch (error : any ) {
             logger.error(SystemErrorType.InternalServerError,error);
+            grpcMetricsCollector(method,error.message,startTime)
+            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
