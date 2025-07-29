@@ -25,16 +25,16 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
     /**
      * Creates an instance of AuthenticateOAuthUserUseCase.
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
      * @contructor
      */
      constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.ITokenProvider)
-        private tokenProvider : ITokenProvider
+        private _tokenProvider : ITokenProvider
      ){}
 
     /**
@@ -46,7 +46,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
     async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
         
         try {
-            const userAlreadyExists = await this.userRepository.findByEmail(data.email)
+            const userAlreadyExists = await this._userRepository.findByEmail(data.email)
 
             if(userAlreadyExists){
                 return {
@@ -66,7 +66,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
                 role : data.role
             })
 
-            await this.userRepository.create(user);
+            await this._userRepository.create(user);
 
             const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
@@ -76,8 +76,8 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             }
 
 
-            const accessToken = this.tokenProvider.generateAccessToken(payload);
-            const refreshToken = this.tokenProvider.generateRefreshToken(payload);
+            const accessToken = this._tokenProvider.generateAccessToken(payload);
+            const refreshToken = this._tokenProvider.generateRefreshToken(payload);
 
             return { 
                 data : { 

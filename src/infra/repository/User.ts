@@ -21,11 +21,11 @@ export class UserRepository implements IUserRepository {
      * Creates an instance of UserRepository.
      * 
      * @constructor
-     * @param {PrismaClient} prisma - The prisma client instance.
+     * @param {PrismaClient} _prisma - The prisma client instance.
      */
     constructor(
         @inject(TYPES.PrismaClient)
-        private prisma : PrismaClient
+        private _prisma : PrismaClient
     ){}
 
     /**
@@ -38,7 +38,7 @@ export class UserRepository implements IUserRepository {
         const startTime = Date.now();
         const operation = 'create';
         try {
-            await this.prisma.user.create({ data });
+            await this._prisma.user.create({ data });
 
             // Observe successfull duration.
             dbMetricsCollector(operation,'success',startTime);
@@ -61,7 +61,7 @@ export class UserRepository implements IUserRepository {
         const startTime = Date.now();
         const operation = 'find_by_email';
         try {
-            const user = await this.prisma.user.findFirst({
+            const user = await this._prisma.user.findFirst({
                 where : { email }
             })
 
@@ -93,7 +93,7 @@ export class UserRepository implements IUserRepository {
         const operation = 'find_by_id';
 
         try {
-            const user = await this.prisma.user.findFirst({
+            const user = await this._prisma.user.findFirst({
                 where : { userId }
             })
 
@@ -126,7 +126,7 @@ export class UserRepository implements IUserRepository {
         
         try {
             const perPage = 4;
-            const users : IUserOutRequestDTO[] = await this.prisma.user.findMany({
+            const users : IUserOutRequestDTO[] = await this._prisma.user.findMany({
                 take : perPage,
                 skip : Math.ceil((pageNumber - 1) * perPage),
                 orderBy : {
@@ -151,7 +151,7 @@ export class UserRepository implements IUserRepository {
                 }
             });
 
-            const total = await this.prisma.user.count();
+            const total = await this._prisma.user.count();
 
             // Observe successfull duration.
             dbMetricsCollector(operation,'success',startTime);
@@ -184,7 +184,7 @@ export class UserRepository implements IUserRepository {
         const operation = 'find_by_username';
         
         try {
-            const usernameExist = await this.prisma.user.findUnique({
+            const usernameExist = await this._prisma.user.findUnique({
                 where : { username },
                 select : { userId : true } 
             })
@@ -216,7 +216,7 @@ export class UserRepository implements IUserRepository {
         const operation = 'update';
 
         try {
-            const userUpdated = await this.prisma.user.update({
+            const userUpdated = await this._prisma.user.update({
                 where : {userId},
                 data : {
                     username : data.username,
@@ -264,7 +264,7 @@ export class UserRepository implements IUserRepository {
         const operation = 'delete';
 
         try {
-            await this.prisma.user.delete({
+            await this._prisma.user.delete({
                 where : {userId},
             })
 

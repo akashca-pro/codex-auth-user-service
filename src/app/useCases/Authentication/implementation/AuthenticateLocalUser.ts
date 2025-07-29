@@ -27,24 +27,24 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
     /**
      * Creates an instance of AuthenticateUserUseCase.
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
-     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
-     * @param {IOtpService} otpService - Otp service provider for verification.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {IPasswordHasher} _passwordHasher - The password hasher provider for comparing hashed password.
+     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
+     * @param {IOtpService} _otpService - Otp service provider for verification.
      * @contructor
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private passwordHasher : IPasswordHasher,
+        private _passwordHasher : IPasswordHasher,
 
         @inject(TYPES.ITokenProvider)
-        private tokenProvider : ITokenProvider,
+        private _tokenProvider : ITokenProvider,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService
+        private _otpService : IOtpService
     ){}
 
     /**
@@ -59,7 +59,7 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
     } : IAuthenticateLocalAuthUserDTO) : Promise<ResponseDTO> {
 
         try {
-        const user = (await this.userRepository.findByEmail(
+        const user = (await this._userRepository.findByEmail(
             email
         ))
 
@@ -77,7 +77,7 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             }
         }
 
-        const passwordMatch = await this.passwordHasher.comparePasswords(password,user.password);
+        const passwordMatch = await this._passwordHasher.comparePasswords(password,user.password);
 
         if(!passwordMatch){
             return {
@@ -87,8 +87,8 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
         }
 
         if(!user.isVerified){
-            await this.otpService.clearOtp(email, OtpType.SIGNUP);
-            await this.otpService.generateAndSendOtp(email, OtpType.SIGNUP);
+            await this._otpService.clearOtp(email, OtpType.SIGNUP);
+            await this._otpService.generateAndSendOtp(email, OtpType.SIGNUP);
             return {
                 data : { message : AuthSuccessType.VerificationOtpSend },
                 success : false
@@ -102,8 +102,8 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             tokenId : randomUUID()
         }
 
-        const accessToken = this.tokenProvider.generateAccessToken(payload);
-        const refreshToken = this.tokenProvider.generateRefreshToken(payload);
+        const accessToken = this._tokenProvider.generateAccessToken(payload);
+        const refreshToken = this._tokenProvider.generateRefreshToken(payload);
 
         return { 
             data : { accessToken, 

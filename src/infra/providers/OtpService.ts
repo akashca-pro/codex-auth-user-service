@@ -18,16 +18,16 @@ export class OtpService implements IOtpService {
 
     /**
      * 
-     * @param {Redis} redis - Redis client for caching the otp
-     * @param {Transporter} mailer - Nodemailer instance for sending otp via mail.
-     * @param {Logger} logger - Custom logger instance from winston
-     * @param {number} otpTtlSeconds - Otp expiry time.
+     * @param {Redis} _redis - Redis client for caching the otp
+     * @param {Transporter} _mailer - Nodemailer instance for sending otp via mail.
+     * @param {Logger} _logger - Custom logger instance from winston
+     * @param {number} _otpTtlSeconds - Otp expiry time.
      */
     constructor(
-        private readonly redis: Redis,
-        private readonly mailer: Transporter,
-        private readonly logger: Logger,
-        private readonly otpTtlSeconds: number = config.OTP_EXPIRY_SECONDS
+        private readonly _redis: Redis,
+        private readonly _mailer: Transporter,
+        private readonly _logger: Logger,
+        private readonly _otpTtlSeconds: number = config.OTP_EXPIRY_SECONDS
     ){}
 
     /**
@@ -51,9 +51,9 @@ export class OtpService implements IOtpService {
     private async cacheOtp(email: string, type: OtpType, otp: string): Promise<void> {
         const key = `otp:${type}:${email}`;
         try {
-        await this.redis.set(key, otp, 'EX', this.otpTtlSeconds);
+        await this._redis.set(key, otp, 'EX', this._otpTtlSeconds);
         } catch (error) {
-        this.logger.error(`Error caching OTP: ${error}`);
+        this._logger.error(`Error caching OTP: ${error}`);
         throw new Error('Failed to cache OTP');
         }
     }
@@ -70,13 +70,13 @@ export class OtpService implements IOtpService {
     async verifyOtp(email: string, type: OtpType, otp: string): Promise<boolean> {
         const key = `otp:${type}:${email}`;
         try {
-        const storedOtp = await this.redis.get(key);
+        const storedOtp = await this._redis.get(key);
         if (!storedOtp) {
             return false;
         }
         return storedOtp === otp;
         } catch (error) {
-        this.logger.error(`Error verifying OTP: ${error}`);
+        this._logger.error(`Error verifying OTP: ${error}`);
         return false;
         }
     }
@@ -91,9 +91,9 @@ export class OtpService implements IOtpService {
     async clearOtp(email: string, type: OtpType): Promise<void> {
         const key = `otp:${type}:${email}`;
         try {
-        await this.redis.del(key);
+        await this._redis.del(key);
         } catch (error) {
-        this.logger.error(`Error clearing OTP: ${error}`);
+        this._logger.error(`Error clearing OTP: ${error}`);
         throw new Error('Failed to clear OTP');
         }
     }
@@ -127,9 +127,9 @@ export class OtpService implements IOtpService {
         };
 
         try {
-        await this.mailer.sendMail(mailOptions);
+        await this._mailer.sendMail(mailOptions);
         } catch (error) {
-        this.logger.error(`Error sending OTP email: ${error}`);
+        this._logger.error(`Error sending OTP email: ${error}`);
         throw new Error('Failed to send OTP email');
         }
     }

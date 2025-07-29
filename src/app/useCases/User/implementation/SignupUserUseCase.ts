@@ -25,19 +25,19 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
     /**
      * Creates an instance of SignupUserUseCase.
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
-     * @param {IOtpService} otpService - Otp service provider for verification.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {IPasswordHasher} _passwordHasher - The password hasher provider for comparing hashed password.
+     * @param {IOtpService} _otpService - Otp service provider for verification.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private passwordHasher : IPasswordHasher,
+        private _passwordHasher : IPasswordHasher,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService
+        private _otpService : IOtpService
     ){}
 
     /**
@@ -51,7 +51,7 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
         
         try {
         
-            const userAlreadyExists = await this.userRepository.findByEmail(data.email);
+            const userAlreadyExists = await this._userRepository.findByEmail(data.email);
 
             if(userAlreadyExists){
                 return {
@@ -60,20 +60,16 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
                 }
             }
 
-            const hashedPassword = await this.passwordHasher.hashPassword(data.password);
+            const hashedPassword = await this._passwordHasher.hashPassword(data.password);
 
 
             const userEntity = User.create({
                 ...data,
                 authentication : new LocalAuthentication(hashedPassword)
             })
-            await this.userRepository.create(userEntity);
+            await this._userRepository.create(userEntity);
 
-       console.log("User created. Sending OTP...");
-
-            await this.otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
-
-        console.log("OTP sent successfully");
+            await this._otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
 
             return {
                 data : { message : UserSuccessType.OtpSendSuccess } , success : true

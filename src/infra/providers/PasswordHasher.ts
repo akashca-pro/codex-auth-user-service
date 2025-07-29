@@ -14,7 +14,7 @@ export class BcryptPasswordHasher implements IPasswordHasher {
      * @private
      * @readonly
      */
-    private readonly saltRounds: number;
+    private readonly _saltRounds: number;
 
     /**
      * Creates an instance of the PasswordHasher.
@@ -22,7 +22,7 @@ export class BcryptPasswordHasher implements IPasswordHasher {
      * @param {number} [saltRounds=10] - The number of salt rounds to use for password hashing.
      */
     constructor(saltRounds: number = 10) {
-        this.saltRounds = saltRounds
+        this._saltRounds = saltRounds
     }
 
     /**
@@ -33,7 +33,7 @@ export class BcryptPasswordHasher implements IPasswordHasher {
      * @returns {Promise<string>} The hashed password.
      */
     async hashPassword(password: string): Promise<string> {
-        const salt = await bcrypt.genSalt(this.saltRounds)
+        const salt = await bcrypt.genSalt(this._saltRounds)
         const hash = await bcrypt.hash(password, salt)
         return hash
     }

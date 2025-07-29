@@ -19,11 +19,11 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
     /**
      * Creates an instance of RefreshTokenEndPointUseCase.
      * 
-     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
+     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
      */
     constructor(
         @inject(TYPES.ITokenProvider)
-        private tokenProvider : ITokenProvider,
+        private _tokenProvider : ITokenProvider,
     ){}
 
     /**
@@ -43,7 +43,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 tokenId : randomUUID()
             }
 
-            const accessToken = this.tokenProvider.generateAccessToken(payload);
+            const accessToken = this._tokenProvider.generateAccessToken(payload);
 
             return { 
                 data : { 

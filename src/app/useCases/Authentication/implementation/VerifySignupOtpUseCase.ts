@@ -29,19 +29,19 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      * Creates an instance of VerifySignUpOtpUseCase.
      * 
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IOtpService} otpService - Otp service provider for verification.
-     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {IOtpService} _otpService - Otp service provider for verification.
+     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
      */
     constructor (
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.ITokenProvider)
-        private tokenProvider : ITokenProvider,
+        private _tokenProvider : ITokenProvider,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService
+        private _otpService : IOtpService
     ){}
 
     /**
@@ -52,13 +52,13 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      */
     async execute({ email, otp }: IVerifySignUpOtp): Promise<ResponseDTO> {
         try {
-            const user = await this.userRepository.findByEmail(email) 
+            const user = await this._userRepository.findByEmail(email) 
             
             if(!user){
                 return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
             }
 
-            const isOtpVerified = await this.otpService.verifyOtp(email,OtpType.SIGNUP,otp);
+            const isOtpVerified = await this._otpService.verifyOtp(email,OtpType.SIGNUP,otp);
 
             if(!isOtpVerified){
                 return {data : {message : AuthenticateUserErrorType.InvalidOrExpiredOtp}, success : false}
@@ -67,9 +67,9 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
             const userEntity = User.rehydrate(user);
             userEntity.update({isVerified : true});
             console.log(userEntity.getUpdatedFields());
-            const res = await this.userRepository.update(user.userId,userEntity.getUpdatedFields());
+            const res = await this._userRepository.update(user.userId,userEntity.getUpdatedFields());
             console.log(res);
-            await this.otpService.clearOtp(email,OtpType.SIGNUP);
+            await this._otpService.clearOtp(email,OtpType.SIGNUP);
 
             const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
@@ -78,8 +78,8 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 tokenId : randomUUID()
             }
 
-            const accessToken = this.tokenProvider.generateAccessToken(payload);
-            const refreshToken = this.tokenProvider.generateRefreshToken(payload);
+            const accessToken = this._tokenProvider.generateAccessToken(payload);
+            const refreshToken = this._tokenProvider.generateRefreshToken(payload);
 
             if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
             if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);

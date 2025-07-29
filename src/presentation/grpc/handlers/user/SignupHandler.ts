@@ -21,12 +21,12 @@ export class GrpcUserSignupHandler {
 
     /**
      * 
-     * @param {ISignUpUserUseCase} signUpUserUseCase - The Usecase for creation of the user.
+     * @param {ISignUpUserUseCase} _signUpUserUseCase - The Usecase for creation of the user.
      * @constructor
      */
     constructor(
         @inject(TYPES.SignUpUserUseCase)
-        private signUpUserUseCase : ISignUpUserUseCase
+        private _signUpUserUseCase : ISignUpUserUseCase
     ){}
 
     /**
@@ -47,7 +47,7 @@ export class GrpcUserSignupHandler {
         try {
             const req = call.request;
             const userData = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
-            const result = await this.signUpUserUseCase.execute(userData);
+            const result = await this._signUpUserUseCase.execute(userData);
         
             if(!result.success){
                 grpcMetricsCollector(method,result.data.message,startTime)

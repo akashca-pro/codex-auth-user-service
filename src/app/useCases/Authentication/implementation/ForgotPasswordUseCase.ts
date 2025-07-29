@@ -21,15 +21,15 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
      * Creates an instance of ForgotpasswordUseCase.
      * 
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IOtpService} otpService -  - Otp service provider for generate and sent otp.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {IOtpService} _otpService -  - Otp service provider for generate and sent otp.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService
+        private _otpService : IOtpService
     ){}
 
     /**
@@ -38,13 +38,13 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
      */
     async execute(email: string): Promise<ResponseDTO>{
         try {
-            const user = this.userRepository.findByEmail(email);
+            const user = this._userRepository.findByEmail(email);
 
             if(!user){
                 return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
             }
 
-            await this.otpService.generateAndSendOtp(email, OtpType.FORGOT_PASS);
+            await this._otpService.generateAndSendOtp(email, OtpType.FORGOT_PASS);
 
             return {
                 data : { message : UserSuccessType.OtpSendSuccess },

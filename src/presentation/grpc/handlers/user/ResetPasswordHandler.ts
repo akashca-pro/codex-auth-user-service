@@ -19,12 +19,12 @@ export class GrpcUserResetPasswordHandler {
 
     /**
      * 
-     * @param {IResetPasswordUseCase} resetPasswordUseCase - The Usecase for creation of the user.
+     * @param {IResetPasswordUseCase} _resetPasswordUseCase - The Usecase for creation of the user.
      * @constructor 
      */
     constructor(
         @inject(TYPES.ResetPasswordUseCase)
-        private resetPasswordUseCase : IResetPasswordUseCase
+        private _resetPasswordUseCase : IResetPasswordUseCase
     ){}
 
     /**
@@ -44,7 +44,7 @@ export class GrpcUserResetPasswordHandler {
             
             const req = call.request;
 
-            const result = await this.resetPasswordUseCase.execute({
+            const result = await this._resetPasswordUseCase.execute({
                 email : req.email,
                 newPassword : req.newPassword,
                 otp : req.otp

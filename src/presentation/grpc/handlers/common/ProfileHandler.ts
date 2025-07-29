@@ -20,12 +20,12 @@ export class GrpcProfileHandler {
     /**
      * This method handles the profile use case.
      * 
-     * @param {IProfileUserUseCase} profileUseCase 
+     * @param {IProfileUserUseCase} _profileUseCase 
      * @constructor
      */
     constructor(
         @inject(TYPES.ProfileUseCase)
-        private profileUseCase : IProfileUseCase
+        private _profileUseCase : IProfileUseCase
     ){}
 
     profile = async (
@@ -38,7 +38,7 @@ export class GrpcProfileHandler {
         try {
             
             const req = call.request;   
-            const result = await this.profileUseCase.execute(req.userId);
+            const result = await this._profileUseCase.execute(req.userId);
 
             if(!result.success){
 

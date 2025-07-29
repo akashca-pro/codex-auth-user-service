@@ -19,12 +19,12 @@ export class GrpcUserResendOtpHandler {
 
     /**
      * 
-     * @param {IResendOtpUseCase} resendOtpUseCase - The use case for resend otp to user.
+     * @param {IResendOtpUseCase} _resendOtpUseCase - The use case for resend otp to user.
      * @constructor
      */
     constructor(
         @inject(TYPES.ResendOtpUseCase)
-        private resendOtpUseCase : IResendOtpUseCase
+        private _resendOtpUseCase : IResendOtpUseCase
     ){}
 
     /**
@@ -43,7 +43,7 @@ export class GrpcUserResendOtpHandler {
         try {
             const req = call.request;
 
-            const result = await this.resendOtpUseCase.execute(req.email);
+            const result = await this._resendOtpUseCase.execute(req.email);
 
             if(!result.success){
                 grpcMetricsCollector(method,result.data.message,startTime)

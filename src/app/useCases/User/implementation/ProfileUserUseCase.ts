@@ -18,11 +18,11 @@ export class ProfileUseCase implements IProfileUseCase {
     /**
      * Creates an instance of ProfileUserUseCase.
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IUserRepository} _userRepository - The repository of the user.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository
+        private _userRepository : IUserRepository
     ){}
 
     /**
@@ -35,7 +35,7 @@ export class ProfileUseCase implements IProfileUseCase {
         
         try {
 
-            const user = await this.userRepository.findById(userId);
+            const user = await this._userRepository.findById(userId);
 
             if(!user){
                 return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}

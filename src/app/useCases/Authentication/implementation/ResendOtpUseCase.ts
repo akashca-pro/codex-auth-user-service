@@ -21,15 +21,15 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     /**
      * Creates an instance of ResendOtpUseCase.
      * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IOtpService} otpService - Otp service provider for re-issuing otp.
+     * @param {IUserRepository} _userRepository - The repository of the user.
+     * @param {IOtpService} _otpService - Otp service provider for re-issuing otp.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService
+        private _otpService : IOtpService
     ){}
 
     /**
@@ -41,7 +41,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
      */
     async execute(email: string): Promise<ResponseDTO> {
         try {
-            const user = await this.userRepository.findByEmail(email);
+            const user = await this._userRepository.findByEmail(email);
             
             if(!user){
                 return {
@@ -57,8 +57,8 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
                 }
             }
 
-            await this.otpService.clearOtp(email,OtpType.SIGNUP);
-            await this.otpService.generateAndSendOtp(email,OtpType.SIGNUP);
+            await this._otpService.clearOtp(email,OtpType.SIGNUP);
+            await this._otpService.generateAndSendOtp(email,OtpType.SIGNUP);
 
             return { data : { message : UserSuccessType.OtpSendSuccess }, success : true }
 

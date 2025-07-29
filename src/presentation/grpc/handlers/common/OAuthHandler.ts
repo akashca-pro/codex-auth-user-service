@@ -22,7 +22,7 @@ export class GrpcOAuthHandler {
     
     constructor(
         @inject(TYPES.AuthenticateOAuthUserUseCase)
-        private oAuthUseCase : IAuthenticateOAuthUserUseCase
+        private _oAuthUseCase : IAuthenticateOAuthUserUseCase
     ){}
 
     /**
@@ -43,7 +43,7 @@ export class GrpcOAuthHandler {
             const req = call.request;
 
             const userData = UserMapper.toCreateOAuthUser(req,UserRole.USER)
-            const result = await this.oAuthUseCase.execute(userData);
+            const result = await this._oAuthUseCase.execute(userData);
 
             if(!result.success){
                 grpcMetricsCollector(method,result.data.message,startTime);

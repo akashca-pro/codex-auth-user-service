@@ -19,12 +19,12 @@ export class GrpcAuthHandler {
 
     /**
      * 
-     * @param {IAuthenticateLocalAuthUserUseCase} authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
+     * @param {IAuthenticateLocalAuthUserUseCase} _authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
      * @constructor
      */
     constructor(
         @inject(TYPES.AuthenticateLocalUserUseCase)
-        private authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
+        private _authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
     ){}
 
     /**
@@ -42,7 +42,7 @@ export class GrpcAuthHandler {
         const method = 'localAuthLogin'
         try {
             const req = call.request;
-            const result = await this.authenticateLocalAuthUserUseCase.execute({
+            const result = await this._authenticateLocalAuthUserUseCase.execute({
                 email : req.email,
                 password : req.password
             })

@@ -4,14 +4,14 @@ import logger from '@/utils/logger';
 import { RedisEvents } from './enums/redis';
 
 class RedisClient {
-    private static instance : Redis
-    private static isConnected = false;
+    private static _instance : Redis
+    private static _isConnected = false;
 
     private constructor() {}
 
     public static getInstance() : Redis {
-        if(!RedisClient.instance){
-            RedisClient.instance = new Redis(config.REDIS_URL, {
+        if(!RedisClient._instance){
+            RedisClient._instance = new Redis(config.REDIS_URL, {
                 retryStrategy : (times : number) => {
                     const delay = Math.min(times * 50,2000);
                     return delay
@@ -20,32 +20,32 @@ class RedisClient {
             });
             RedisClient.setupEventListeners();
         }
-        return RedisClient.instance
+        return RedisClient._instance
     }
 
     public static setupEventListeners() : void {
-        RedisClient.instance.on(RedisEvents.READY,()=>{
-            RedisClient.isConnected = true;
+        RedisClient._instance.on(RedisEvents.READY,()=>{
+            RedisClient._isConnected = true;
             logger.info('Redis is ready');
         })
 
-    RedisClient.instance.on(RedisEvents.ERROR, (error) => {
-      RedisClient.isConnected = false;
+    RedisClient._instance.on(RedisEvents.ERROR, (error) => {
+      RedisClient._isConnected = false;
       logger.error('Redis connection error:', error);
     });
 
-    RedisClient.instance.on(RedisEvents.CLOSE, () => {
-      RedisClient.isConnected = false;
+    RedisClient._instance.on(RedisEvents.CLOSE, () => {
+      RedisClient._isConnected = false;
       logger.warn('Redis connection closed');
     });
 
-    RedisClient.instance.on(RedisEvents.RECONNECTING, () => {
+    RedisClient._instance.on(RedisEvents.RECONNECTING, () => {
       logger.info('Reconnecting to Redis...');
     });
     }
 
     public static isReady() : boolean {
-        return RedisClient.isConnected
+        return RedisClient._isConnected
     }
 }
 

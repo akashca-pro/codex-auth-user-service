@@ -18,12 +18,12 @@ export class GrpcUserVerifySignupOtpHandler {
 
     /**
      * 
-     * @param {IVerifySignUpOtpUseCase} verifySignupOtpUseCase - The Usecase for verify otp of the user.
+     * @param {IVerifySignUpOtpUseCase} _verifySignupOtpUseCase - The Usecase for verify otp of the user.
      * @constructor
      */
     constructor(
         @inject(TYPES.VerifySignUpOtpUseCase)
-        private verifySignupOtpUseCase : IVerifySignUpOtpUseCase
+        private _verifySignupOtpUseCase : IVerifySignUpOtpUseCase
     ){}
 
     /**
@@ -42,7 +42,7 @@ export class GrpcUserVerifySignupOtpHandler {
         try {
             
             const req = call.request;
-            const result = await this.verifySignupOtpUseCase.execute({
+            const result = await this._verifySignupOtpUseCase.execute({
                 email : req.email,
                 otp : req.otp
             });

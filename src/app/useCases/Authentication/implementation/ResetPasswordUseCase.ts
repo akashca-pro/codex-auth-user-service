@@ -29,13 +29,13 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private userRepository : IUserRepository,
+        private _userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private passwordHasher : IPasswordHasher,
+        private _passwordHasher : IPasswordHasher,
 
         @inject(TYPES.IOtpService)
-        private otpService : IOtpService,
+        private _otpService : IOtpService,
     ){}
 
     /**
@@ -53,27 +53,27 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
         
         try {
 
-            const user = await this.userRepository.findByEmail(email);
+            const user = await this._userRepository.findByEmail(email);
 
             if(!user){
                 return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
             }
 
-            if(!await this.otpService.verifyOtp(email,OtpType.FORGOT_PASS,otp)){
+            if(!await this._otpService.verifyOtp(email,OtpType.FORGOT_PASS,otp)){
                 return {
                     data : { message : AuthenticateUserErrorType.InvalidOrExpiredOtp},
                     success : false
                  }
             }
 
-            const hashedPassword = await this.passwordHasher.hashPassword(newPassword);
+            const hashedPassword = await this._passwordHasher.hashPassword(newPassword);
 
             const userEntity = User.rehydrate(user);
             userEntity.update({
                 password : hashedPassword
             })
 
-            await this.userRepository.update(user.userId,userEntity.getUpdatedFields());
+            await this._userRepository.update(user.userId,userEntity.getUpdatedFields());
 
             return {
                 data : { message : UserSuccessType.PasswordChangedSuccessfully },

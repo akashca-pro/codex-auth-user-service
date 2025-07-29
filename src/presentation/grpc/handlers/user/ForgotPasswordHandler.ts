@@ -18,12 +18,12 @@ export class GrpcUserForgotPasswordHandler {
 
     /**
      * 
-     * @param {IForgotPasswordUseCase} forgotPasswordUseCase - The use case for forgot password for the user.
+     * @param {IForgotPasswordUseCase} _forgotPasswordUseCase - The use case for forgot password for the user.
      * @constructor
      */
     constructor(
         @inject(TYPES.ForgotPasswordUseCase)
-        private forgotPasswordUseCase : IForgotPasswordUseCase
+        private _forgotPasswordUseCase : IForgotPasswordUseCase
     ){}
 
     /**
@@ -42,7 +42,7 @@ export class GrpcUserForgotPasswordHandler {
         try {
             
             const req = call.request;
-            const result = await this.forgotPasswordUseCase.execute(req.email);
+            const result = await this._forgotPasswordUseCase.execute(req.email);
 
             if(!result.success){
                 grpcMetricsCollector(method,result.data.message,startTime);

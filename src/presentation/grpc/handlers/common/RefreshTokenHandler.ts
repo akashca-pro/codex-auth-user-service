@@ -7,6 +7,7 @@ import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
+import { randomUUID } from "node:crypto";
 
 /**
  * Class for handling Refresh token.
@@ -19,12 +20,12 @@ export class GrpcRefreshTokenHandler {
 
     /**
      * 
-     * @param {IRefreshTokenUseCase} refreshTokenUseCase - The use case of refresh token.
+     * @param {IRefreshTokenUseCase} _refreshTokenUseCase - The use case of refresh token.
      * @constructor
      */
     constructor(
         @inject(TYPES.RefreshTokenUseCase)
-        private refreshTokenUseCase : IRefreshTokenUseCase
+        private _refreshTokenUseCase : IRefreshTokenUseCase
     ){}
 
     /**
@@ -43,10 +44,11 @@ export class GrpcRefreshTokenHandler {
         try {
             
             const req = call.request;
-            const result = await this.refreshTokenUseCase.execute({
+            const result = await this._refreshTokenUseCase.execute({
                 userId : req.userId,
                 email : req.email,
-                role : req.role
+                role : req.role,
+                tokenId : randomUUID()
             });
 
             if(!result.success){
