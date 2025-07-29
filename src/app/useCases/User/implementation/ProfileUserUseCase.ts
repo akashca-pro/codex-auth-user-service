@@ -42,7 +42,6 @@ export class ProfileUseCase implements IProfileUseCase {
             }
 
             const response = UserMapper.toOutDTO(user);
-            console.log(response)
 
             return { 
                 data : response , success : true

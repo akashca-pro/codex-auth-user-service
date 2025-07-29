@@ -5,6 +5,7 @@ import { IRefreshTokenUseCase } from "../RefreshTokenUseCase";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { injectable, inject } from "inversify";
+import { randomUUID } from "node:crypto";
 
 /**
  * Use case for issuing new accessToken.
@@ -38,7 +39,8 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
             const payload : ITokenPayLoadDTO = {
                 userId,
                 email,
-                role
+                role,
+                jti : randomUUID()
             }
 
             const accessToken = this.tokenProvider.generateAccessToken(payload);

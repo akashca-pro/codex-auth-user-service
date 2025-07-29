@@ -18,4 +18,9 @@ export interface ITokenPayLoadDTO {
      * The role of the user.
      */
     role : string;
+
+    /**
+     * Unique id for token.
+     */
+    jti : string;
 }

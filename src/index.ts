@@ -2,7 +2,7 @@ import express from 'express';
 import logger from '@/utils/logger';
 import { globalErrorHandler } from '@/utils/errorHandler';
 import { config } from '@/config';
-import { startGrpcServer } from '@/infra/grpc/server';
+import { startGrpcServer } from '@/presentation/grpc/server';
 import dotenv from 'dotenv';
 import { startMetricsServer } from './config/metrics/metrics-server';
 dotenv.config();

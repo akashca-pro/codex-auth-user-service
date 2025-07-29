@@ -32,15 +32,15 @@ import { VerifySignUpOtpUseCase } from '@/app/useCases/Authentication/implementa
 import { IVerifySignUpOtpUseCase } from '@/app/useCases/Authentication/VerifySignup';
 
 // gRPC handlers
-import { GrpcAuthHandler } from '@/infra/grpc/handlers/common/AuthHandler';
-import { GrpcUserSignupHandler } from '@/infra/grpc/handlers/user/SignupHandler';
-import { GrpcUserVerifySignupOtpHandler } from '@/infra/grpc/handlers/user/VerifyOtpHandler';
-import { GrpcUserResendOtpHandler } from '@/infra/grpc/handlers/user/ResendOtpHandler';
-import { GrpcUserForgotPasswordHandler } from '@/infra/grpc/handlers/user/ForgotPasswordHandler';
-import { GrpcUserResetPasswordHandler } from '@/infra/grpc/handlers/user/ResetPasswordHandler';
-import { GrpcOAuthHandler } from '@/infra/grpc/handlers/common/OAuthHandler';
-import { GrpcRefreshTokenHandler } from '@/infra/grpc/handlers/common/RefreshTokenHandler';
-import { GrpcProfileHandler } from '@/infra/grpc/handlers/common/ProfileHandler';
+import { GrpcAuthHandler } from '@/presentation/grpc/handlers/common/AuthHandler';
+import { GrpcUserSignupHandler } from '@/presentation/grpc/handlers/user/SignupHandler';
+import { GrpcUserVerifySignupOtpHandler } from '@/presentation/grpc/handlers/user/VerifyOtpHandler';
+import { GrpcUserResendOtpHandler } from '@/presentation/grpc/handlers/user/ResendOtpHandler';
+import { GrpcUserForgotPasswordHandler } from '@/presentation/grpc/handlers/user/ForgotPasswordHandler';
+import { GrpcUserResetPasswordHandler } from '@/presentation/grpc/handlers/user/ResetPasswordHandler';
+import { GrpcOAuthHandler } from '@/presentation/grpc/handlers/common/OAuthHandler';
+import { GrpcRefreshTokenHandler } from '@/presentation/grpc/handlers/common/RefreshTokenHandler';
+import { GrpcProfileHandler } from '@/presentation/grpc/handlers/common/ProfileHandler';
 
 import Redis from 'ioredis';
 import redis from '@/config/redis'

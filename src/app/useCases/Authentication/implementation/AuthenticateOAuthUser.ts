@@ -11,6 +11,7 @@ import { AuthProvider } from "@/domain/enums/AuthProvider";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
+import { randomUUID } from "node:crypto";
 
 /**
  * Use case for authenticating a user.
@@ -70,7 +71,8 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
                 email : user.email,
-                role : user.role
+                role : user.role,
+                jti : randomUUID()
             }
 
 

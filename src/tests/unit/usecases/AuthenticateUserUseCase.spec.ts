@@ -1,8 +1,8 @@
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp"
-import { ITokenService } from "@/app/providers/GenerateTokens"
+import { ITokenProvider } from "@/app/providers/GenerateTokens"
 import { IPasswordHasher } from "@/app/providers/PasswordHasher"
 import { IUserRepository } from "@/app/repository/User"
-import { AuthenticateUserUseCase } from "@/app/useCases/Authentication/implementation/AuthenticateLocalUser"
+import { AuthenticateLocalUserUseCase } from "@/app/useCases/Authentication/implementation/AuthenticateLocalUser"
 import { IUserInRequestDTO } from '@/domain/dtos/User/UserIn'
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType"
 import { AuthProvider } from "@/domain/enums/AuthProvider"
@@ -29,10 +29,10 @@ const mockOtpService = {
     clearOtp : jest.fn(),
 }
 
-const useCase = new AuthenticateUserUseCase(
+const useCase = new AuthenticateLocalUserUseCase(
     mockUserRepository as unknown as IUserRepository,
     mockPasswordHasher as unknown as IPasswordHasher,
-    mockTokenService as unknown as ITokenService,
+    mockTokenService as unknown as ITokenProvider,
     mockOtpService as unknown as IOtpService
 )
 

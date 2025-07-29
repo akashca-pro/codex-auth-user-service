@@ -13,6 +13,7 @@ import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { inject, injectable } from "inversify";
+import { randomUUID } from "node:crypto";
 
 
 /**
@@ -73,7 +74,8 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
             const payload : ITokenPayLoadDTO = {
                 userId : user.userId,
                 email : user.email,
-                role : UserRole.USER
+                role : UserRole.USER,
+                jti : randomUUID()
             }
 
             const accessToken = this.tokenProvider.generateAccessToken(payload);

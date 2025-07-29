@@ -6,6 +6,7 @@ export const grpcMetricsCollector = (
     startTime : number
 
 ) => {
+    if(status === undefined) status = 'success'
     grpcRequestCounter.inc({ method , status });
     grpcLatency.observe(
         {method, status},

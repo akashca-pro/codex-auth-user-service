@@ -42,7 +42,7 @@ export class GrpcProfileHandler {
 
             if(!result.success){
 
-                grpcMetricsCollector(method,result.data.message,startTime)
+                grpcMetricsCollector(method,'success',startTime)
 
                 return callback({
                     code : mapMessageToGrpcStatus(result.data.message),
@@ -50,7 +50,7 @@ export class GrpcProfileHandler {
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime)
+            grpcMetricsCollector(method,'success',startTime)
 
             return callback(null,{ ...result.data });
             

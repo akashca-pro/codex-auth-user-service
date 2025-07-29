@@ -14,6 +14,7 @@ import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import logger from "@/utils/logger";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
+import { randomUUID } from "node:crypto";
 
 /**
  * Use case for authenticating a user.
@@ -97,7 +98,8 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
-            role : user.role
+            role : user.role,
+            jti : randomUUID()
         }
 
         const accessToken = this.tokenProvider.generateAccessToken(payload);
