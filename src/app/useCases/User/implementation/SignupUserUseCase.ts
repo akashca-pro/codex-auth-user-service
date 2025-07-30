@@ -1,4 +1,4 @@
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { ISignUpUserUseCase } from "../SignupUserUseCase";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";

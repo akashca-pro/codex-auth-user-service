@@ -2,7 +2,7 @@ import TYPES from "@/config/inversify/types";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IResendOtpUseCase } from "../ResendOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";

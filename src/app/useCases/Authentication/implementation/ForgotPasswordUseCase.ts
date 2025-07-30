@@ -1,5 +1,5 @@
 import TYPES from "@/config/inversify/types";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { IForgotPasswordUseCase } from "../ForgotPasswordUseCase";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";

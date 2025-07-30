@@ -1,3 +1,5 @@
+import { UserRole } from "@/generated/prisma";
+
 /**
  * Data Transfer Object (DTO) representing local user authentication data.
  *
@@ -13,4 +15,9 @@ export interface IAuthenticateLocalAuthUserDTO {
    * The password of the user for authentication.
    */
   password: string;
+
+  /**
+   * The role of the user.
+   */
+  role : UserRole
 }

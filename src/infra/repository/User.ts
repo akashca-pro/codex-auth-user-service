@@ -1,8 +1,8 @@
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaClient, UserRole } from "@/generated/prisma";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { inject, injectable } from "inversify";
@@ -76,6 +76,37 @@ export class UserRepository implements IUserRepository {
             // Observe failed duration.
             dbMetricsCollector(operation,'error',startTime);
 
+            throw error;
+        }
+
+    }
+
+    /**
+     * 
+     * @param {string} email - The email address of the user.
+     * @param {UserRole} role - The role of the user.
+     * @returns {Promse<IUserInRequestDTO | null>} - The found user data or null if not.
+     */
+    async findByEmailAndRole(email: string, role: UserRole): Promise<IUserInRequestDTO | null> {
+        const startTime = Date.now();
+        const operation = 'find_by_email_and_role';
+        try {
+            
+            const user = await this._prisma.user.findFirst({
+                where : {
+                    email,
+                    role
+                }
+            })
+
+            dbMetricsCollector(operation,'success',startTime);
+
+            if(!user) return null;
+
+            return UserMapper.mapPrismaUserToDomain(user);
+
+        } catch (error) {
+            dbMetricsCollector(operation, 'error', startTime);
             throw error;
         }
 

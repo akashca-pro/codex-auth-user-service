@@ -2,7 +2,7 @@ import TYPES from "@/config/inversify/types";
 import { injectable, inject } from "inversify";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IAuthenticateOAuthUserUseCase } from "../AuthenticateOAuthUser";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";

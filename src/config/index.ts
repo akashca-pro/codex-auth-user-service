@@ -15,6 +15,7 @@ interface Config {
     JWT_ACCESS_TOKEN_EXPIRY : string;
     NODEMAILER_SERVICE : string;
     OTP_EXPIRY_SECONDS : number;
+    METRICS_PORT : number;
 }
 
 export const config : Config = {
@@ -30,5 +31,6 @@ export const config : Config = {
      JWT_ACCESS_TOKEN_EXPIRY : process.env.JWT_ACCESS_TOKEN_EXPIRY || '1d',
      JWT_REFRESH_TOKEN_EXPIRY : process.env.JWT_REFRESH_TOKEN_EXPIRY || '7d',
      NODEMAILER_SERVICE : process.env.NODEMAILER_SERVICE || 'gmail',
-     OTP_EXPIRY_SECONDS : Number(process.env.OTP_EXPIRY_SECONDS) || 120
+     OTP_EXPIRY_SECONDS : Number(process.env.OTP_EXPIRY_SECONDS) || 120,
+     METRICS_PORT : Number(process.env.METRICS_PORT) || 9101
 }

@@ -3,7 +3,7 @@ import { injectable, inject } from "inversify";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { IAuthenticateLocalAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
@@ -15,6 +15,7 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import logger from "@/utils/logger";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { randomUUID } from "node:crypto";
+import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Use case for authenticating a user.
@@ -55,12 +56,14 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
      */
     async execute({
         email,
-        password
+        password,
+        role
     } : IAuthenticateLocalAuthUserDTO) : Promise<ResponseDTO> {
 
         try {
-        const user = (await this._userRepository.findByEmail(
-            email
+        const user = (await this._userRepository.findByEmailAndRole(
+            email,
+            role
         ))
 
         if(!user){

@@ -1,6 +1,6 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IProfileUseCase } from "../ProfileUserUseCase";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { inject, injectable } from "inversify";

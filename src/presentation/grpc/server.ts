@@ -5,23 +5,24 @@ import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/cod
 import { Server, ServerCredentials } from "@grpc/grpc-js"
 import { config } from "@/config";
 
-import { GrpcAuthHandler } from "./handlers/common/AuthHandler";
+import { GrpcUserAuthHandler } from "./handlers/user/UserAuthHandler";
 
 import { GrpcUserSignupHandler } from "./handlers/user/SignupHandler";
 import { GrpcUserVerifySignupOtpHandler } from "./handlers/user/VerifyOtpHandler";
 import { GrpcUserResendOtpHandler } from "./handlers/user/ResendOtpHandler";
 import { GrpcUserForgotPasswordHandler } from "./handlers/user/ForgotPasswordHandler";
 import { GrpcUserResetPasswordHandler } from "./handlers/user/ResetPasswordHandler";
-import { GrpcOAuthHandler } from "./handlers/common/OAuthHandler";
+import { GrpcOAuthHandler } from "./handlers/user/OAuthHandler";
 import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
 import { GrpcProfileHandler } from "./handlers/common/ProfileHandler";
+import { GrpcAdminAuthHandler } from "./handlers/admin/AdminAuthHandler";
 
 // common
-const authHandler = container.get<GrpcAuthHandler>(TYPES.GrpcAuthHandler);
-const oAuthHandler = container.get<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler);
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
 
 // users 
+const userAuthHandler = container.get<GrpcUserAuthHandler>(TYPES.GrpcUserAuthHandler);
+const oAuthHandler = container.get<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler);
 const userSignupHandler = container.get<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler);
 const userVerifySignupOtpHandler = container.get<GrpcUserVerifySignupOtpHandler>(TYPES.GrpcUserVerifySignupOtpHandler);
 const userResendOtpHandler = container.get<GrpcUserResendOtpHandler>(TYPES.GrpcUserResendOtpHandler);
@@ -29,13 +30,16 @@ const userForgotPasswordHandler = container.get<GrpcUserForgotPasswordHandler>(T
 const userResetPasswordHandler = container.get<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler);
 const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHandler);
 
+// admin
+const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
+
 const adminHandlers = {
-    ...authHandler.getServiceHandler(),
+    ...adminAuthHandler.getServiceHandler(),
     ...refreshToken.getServiceHandler()
 }
 
 const userHandlers = {
-    ...authHandler.getServiceHandler(),
+    ...userAuthHandler.getServiceHandler(),
     ...oAuthHandler.getServiceHandler(),
     ...refreshToken.getServiceHandler(),
     ...userSignupHandler.getServiceHandler(),

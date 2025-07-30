@@ -1,6 +1,6 @@
 import { ResendOtpUseCase } from "@/app/useCases/Authentication/implementation/ResendOtpUseCase";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";

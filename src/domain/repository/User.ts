@@ -2,6 +2,7 @@ import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
+import { UserRole } from "@/generated/prisma";
 
 /**
  * Interface for the repository handling user data.
@@ -23,9 +24,17 @@ export interface IUserRepository {
      * 
      * @async
      * @param {string} email - The email address of the user.
-     * @returns {Promse<IUserInRequestDTO | null>} - The found user data or undefined if not.
+     * @returns {Promse<IUserInRequestDTO | null>} - The found user data or null if not.
      */
     findByEmail(email : string) : Promise<IUserInRequestDTO | null>;
+
+    /**
+     * 
+     * @param {string} email - The email address of the user.
+     * @param {UserRole} role - The role of the user.
+     * @returns {Promse<IUserInRequestDTO | null>} - The found user data or null if not.
+     */
+    findByEmailAndRole(email : string, role : UserRole) : Promise<IUserInRequestDTO | null> 
 
     /**
      * Find a user by their userId.

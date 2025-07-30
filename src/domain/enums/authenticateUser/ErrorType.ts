@@ -30,4 +30,5 @@ export enum AuthenticateUserErrorType {
    */
   InvalidAuthenticationMethod = 'Invalid authentication method. Expected LocalAuthentication.',
 
+  UnAuthorized = 'Unauthorized'
 }

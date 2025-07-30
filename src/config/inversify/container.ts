@@ -3,7 +3,7 @@ import { Container } from "inversify";
 import TYPES from './types';
 
 // Dependencies
-import { IUserRepository } from '@/app/repository/User';
+import { IUserRepository } from '@/domain/repository/User';
 import { UserRepository } from '@/infra/repository/User';
 
 import { IPasswordHasher } from '@/app/providers/PasswordHasher';
@@ -32,13 +32,13 @@ import { VerifySignUpOtpUseCase } from '@/app/useCases/Authentication/implementa
 import { IVerifySignUpOtpUseCase } from '@/app/useCases/Authentication/VerifySignup';
 
 // gRPC handlers
-import { GrpcAuthHandler } from '@/presentation/grpc/handlers/common/AuthHandler';
+import { GrpcUserAuthHandler } from '@/presentation/grpc/handlers/user/UserAuthHandler';
 import { GrpcUserSignupHandler } from '@/presentation/grpc/handlers/user/SignupHandler';
 import { GrpcUserVerifySignupOtpHandler } from '@/presentation/grpc/handlers/user/VerifyOtpHandler';
 import { GrpcUserResendOtpHandler } from '@/presentation/grpc/handlers/user/ResendOtpHandler';
 import { GrpcUserForgotPasswordHandler } from '@/presentation/grpc/handlers/user/ForgotPasswordHandler';
 import { GrpcUserResetPasswordHandler } from '@/presentation/grpc/handlers/user/ResetPasswordHandler';
-import { GrpcOAuthHandler } from '@/presentation/grpc/handlers/common/OAuthHandler';
+import { GrpcOAuthHandler } from '@/presentation/grpc/handlers/user/OAuthHandler';
 import { GrpcRefreshTokenHandler } from '@/presentation/grpc/handlers/common/RefreshTokenHandler';
 import { GrpcProfileHandler } from '@/presentation/grpc/handlers/common/ProfileHandler';
 
@@ -52,6 +52,7 @@ import { ISignUpUserUseCase } from '@/app/useCases/User/SignupUserUseCase';
 import { SignupUserUseCase } from '@/app/useCases/User/implementation/SignupUserUseCase';
 import { IProfileUseCase } from '@/app/useCases/User/ProfileUserUseCase';
 import { ProfileUseCase } from '@/app/useCases/User/implementation/ProfileUserUseCase';
+import { GrpcAdminAuthHandler } from '@/presentation/grpc/handlers/admin/AdminAuthHandler';
 
 const container = new Container();
 
@@ -107,8 +108,8 @@ container
  * Common gRPC handlers.
  */
 container
-    .bind<GrpcAuthHandler>(TYPES.GrpcAuthHandler)
-    .to(GrpcAuthHandler);
+    .bind<GrpcUserAuthHandler>(TYPES.GrpcUserAuthHandler)
+    .to(GrpcUserAuthHandler);
 container
     .bind<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler)
     .to(GrpcOAuthHandler);
@@ -141,5 +142,9 @@ container
 /**
  * Admin gRPC handlers.
  */
+
+container
+    .bind<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler)
+    .to(GrpcAdminAuthHandler);
 
 export default container;

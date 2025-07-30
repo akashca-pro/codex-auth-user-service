@@ -1,7 +1,7 @@
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp"
 import { ITokenProvider } from "@/app/providers/GenerateTokens"
 import { IPasswordHasher } from "@/app/providers/PasswordHasher"
-import { IUserRepository } from "@/app/repository/User"
+import { IUserRepository } from "@/domain/repository/User"
 import { AuthenticateLocalUserUseCase } from "@/app/useCases/Authentication/implementation/AuthenticateLocalUser"
 import { IUserInRequestDTO } from '@/domain/dtos/User/UserIn'
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType"

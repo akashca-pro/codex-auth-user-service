@@ -89,4 +89,19 @@ export class UserMapper {
       updatedAt: user.updatedAt,
     };
   }
+
+static toUserRole(role: string): UserRole {
+  const normalized = role?.toLowerCase();
+
+  if (normalized === 'user') {
+    return UserRole.USER;
+  }
+
+  if (normalized === 'admin') {
+    return UserRole.ADMIN;
+  }
+
+  throw new Error('Invalid role: ' + role);
+}
+
 }

@@ -1,5 +1,5 @@
 import TYPES from "@/config/inversify/types";
-import { IUserRepository } from "@/app/repository/User";
+import { IUserRepository } from "@/domain/repository/User";
 import { IVerifySignUpOtpUseCase } from "../VerifySignup";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";

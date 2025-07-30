@@ -7,15 +7,16 @@ import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
+import { UserRole } from "@/domain/enums/UserRole";
 
 
 /**
- * Class for handling login.
+ * Class for handling User login.
  * 
  * @class
  */
 @injectable()
-export class GrpcAuthHandler {
+export class GrpcUserAuthHandler {
 
     /**
      * 
@@ -28,7 +29,7 @@ export class GrpcAuthHandler {
     ){}
 
     /**
-     * This method handles the local authentication use case.
+     * This method handles the user local authentication use case.
      * 
      * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
@@ -39,12 +40,13 @@ export class GrpcAuthHandler {
         callback : sendUnaryData<LoginResponse>
     ) : Promise<void> => {
         const startTime = Date.now(); // for latency
-        const method = 'localAuthLogin'
+        const method = 'UserlocalAuthLogin'
         try {
             const req = call.request;
             const result = await this._authenticateLocalAuthUserUseCase.execute({
                 email : req.email,
-                password : req.password
+                password : req.password,
+                role : UserRole.USER
             })
 
             if(!result.success){

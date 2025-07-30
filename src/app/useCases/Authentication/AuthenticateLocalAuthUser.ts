@@ -15,12 +15,12 @@ export interface IAuthenticateLocalAuthUserUseCase {
      * executes the authentication usecase.
      * 
      * @async
-     * @param {IAuthenticateLocalAuthUserDTO} credentials - The user credentials for authentication.
+     * @param {IAuthenticateLocalAuthUserDTO} data - The user credentials for authentication.
      * @returns {Promise<ResponseDTO>} - The response data 
      * 
      * @remarks
      * This method is responsible for handling the logic of authenticating a user
      * based on the provided credentials (email and password).
      */
-    execute({email, password} : IAuthenticateLocalAuthUserDTO ) : Promise<ResponseDTO> 
+    execute(data : IAuthenticateLocalAuthUserDTO ) : Promise<ResponseDTO> 
 }

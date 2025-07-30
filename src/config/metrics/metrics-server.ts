@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { register } from './metrics';
 import logger from '@/utils/logger';
 
-export const startMetricsServer = (port : number = 9100)  => {
+export const startMetricsServer = (port : number)  => {
 
     const app = express();
 

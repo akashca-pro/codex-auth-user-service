@@ -14,12 +14,9 @@ app.use(globalErrorHandler);
 
 const startServer = () => {
     try {
-        app.listen(config.PORT,()=>{
-            logger.info(`${config.SERVICE_NAME} running on port ${config.PORT}`);
-        })
 
         // Start prometheus metrics server.
-        startMetricsServer();
+        startMetricsServer(config.METRICS_PORT);
 
         // start gRPC server.
         startGrpcServer();
