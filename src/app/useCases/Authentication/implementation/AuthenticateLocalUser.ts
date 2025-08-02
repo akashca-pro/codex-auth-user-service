@@ -15,7 +15,6 @@ import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import logger from "@/utils/logger";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { randomUUID } from "node:crypto";
-import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Use case for authenticating a user.
