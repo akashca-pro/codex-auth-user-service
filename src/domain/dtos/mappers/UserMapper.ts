@@ -54,11 +54,11 @@ export class UserMapper {
       avatar: user.avatar,
       country: user.country,
       preferredLanguage: user.preferredLanguage,
-      easySolved: user.easySolved,
-      mediumSolved: user.mediumSolved,
-      hardSolved: user.hardSolved,
-      totalSubmission: user.totalSubmission,
-      streak: user.streak,
+      easySolved: user.easySolved ?? 0,
+      mediumSolved: user.mediumSolved ?? 0,
+      hardSolved: user.hardSolved ?? 0,
+      totalSubmission: user.totalSubmission ?? 0,
+      streak: user.streak ?? 0,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
     };

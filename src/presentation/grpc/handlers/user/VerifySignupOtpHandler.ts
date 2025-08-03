@@ -6,7 +6,6 @@ import { VerifyOtpRequest, VerifyOtpResponse } from "@akashcapro/codex-shared-ut
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 /**
  * Class for handling verify otp after signup.
@@ -16,15 +15,19 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 @injectable()
 export class GrpcUserVerifySignupOtpHandler {
 
+    #_verifySignupOtpUseCase : IVerifySignUpOtpUseCase
+    
     /**
      * 
-     * @param {IVerifySignUpOtpUseCase} _verifySignupOtpUseCase - The Usecase for verify otp of the user.
+     * @param {IVerifySignUpOtpUseCase} verifySignupOtpUseCase - The Usecase for verify otp of the user.
      * @constructor
      */
     constructor(
         @inject(TYPES.VerifySignUpOtpUseCase)
-        private _verifySignupOtpUseCase : IVerifySignUpOtpUseCase
-    ){}
+        verifySignupOtpUseCase : IVerifySignUpOtpUseCase
+    ){
+        this.#_verifySignupOtpUseCase = verifySignupOtpUseCase
+    }
 
     /**
      * This method handles the verify sign otp use case.
@@ -37,36 +40,34 @@ export class GrpcUserVerifySignupOtpHandler {
         call : ServerUnaryCall<VerifyOtpRequest,VerifyOtpResponse>,
         callback : sendUnaryData<VerifyOtpResponse>
     ) : Promise<void> => {
-        const startTime = Date.now(); // for latency
-        const method = 'verifyOtp'
         try {
-            
             const req = call.request;
-            const result = await this._verifySignupOtpUseCase.execute({
+            const result = await this.#_verifySignupOtpUseCase.execute({
                 email : req.email,
                 otp : req.otp
             });
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime)
-            return callback(null,result.data);
+            return callback(null,{
+                accessToken : result.data.accessToken,
+                refreshToken : result.data.refreshToken,
+                userInfo : result.data.userInfo,
+                message : result.message
+            });
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime)
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**

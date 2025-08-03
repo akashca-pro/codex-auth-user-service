@@ -34,7 +34,7 @@ import { IVerifySignUpOtpUseCase } from '@/app/useCases/Authentication/VerifySig
 // gRPC handlers
 import { GrpcUserAuthHandler } from '@/presentation/grpc/handlers/user/UserAuthHandler';
 import { GrpcUserSignupHandler } from '@/presentation/grpc/handlers/user/SignupHandler';
-import { GrpcUserVerifySignupOtpHandler } from '@/presentation/grpc/handlers/user/VerifyOtpHandler';
+import { GrpcUserVerifySignupOtpHandler } from '@/presentation/grpc/handlers/user/VerifySignupOtpHandler';
 import { GrpcUserResendOtpHandler } from '@/presentation/grpc/handlers/user/ResendOtpHandler';
 import { GrpcUserForgotPasswordHandler } from '@/presentation/grpc/handlers/user/ForgotPasswordHandler';
 import { GrpcUserResetPasswordHandler } from '@/presentation/grpc/handlers/user/ResetPasswordHandler';
@@ -53,6 +53,9 @@ import { SignupUserUseCase } from '@/app/useCases/User/implementation/SignupUser
 import { IProfileUseCase } from '@/app/useCases/User/ProfileUserUseCase';
 import { ProfileUseCase } from '@/app/useCases/User/implementation/ProfileUserUseCase';
 import { GrpcAdminAuthHandler } from '@/presentation/grpc/handlers/admin/AdminAuthHandler';
+import { IUpdateUserProfileUseCase } from '@/app/useCases/User/UpdateProfileUseCase';
+import { UpdateUserProfileUseCase } from '@/app/useCases/User/implementation/UpdateProfileUseCase';
+import { GrpcUpdateProfileHandler } from '@/presentation/grpc/handlers/common/UpdateProfileHandler';
 
 const container = new Container();
 
@@ -102,7 +105,10 @@ container
     .to(SignupUserUseCase);
 container
     .bind<IProfileUseCase>(TYPES.ProfileUseCase)
-    .to(ProfileUseCase)
+    .to(ProfileUseCase);
+container
+    .bind<IUpdateUserProfileUseCase>(TYPES.UpdateProfileUseCase)
+    .to(UpdateUserProfileUseCase)
 
 /**
  * Common gRPC handlers.
@@ -116,6 +122,9 @@ container
 container
     .bind<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler)
     .to(GrpcRefreshTokenHandler);
+container
+    .bind<GrpcUpdateProfileHandler>(TYPES.GrpcUpdateProfileHandler)
+    .to(GrpcUpdateProfileHandler);
 
 /**
  * User gRPC handlers.

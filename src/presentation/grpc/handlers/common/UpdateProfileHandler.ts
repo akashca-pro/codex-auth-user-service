@@ -1,48 +1,48 @@
-import { IForgotPasswordUseCase } from "@/app/useCases/Authentication/ForgotPasswordUseCase";
+import { IUpdateUserProfileUseCase } from "@/app/useCases/User/UpdateProfileUseCase";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { ForgotPasswordRequest, ForgotPasswordResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from "@/utils/logger";
+import { UpdateProfileRequest, UpdateProfileResponse } from "@akashcapro/codex-shared-utils";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 /**
- * Class for handling forgot password.
+ * Grpc Handler for update profile use case.
  * 
  * @class
  */
 @injectable()
-export class GrpcUserForgotPasswordHandler {
+export class GrpcUpdateProfileHandler {
 
-    #_forgotPasswordUseCase : IForgotPasswordUseCase
-
+    #updateProfileUseCase : IUpdateUserProfileUseCase
+    
     /**
      * 
-     * @param {IForgotPasswordUseCase} forgotPasswordUseCase - The use case for forgot password for the user.
+     * @param {IUpdateUserProfileUseCase} updateProfileUseCase
      * @constructor
      */
     constructor(
-        @inject(TYPES.ForgotPasswordUseCase)
-        forgotPasswordUseCase : IForgotPasswordUseCase
+        @inject(TYPES.UpdateProfileUseCase) updateProfileUseCase : IUpdateUserProfileUseCase
     ){
-        this.#_forgotPasswordUseCase = forgotPasswordUseCase
+        this.#updateProfileUseCase = updateProfileUseCase
     }
 
-    /**
-     * This method handles the forgot password use case.
-     * 
-     * @async
-     * @param {ServerUnaryCall} call - This contain the request from the grpc. 
-     * @param {sendUnaryData} callback - The sends the grpc response.
-     */
-    forgotPassword = async (
-        call : ServerUnaryCall<ForgotPasswordRequest,ForgotPasswordResponse>,
-        callback : sendUnaryData<ForgotPasswordResponse>
+    updateProfile = async (
+        call : ServerUnaryCall<UpdateProfileRequest,UpdateProfileResponse>,
+        callback : sendUnaryData<UpdateProfileResponse>
     ) => {
+
         try {
             const req = call.request;
-            const result = await this.#_forgotPasswordUseCase.execute(req.email);
+            const result = await this.#updateProfileUseCase.execute(req.userId,{
+                username : req.username,
+                firstName : req.firstName,
+                lastName : req.lastName,
+                avatar : req.avatar,
+                country : req.country,
+                preferredLanguage : req.preferredLanguage
+            });
 
             if(!result.success){
                 return callback({
@@ -55,20 +55,21 @@ export class GrpcUserForgotPasswordHandler {
                 message : result.message
             });
 
-        } catch (error : any) {
+        } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);
+            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
             },null);
         }
     }
-    
+
     /**
      * Returns the bound handler method for the gRPC service.
      *
      * @remarks
-     * This method ensures that the `forgotPassword` handler maintains the correct `this` context
+     * This method ensures that the `profile` handler maintains the correct `this` context
      * when passed to the gRPC server. This is especially important since gRPC handlers
      * are called with a different execution context.
      *
@@ -76,7 +77,7 @@ export class GrpcUserForgotPasswordHandler {
      */
     getServiceHandler(): object{
         return {
-            forgotPassword : this.forgotPassword.bind(this)
+            updateProfile : this.updateProfile.bind(this)
         } 
     }
 

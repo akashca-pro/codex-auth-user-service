@@ -5,6 +5,8 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
+import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 
 /**
  * Use case for retrieving profile of a user.
@@ -15,15 +17,13 @@ import TYPES from "@/config/inversify/types";
 @injectable()
 export class ProfileUseCase implements IProfileUseCase {
 
-    /**
-     * Creates an instance of ProfileUserUseCase.
-     * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     */
+    #_userRepository : IUserRepository
+
     constructor(
-        @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository
-    ){}
+        @inject(TYPES.IUserRepository) userRepository : IUserRepository
+    ){
+        this.#_userRepository = userRepository;
+    }
 
     /**
      * 
@@ -32,25 +32,24 @@ export class ProfileUseCase implements IProfileUseCase {
      * @return {ResponseDTO} - The response data.
      */
     async execute(userId: string): Promise<ResponseDTO> {
-        
-        try {
 
-            const user = await this._userRepository.findById(userId);
+        const user = await this.#_userRepository.findById(userId);
+        console.log(user);
 
-            if(!user){
-                return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
+        if(!user){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
             }
-
-            const response = UserMapper.toOutDTO(user);
-
-            return { 
-                data : response , success : true
-            }
-            
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
         }
 
-    }
+        const response = UserMapper.toOutDTO(user);
 
+        return { 
+            data : response,
+            success : true,
+            message : UserSuccessType.ProfileLoaded
+        }
+    }
 }

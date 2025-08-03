@@ -15,7 +15,7 @@ export interface ResponseDTO {
   data: any
 
   /**
-   * The HTTP status code (optional).
+   * The repsonse message.                               .
    */
-  statusCode?: number
+  message : string
 }

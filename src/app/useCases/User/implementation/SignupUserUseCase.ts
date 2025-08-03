@@ -4,7 +4,6 @@ import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { ICreateLocalUserRequestDTO } from "@/domain/dtos/User/CreateUser";
-import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";
 import { LocalAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
@@ -22,23 +21,31 @@ import TYPES from "@/config/inversify/types";
 @injectable()
 export class SignupUserUseCase implements ISignUpUserUseCase {
 
+    #_userRepository : IUserRepository
+    #_passwordHasher : IPasswordHasher
+    #_otpService : IOtpService
+
     /**
      * Creates an instance of SignupUserUseCase.
      * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {IPasswordHasher} _passwordHasher - The password hasher provider for comparing hashed password.
-     * @param {IOtpService} _otpService - Otp service provider for verification.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
+     * @param {IOtpService} otpService - Otp service provider for verification.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private _passwordHasher : IPasswordHasher,
+        passwordHasher : IPasswordHasher,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_otpService = otpService,
+        this.#_passwordHasher = passwordHasher,
+        this.#_userRepository = userRepository 
+    }
 
     /**
      * Execute the create user use case.
@@ -49,36 +56,31 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
      */
     async execute(data: ICreateLocalUserRequestDTO): Promise<ResponseDTO> {
         
-        try {
-        
-            const userAlreadyExists = await this._userRepository.findByEmail(data.email);
+        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
 
-            if(userAlreadyExists){
-                return {
-                    data : { message : UserErrorType.UserAlreadyExists },
-                    success : false
-                }
-            }
-
-            const hashedPassword = await this._passwordHasher.hashPassword(data.password);
-
-
-            const userEntity = User.create({
-                ...data,
-                authentication : new LocalAuthentication(hashedPassword)
-            })
-            await this._userRepository.create(userEntity);
-
-            await this._otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
-
+        if(userAlreadyExists){
             return {
-                data : { message : UserSuccessType.OtpSendSuccess } , success : true
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
             }
-
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
         }
 
-    }
+        const hashedPassword = await this.#_passwordHasher.hashPassword(data.password);
 
+
+        const userEntity = User.create({
+            ...data,
+            authentication : new LocalAuthentication(hashedPassword)
+        })
+        await this.#_userRepository.create(userEntity);
+
+        await this.#_otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
+
+        return {
+            data : null,
+            message : UserSuccessType.OtpSendSuccess,
+            success : true
+        }
+    }
 }

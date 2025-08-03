@@ -18,19 +18,24 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class ResendOtpUseCase implements IResendOtpUseCase {
 
+    #_userRepository : IUserRepository
+    #_otpService : IOtpService
     /**
      * Creates an instance of ResendOtpUseCase.
      * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {IOtpService} _otpService - Otp service provider for re-issuing otp.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IOtpService} otpService - Otp service provider for re-issuing otp.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_userRepository = userRepository,
+        this.#_otpService = otpService
+    }
 
     /**
      * Executes the ResendOtpUseCase use case.
@@ -40,31 +45,32 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
      * @returns {Promise<ResponseDTO>} - The response data.
      */
     async execute(email: string): Promise<ResponseDTO> {
-        try {
-            const user = await this._userRepository.findByEmail(email);
-            
-            if(!user){
-                return {
-                    data : { message : AuthenticateUserErrorType.AccountNotFound },
-                    success : false
-                }
+
+        const user = await this.#_userRepository.findByEmail(email);
+        
+        if(!user){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
             }
+        }
 
-            if(user.isVerified){
-                return {
-                    data : { message : UserErrorType.AlreadyVerified },
-                    success : false
-                }
+        if(user.isVerified){
+            return {
+                data : null,
+                message : UserErrorType.AlreadyVerified,
+                success : false
             }
+        }
 
-            await this._otpService.clearOtp(email,OtpType.SIGNUP);
-            await this._otpService.generateAndSendOtp(email,OtpType.SIGNUP);
+        await this.#_otpService.clearOtp(email,OtpType.SIGNUP);
+        await this.#_otpService.generateAndSendOtp(email,OtpType.SIGNUP);
 
-            return { data : { message : UserSuccessType.OtpSendSuccess }, success : true }
-
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+        return {
+            data : null,
+            message : UserSuccessType.OtpSendSuccess,
+            success : true
         }
     }
-
 }

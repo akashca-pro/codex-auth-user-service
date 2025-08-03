@@ -6,8 +6,6 @@ import { RefreshTokenRequest, RefreshTokenResponse } from "@akashcapro/codex-sha
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
-import { randomUUID } from "node:crypto";
 
 /**
  * Class for handling Refresh token.
@@ -17,16 +15,19 @@ import { randomUUID } from "node:crypto";
 @injectable()
 export class GrpcRefreshTokenHandler {
 
+    #_refreshTokenUseCase : IRefreshTokenUseCase
 
     /**
      * 
-     * @param {IRefreshTokenUseCase} _refreshTokenUseCase - The use case of refresh token.
+     * @param {IRefreshTokenUseCase} refreshTokenUseCase - The use case of refresh token.
      * @constructor
      */
     constructor(
         @inject(TYPES.RefreshTokenUseCase)
-        private _refreshTokenUseCase : IRefreshTokenUseCase
-    ){}
+        refreshTokenUseCase : IRefreshTokenUseCase
+    ){
+        this.#_refreshTokenUseCase = refreshTokenUseCase
+    }
 
     /**
      * This method handles the refreshToken use case.
@@ -39,39 +40,36 @@ export class GrpcRefreshTokenHandler {
         call : ServerUnaryCall<RefreshTokenRequest,RefreshTokenResponse>,
         callback : sendUnaryData<RefreshTokenResponse>
     ) => {
-        const startTime = Date.now(); // for latency
-        const method = 'refreshToken'
+
         try {
             
             const req = call.request;
-            const result = await this._refreshTokenUseCase.execute({
+            const result = await this.#_refreshTokenUseCase.execute({
                 userId : req.userId,
                 email : req.email,
-                role : req.role,
-                tokenId : randomUUID()
+                role : req.role
             });
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
-
-            grpcMetricsCollector(method,result.data.message,startTime);            
-            return callback(null,result.data);
+          
+            return callback(null,{
+                accessToken : result.data.accessToken,
+                message : result.message,
+                userInfo : result.data.userInfo
+            });
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime);
-
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**

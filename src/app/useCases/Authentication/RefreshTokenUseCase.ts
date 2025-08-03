@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
+import { ITokenPayLoadDTO, IUserInfoPayload } from "@/domain/dtos/TokenPayload";
 
 /**
  * Interface for the use case of issuing new access token based on refreshToken.
@@ -26,6 +26,6 @@ export interface IRefreshTokenUseCase {
         userId,
         email,
         role
-    } : ITokenPayLoadDTO ) : Promise<ResponseDTO>
+    } : IUserInfoPayload ) : Promise<ResponseDTO>
 
 }

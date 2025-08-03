@@ -8,7 +8,6 @@ import { OAuthLoginRequest, OAuthLoginResponse } from "@akashcapro/codex-shared-
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 
 /**
@@ -20,10 +19,19 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 export class GrpcOAuthHandler {
 
     
+    #_oAuthUseCase : IAuthenticateOAuthUserUseCase
+
+    /**
+     * 
+     * @param {IAuthenticateOAuthUserUseCase} oAuthUseCase - The use case for register o auth user.
+     * @constructor
+     */
     constructor(
         @inject(TYPES.AuthenticateOAuthUserUseCase)
-        private _oAuthUseCase : IAuthenticateOAuthUserUseCase
-    ){}
+        oAuthUseCase : IAuthenticateOAuthUserUseCase
+    ){
+        this.#_oAuthUseCase = oAuthUseCase
+    }
 
     /**
      * This method handles the o auth authentication use case.
@@ -36,35 +44,32 @@ export class GrpcOAuthHandler {
         call : ServerUnaryCall<OAuthLoginRequest,OAuthLoginResponse>,
         callback : sendUnaryData<OAuthLoginResponse>
     ) : Promise<void> => {
-        const startTime = Date.now(); // for latency
-        const method = 'OAuthLogin'
         try {
-
             const req = call.request;
-
             const userData = UserMapper.toCreateOAuthUser(req,UserRole.USER)
-            const result = await this._oAuthUseCase.execute(userData);
+            const result = await this.#_oAuthUseCase.execute(userData);
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime);
-            return callback(null,result.data);
+            return callback(null,{
+                accessToken : result.data.accessToken,
+                refreshToken : result.data.refreshToken,
+                message : result.message,
+                userInfo : result.data.userInfo
+            });
             
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime);
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**

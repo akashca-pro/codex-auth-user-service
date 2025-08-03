@@ -18,15 +18,19 @@ import { UserRole } from "@/domain/enums/UserRole";
 @injectable()
 export class GrpcUserAuthHandler {
 
+    #_authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
+
     /**
      * 
-     * @param {IAuthenticateLocalAuthUserUseCase} _authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
+     * @param {IAuthenticateLocalAuthUserUseCase} authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
      * @constructor
      */
     constructor(
         @inject(TYPES.AuthenticateLocalUserUseCase)
-        private _authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
-    ){}
+        authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
+    ){
+        this.#_authenticateLocalAuthUserUseCase = authenticateLocalAuthUserUseCase
+    }
 
     /**
      * This method handles the user local authentication use case.
@@ -39,30 +43,27 @@ export class GrpcUserAuthHandler {
         call : ServerUnaryCall<LoginRequest,LoginResponse>,
         callback : sendUnaryData<LoginResponse>
     ) : Promise<void> => {
-        const startTime = Date.now(); // for latency
-        const method = 'UserlocalAuthLogin'
         try {
             const req = call.request;
-            const result = await this._authenticateLocalAuthUserUseCase.execute({
+            const result = await this.#_authenticateLocalAuthUserUseCase.execute({
                 email : req.email,
                 password : req.password,
                 role : UserRole.USER
             })
-
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
-
-            grpcMetricsCollector(method,result.data.message,startTime);
-            return callback(null,result.data);
-
+            return callback(null,{
+                accessToken : result.data.accessToken,
+                refreshToken : result.data.refreshToken,
+                userInfo : result.data.userInfo,
+                message : result.message
+            })
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime);
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

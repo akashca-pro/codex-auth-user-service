@@ -22,20 +22,26 @@ import { randomUUID } from "node:crypto";
 @injectable()
 export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCase {
 
+    #_userRepository : IUserRepository
+    #_tokenProvider : ITokenProvider
+
     /**
      * Creates an instance of AuthenticateOAuthUserUseCase.
      * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      * @contructor
      */
      constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.ITokenProvider)
-        private _tokenProvider : ITokenProvider
-     ){}
+        tokenProvider : ITokenProvider
+     ){
+        this.#_userRepository = userRepository,
+        this.#_tokenProvider = tokenProvider
+     }
 
     /**
      * Executes the oauth authentication use case.
@@ -45,59 +51,52 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
      */ 
     async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
         
-        try {
-            const userAlreadyExists = await this._userRepository.findByEmail(data.email)
+        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email)
 
-            if(userAlreadyExists){
-                return {
-                    data : { message : UserErrorType.UserAlreadyExists },
-                    success : false
-                }
+        if(userAlreadyExists){
+            return {
+                data : null,
+                message : UserErrorType.UserAlreadyExists,
+                success : false
             }
+        }
 
-            const user = User.create({
-                username : data.username,
-                email : data.email,
-                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
-                firstName : data.firstName,
-                avatar : null,
-                country : null,
-                lastName : null,
-                role : data.role
-            })
+        const user = User.create({
+            username : data.username,
+            email : data.email,
+            authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
+            firstName : data.firstName,
+            avatar : null,
+            country : data.country,
+            lastName : data.lastName,
+            role : data.role
+        })
 
-            await this._userRepository.create(user);
+        await this.#_userRepository.create(user);
 
-            const payload : ITokenPayLoadDTO = {
-                userId : user.userId,
-                email : user.email,
-                role : user.role,
-                tokenId : randomUUID()
-            }
+        const payload : ITokenPayLoadDTO = {
+            userId : user.userId,
+            email : user.email,
+            role : user.role,
+            tokenId : randomUUID()
+        }
 
+        const accessToken = this.#_tokenProvider.generateAccessToken(payload);
+        const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
 
-            const accessToken = this._tokenProvider.generateAccessToken(payload);
-            const refreshToken = this._tokenProvider.generateRefreshToken(payload);
-
-            return { 
-                data : { 
-                    accessToken,
-                    refreshToken,
-                    message : UserSuccessType.SignupSuccess,
-                    userInfo : {
+        return { 
+            data : { 
+                accessToken,
+                refreshToken,
+                userInfo : {
                     userId : user.userId,
                     email : user.email,
                     role : user.role
                 }
-                },    
-                success : true
-            }
-
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+            },    
+            message : UserSuccessType.SignupSuccess,
+            success : true
         }
-
     }
-
 }
 

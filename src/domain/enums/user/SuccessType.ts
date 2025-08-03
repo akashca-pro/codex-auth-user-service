@@ -29,4 +29,14 @@ export enum UserSuccessType {
    */
   PasswordChangedSuccessfully = 'Password updated',
 
+  /**
+   * Success type indicating that the profile has been updated successfully.
+   */
+  ProfileUpdated = 'Profile updated',
+
+  /**
+   * Success type indicating that the profile data has been loaded.
+   */
+  ProfileLoaded = 'Profile details loaded successfully'
+
 }

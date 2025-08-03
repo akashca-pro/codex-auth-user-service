@@ -17,43 +17,49 @@ import { injectable, inject } from "inversify";
 @injectable()
 export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
  
+    #_userRepository : IUserRepository
+    #_otpService : IOtpService
+
     /**
      * Creates an instance of ForgotpasswordUseCase.
      * 
      * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {IOtpService} _otpService -  - Otp service provider for generate and sent otp.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IOtpService} otpService - Otp service provider for generate and sent otp.
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_userRepository = userRepository,
+        this.#_otpService = otpService
+    }
 
     /**
      * @async
      * @param {string} email 
      */
     async execute(email: string): Promise<ResponseDTO>{
-        try {
-            const user = this._userRepository.findByEmail(email);
 
-            if(!user){
-                return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
-            }
+        const user = this.#_userRepository.findByEmail(email);
 
-            await this._otpService.generateAndSendOtp(email, OtpType.FORGOT_PASS);
-
+        if(!user){
             return {
-                data : { message : UserSuccessType.OtpSendSuccess },
-                success : true
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
             }
-
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
         }
-    }
-    
+
+        await this.#_otpService.generateAndSendOtp(email, OtpType.FORGOT_PASS);
+
+        return {
+            data : null,
+            message : UserSuccessType.OtpSendSuccess,
+            success : true
+        }
+    }  
 }

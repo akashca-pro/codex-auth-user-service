@@ -8,8 +8,6 @@ import { SignupRequest, SignupResponse } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
-
 
 /**
  * Class for handling user signup.
@@ -19,15 +17,19 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 @injectable()
 export class GrpcUserSignupHandler {
 
+    #_signupUserUseCase : ISignUpUserUseCase
+
     /**
      * 
-     * @param {ISignUpUserUseCase} _signUpUserUseCase - The Usecase for creation of the user.
+     * @param {ISignUpUserUseCase} signupUserUseCase - The Usecase for creation of the user.
      * @constructor
      */
     constructor(
         @inject(TYPES.SignUpUserUseCase)
-        private _signUpUserUseCase : ISignUpUserUseCase
-    ){}
+        signupUserUseCase : ISignUpUserUseCase
+    ){
+        this.#_signupUserUseCase = signupUserUseCase
+    }
 
     /**
      * This method handles the signup user use case.
@@ -41,32 +43,24 @@ export class GrpcUserSignupHandler {
         callback : sendUnaryData<SignupResponse>
     ) : Promise<void> => {
 
-        const startTime = Date.now(); // for latency
-        const method = 'signup'
-
         try {
             const req = call.request;
             const userData = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
-            const result = await this._signUpUserUseCase.execute(userData);
+            const result = await this.#_signupUserUseCase.execute(userData);
         
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime)
-
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime)
-
-            return callback(null,result.data);
+            return callback(null,{
+                message : result.message
+            });
 
         } catch (error : any) {
-
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime)
-
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
@@ -84,7 +78,7 @@ export class GrpcUserSignupHandler {
      *
      * @returns {object} The bound login handler for gRPC wrapped in an object.
      */
-    getServiceHandler(): object{
+    getServiceHandler(): object {
         return {
             signup : this.signup.bind(this)
         } 

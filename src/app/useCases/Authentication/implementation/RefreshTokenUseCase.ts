@@ -1,6 +1,6 @@
 import TYPES from "@/config/inversify/types";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
+import { ITokenPayLoadDTO, IUserInfoPayload } from "@/domain/dtos/TokenPayload";
 import { IRefreshTokenUseCase } from "../RefreshTokenUseCase";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
@@ -16,15 +16,19 @@ import { randomUUID } from "node:crypto";
 @injectable()
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
 
+    #_tokenProvider : ITokenProvider
+
     /**
      * Creates an instance of RefreshTokenEndPointUseCase.
      * 
-     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor(
         @inject(TYPES.ITokenProvider)
-        private _tokenProvider : ITokenProvider,
-    ){}
+        tokenProvider : ITokenProvider,
+    ){
+        this.#_tokenProvider = tokenProvider
+    }
 
     /**
      * Executes the RefreshTokenEndPointUseCase use case.
@@ -33,36 +37,29 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
      * @param {ITokenPayLoadDTO} credentials - The credentials include decoded data from refreshToken.
      * @returns {ResponseDTO} - The response data.
      */
-    async execute({ userId, email, role }: ITokenPayLoadDTO): Promise<ResponseDTO> {
+    async execute({ userId, email, role }: IUserInfoPayload ): Promise<ResponseDTO> {
         
-        try {
-            const payload : ITokenPayLoadDTO = {
-                userId,
-                email,
-                role,
-                tokenId : randomUUID()
-            }
+        const payload : ITokenPayLoadDTO = {
+            userId,
+            email,
+            role,
+            tokenId : randomUUID()
+        }
 
-            const accessToken = this._tokenProvider.generateAccessToken(payload);
+        const accessToken = this.#_tokenProvider.generateAccessToken(payload);
 
-            return { 
-                data : { 
-                    accessToken,
-                    message : UserSuccessType.TokenIssued,
-                    userInfo : {
+        return { 
+            data : { 
+                accessToken,
+                userInfo : {
                     userId,
                     email,
                     role 
-                    }
-                 },    
-                success : true
-            }
-
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+                }
+                },
+            message : UserSuccessType.TokenIssued,   
+            success : true
         }
-
     }
-
 }
 

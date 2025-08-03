@@ -12,8 +12,6 @@ import { OtpType } from "@/domain/enums/OtpType";
 import { IAuthenticateLocalAuthUserUseCase } from "../AuthenticateLocalAuthUser";
 import { AuthSuccessType } from "@/domain/enums/authenticateUser/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
-import logger from "@/utils/logger";
-import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { randomUUID } from "node:crypto";
 
 /**
@@ -24,28 +22,39 @@ import { randomUUID } from "node:crypto";
  */
 @injectable()
 export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserUseCase {
+
+    #_userRepository : IUserRepository
+    #_passwordHasher : IPasswordHasher
+    #_tokenProvider : ITokenProvider
+    #_otpService : IOtpService
+
     /**
      * Creates an instance of AuthenticateUserUseCase.
      * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {IPasswordHasher} _passwordHasher - The password hasher provider for comparing hashed password.
-     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
-     * @param {IOtpService} _otpService - Otp service provider for verification.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
+     * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
+     * @param {IOtpService} otpService - Otp service provider for verification.
      * @contructor
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private _passwordHasher : IPasswordHasher,
+        passwordHasher : IPasswordHasher,
 
         @inject(TYPES.ITokenProvider)
-        private _tokenProvider : ITokenProvider,
+        tokenProvider : ITokenProvider,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_userRepository = userRepository,
+        this.#_passwordHasher = passwordHasher,
+        this.#_tokenProvider = tokenProvider,
+        this.#_otpService = otpService
+    }
 
     /**
      * Executes the local authentication use case.
@@ -59,40 +68,43 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
         role
     } : IAuthenticateLocalAuthUserDTO) : Promise<ResponseDTO> {
 
-        try {
-        const user = (await this._userRepository.findByEmailAndRole(
+        const user = await this.#_userRepository.findByEmailAndRole(
             email,
             role
-        ))
+        )
 
         if(!user){
             return {
-                data : { message : AuthenticateUserErrorType.EmailOrPasswordWrong },
+                data : null,
+                message : AuthenticateUserErrorType.EmailOrPasswordWrong,
                 success : false,
             }
         }
 
         if(user.authProvider !== AuthProvider.LOCAL || user.password === null){
             return {
-                data : { message : AuthenticateUserErrorType.AuthProviderWrong },
+                data : null,
+                message : AuthenticateUserErrorType.AuthProviderWrong,
                 success : false,
             }
         }
 
-        const passwordMatch = await this._passwordHasher.comparePasswords(password,user.password);
+        const passwordMatch = await this.#_passwordHasher.comparePasswords(password,user.password);
 
         if(!passwordMatch){
             return {
-                data : { message : AuthenticateUserErrorType.EmailOrPasswordWrong },
+                data : null,
+                message : AuthenticateUserErrorType.EmailOrPasswordWrong,
                 success : false,
             }
         }
 
         if(!user.isVerified){
-            await this._otpService.clearOtp(email, OtpType.SIGNUP);
-            await this._otpService.generateAndSendOtp(email, OtpType.SIGNUP);
+            await this.#_otpService.clearOtp(email, OtpType.SIGNUP);
+            await this.#_otpService.generateAndSendOtp(email, OtpType.SIGNUP);
             return {
-                data : { message : AuthSuccessType.VerificationOtpSend },
+                data : null,
+                message : AuthSuccessType.VerificationOtpSend,
                 success : false
             }
         }
@@ -104,27 +116,22 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             tokenId : randomUUID()
         }
 
-        const accessToken = this._tokenProvider.generateAccessToken(payload);
-        const refreshToken = this._tokenProvider.generateRefreshToken(payload);
+        const accessToken = this.#_tokenProvider.generateAccessToken(payload);
+        const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
 
         return { 
-            data : { accessToken, 
+            data : { 
+                accessToken, 
                 refreshToken, 
-                message : AuthSuccessType.AuthenticationSuccess,
                 userInfo : {
                     userId : user.userId,
                     email : user.email,
                     role : user.role
-                } 
+                }
             },
+            message : AuthSuccessType.AuthenticationSuccess, 
             success : true
          }
-
-        } catch (error : any) {
-            logger.error(error);
-            return { data : { message : SystemErrorType.InternalServerError } , success : false };
-        }
-
     }
 }
 

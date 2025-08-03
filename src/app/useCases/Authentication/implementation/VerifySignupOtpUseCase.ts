@@ -25,24 +25,31 @@ import { randomUUID } from "node:crypto";
 @injectable()
 export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
 
+    #_userRepository : IUserRepository
+    #_tokenProvider : ITokenProvider
+    #_otpService : IOtpService
+
     /**
-     * Creates an instance of VerifySignUpOtpUseCase.
+     * Creates an instance of SignupUserUseCase.
      * 
-     * 
-     * @param {IUserRepository} _userRepository - The repository of the user.
-     * @param {IOtpService} _otpService - Otp service provider for verification.
-     * @param {ITokenProvider} _tokenProvider - Token service provider for generating token.
+     * @param {IUserRepository} userRepository - The repository of the user.
+     * @param {ITokenProvider} tokenProvider - The token provider for issueing access and refresh token.
+     * @param {IOtpService} otpService - Otp service provider for verification.
      */
-    constructor (
+    constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.ITokenProvider)
-        private _tokenProvider : ITokenProvider,
+        tokenProvider : ITokenProvider,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_otpService = otpService,
+        this.#_tokenProvider = tokenProvider,
+        this.#_userRepository = userRepository 
+    }
 
     /**
      * Executes the VerifySignupOtp use case.
@@ -51,56 +58,57 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
      * @returns {ResponseDTO} - The response data.
      */
     async execute({ email, otp }: IVerifySignUpOtp): Promise<ResponseDTO> {
-        try {
-            const user = await this._userRepository.findByEmail(email) 
-            
-            if(!user){
-                return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
+
+        const user = await this.#_userRepository.findByEmail(email) 
+        
+        if(!user){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
             }
+        }
 
-            const isOtpVerified = await this._otpService.verifyOtp(email,OtpType.SIGNUP,otp);
+        const isOtpVerified = await this.#_otpService.verifyOtp(email,OtpType.SIGNUP,otp);
 
-            if(!isOtpVerified){
-                return {data : {message : AuthenticateUserErrorType.InvalidOrExpiredOtp}, success : false}
+        if(!isOtpVerified){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.EmailOrPasswordWrong,
+                success : false
             }
+        }
 
-            const userEntity = User.rehydrate(user);
-            userEntity.update({isVerified : true});
-            console.log(userEntity.getUpdatedFields());
-            const res = await this._userRepository.update(user.userId,userEntity.getUpdatedFields());
-            console.log(res);
-            await this._otpService.clearOtp(email,OtpType.SIGNUP);
+        const userEntity = User.rehydrate(user);
+        userEntity.update({isVerified : true});
+        await this.#_userRepository.update(user.userId,userEntity.getUpdatedFields());
+        await this.#_otpService.clearOtp(email,OtpType.SIGNUP);
 
-            const payload : ITokenPayLoadDTO = {
+        const payload : ITokenPayLoadDTO = {
+            userId : user.userId,
+            email : user.email,
+            role : UserRole.USER,
+            tokenId : randomUUID()
+        }
+
+        const accessToken = this.#_tokenProvider.generateAccessToken(payload);
+        const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
+
+        if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
+        if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
+
+        return { 
+            data : { 
+                accessToken,
+                refreshToken,
+                userInfo : {
                 userId : user.userId,
                 email : user.email,
-                role : UserRole.USER,
-                tokenId : randomUUID()
-            }
-
-            const accessToken = this._tokenProvider.generateAccessToken(payload);
-            const refreshToken = this._tokenProvider.generateRefreshToken(payload);
-
-            if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
-            if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
-
-            return { 
-                data : { 
-                    accessToken,
-                    refreshToken,
-                    message : UserSuccessType.SignupSuccess,
-                    userInfo : {
-                    userId : user.userId,
-                    email : user.email,
-                    role : user.role
-                    }
-                 },    
-                success : true
-            }
-       
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+                role : user.role
+                }
+            },
+            message : UserSuccessType.SignupSuccess,    
+            success : true
         }
     }
-
 }

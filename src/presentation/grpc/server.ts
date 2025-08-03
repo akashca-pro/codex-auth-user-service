@@ -8,7 +8,7 @@ import { config } from "@/config";
 import { GrpcUserAuthHandler } from "./handlers/user/UserAuthHandler";
 
 import { GrpcUserSignupHandler } from "./handlers/user/SignupHandler";
-import { GrpcUserVerifySignupOtpHandler } from "./handlers/user/VerifyOtpHandler";
+import { GrpcUserVerifySignupOtpHandler } from "./handlers/user/VerifySignupOtpHandler";
 import { GrpcUserResendOtpHandler } from "./handlers/user/ResendOtpHandler";
 import { GrpcUserForgotPasswordHandler } from "./handlers/user/ForgotPasswordHandler";
 import { GrpcUserResetPasswordHandler } from "./handlers/user/ResetPasswordHandler";
@@ -16,9 +16,11 @@ import { GrpcOAuthHandler } from "./handlers/user/OAuthHandler";
 import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
 import { GrpcProfileHandler } from "./handlers/common/ProfileHandler";
 import { GrpcAdminAuthHandler } from "./handlers/admin/AdminAuthHandler";
+import { GrpcUpdateProfileHandler } from "./handlers/common/UpdateProfileHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
+const updateProfile = container.get<GrpcUpdateProfileHandler>(TYPES.GrpcUpdateProfileHandler);
 
 // users 
 const userAuthHandler = container.get<GrpcUserAuthHandler>(TYPES.GrpcUserAuthHandler);
@@ -35,7 +37,8 @@ const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuth
 
 const adminHandlers = {
     ...adminAuthHandler.getServiceHandler(),
-    ...refreshToken.getServiceHandler()
+    ...refreshToken.getServiceHandler(),
+    ...updateProfile.getServiceHandler(),
 }
 
 const userHandlers = {
@@ -48,7 +51,9 @@ const userHandlers = {
     ...userForgotPasswordHandler.getServiceHandler(),
     ...userResetPasswordHandler.getServiceHandler(),
 
-    ...userProfileHandler.getServiceHandler()
+    ...userProfileHandler.getServiceHandler(),
+    ...updateProfile.getServiceHandler()
+
 }
 
 export const startGrpcServer = () => {

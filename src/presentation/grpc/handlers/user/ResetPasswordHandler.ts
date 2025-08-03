@@ -17,15 +17,19 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 @injectable()
 export class GrpcUserResetPasswordHandler {
 
+    #_resetPasswordUseCase : IResetPasswordUseCase
+
     /**
      * 
-     * @param {IResetPasswordUseCase} _resetPasswordUseCase - The Usecase for creation of the user.
+     * @param {IResetPasswordUseCase} resetPasswordUseCase - The Usecase for creation of the user.
      * @constructor 
      */
     constructor(
         @inject(TYPES.ResetPasswordUseCase)
-        private _resetPasswordUseCase : IResetPasswordUseCase
-    ){}
+        resetPasswordUseCase : IResetPasswordUseCase
+    ){
+        this.#_resetPasswordUseCase = resetPasswordUseCase
+    }
 
     /**
      * This method handles the resetPassword use case.
@@ -44,22 +48,24 @@ export class GrpcUserResetPasswordHandler {
             
             const req = call.request;
 
-            const result = await this._resetPasswordUseCase.execute({
+            const result = await this.#_resetPasswordUseCase.execute({
                 email : req.email,
                 newPassword : req.newPassword,
                 otp : req.otp
             })
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime)
+                grpcMetricsCollector(method,result.message,startTime)
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime)
-            return callback(null,result.data);
+            grpcMetricsCollector(method,result.message,startTime)
+            return callback(null,{
+                message : result.message
+            });
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
@@ -70,7 +76,6 @@ export class GrpcUserResetPasswordHandler {
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**
@@ -88,5 +93,4 @@ export class GrpcUserResetPasswordHandler {
             resetPassword : this.ResetPassword.bind(this)
         } 
     }
-
 }

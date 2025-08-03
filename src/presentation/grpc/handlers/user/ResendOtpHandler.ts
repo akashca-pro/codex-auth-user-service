@@ -17,15 +17,19 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 @injectable()
 export class GrpcUserResendOtpHandler {
 
+    #_resendOtpUseCase : IResendOtpUseCase
+
     /**
      * 
-     * @param {IResendOtpUseCase} _resendOtpUseCase - The use case for resend otp to user.
+     * @param {IResendOtpUseCase} resendOtpUseCase - The use case for resend otp to user.
      * @constructor
      */
     constructor(
         @inject(TYPES.ResendOtpUseCase)
-        private _resendOtpUseCase : IResendOtpUseCase
-    ){}
+        resendOtpUseCase : IResendOtpUseCase
+    ){
+        this.#_resendOtpUseCase = resendOtpUseCase
+    }
 
     /**
      * This method handles the resend otp use case.
@@ -43,17 +47,19 @@ export class GrpcUserResendOtpHandler {
         try {
             const req = call.request;
 
-            const result = await this._resendOtpUseCase.execute(req.email);
+            const result = await this.#_resendOtpUseCase.execute(req.email);
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime)
+                grpcMetricsCollector(method,result.message,startTime)
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
-            grpcMetricsCollector(method,result.data.message,startTime)
-            return callback(null,result.data);
+            grpcMetricsCollector(method,result.message,startTime)
+            return callback(null,{
+                message : result.message
+            });
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
@@ -64,7 +70,6 @@ export class GrpcUserResendOtpHandler {
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**
@@ -82,5 +87,4 @@ export class GrpcUserResendOtpHandler {
             resendOtp : this.resendOtp.bind(this)
         } 
     }
-
 }

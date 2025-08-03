@@ -20,8 +20,12 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
+    #_userRepository : IUserRepository
+    #_passwordHasher : IPasswordHasher
+    #_otpService : IOtpService
+
     /**
-     * Creates an instance of ResetPasswordUseCase.
+     * Creates an instance of SignupUserUseCase.
      * 
      * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IPasswordHasher} passwordHasher - The password hasher provider for comparing hashed password.
@@ -29,14 +33,18 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
      */
     constructor(
         @inject(TYPES.IUserRepository)
-        private _userRepository : IUserRepository,
+        userRepository : IUserRepository,
 
         @inject(TYPES.IPasswordHasher)
-        private _passwordHasher : IPasswordHasher,
+        passwordHasher : IPasswordHasher,
 
         @inject(TYPES.IOtpService)
-        private _otpService : IOtpService,
-    ){}
+        otpService : IOtpService
+    ){
+        this.#_otpService = otpService,
+        this.#_passwordHasher = passwordHasher,
+        this.#_userRepository = userRepository 
+    }
 
     /**
      * Executes the reset password use case.
@@ -50,39 +58,38 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
         otp,
         newPassword
     } : IResetPasswordDTO ): Promise<ResponseDTO> {
-        
-        try {
 
-            const user = await this._userRepository.findByEmail(email);
+        const user = await this.#_userRepository.findByEmail(email);
 
-            if(!user){
-                return {data : { message : AuthenticateUserErrorType.AccountNotFound }, success : false}
-            }
-
-            if(!await this._otpService.verifyOtp(email,OtpType.FORGOT_PASS,otp)){
-                return {
-                    data : { message : AuthenticateUserErrorType.InvalidOrExpiredOtp},
-                    success : false
-                 }
-            }
-
-            const hashedPassword = await this._passwordHasher.hashPassword(newPassword);
-
-            const userEntity = User.rehydrate(user);
-            userEntity.update({
-                password : hashedPassword
-            })
-
-            await this._userRepository.update(user.userId,userEntity.getUpdatedFields());
-
+        if(!user){
             return {
-                data : { message : UserSuccessType.PasswordChangedSuccessfully },
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
                 success : false
             }
-            
-        } catch (error : any) {
-            return { data : { message : error.message } , success : false };
+        }
+
+        if(!await this.#_otpService.verifyOtp(email,OtpType.FORGOT_PASS,otp)){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.EmailOrPasswordWrong,
+                success : false
+            }
+        }
+
+        const hashedPassword = await this.#_passwordHasher.hashPassword(newPassword);
+
+        const userEntity = User.rehydrate(user);
+        userEntity.update({
+            password : hashedPassword
+        })
+
+        await this.#_userRepository.update(user.userId,userEntity.getUpdatedFields());
+
+        return {
+            data : null,
+            message : UserSuccessType.PasswordChangedSuccessfully,
+            success : true
         }
     }
-
 } 

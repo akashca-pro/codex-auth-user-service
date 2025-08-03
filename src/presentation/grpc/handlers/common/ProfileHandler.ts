@@ -17,54 +17,45 @@ import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 @injectable()
 export class GrpcProfileHandler {
 
+    #_profileUseCase : IProfileUseCase
+
+    constructor(
+        @inject(TYPES.ProfileUseCase) profileUseCase : IProfileUseCase
+    ){
+        this.#_profileUseCase = profileUseCase;
+    }
+
     /**
      * This method handles the profile use case.
      * 
-     * @param {IProfileUserUseCase} _profileUseCase 
-     * @constructor
+     * @async
+     * @param {ServerUnaryCall} call - This contain the request from the grpc. 
+     * @param {sendUnaryData} callback - The sends the grpc response.
      */
-    constructor(
-        @inject(TYPES.ProfileUseCase)
-        private _profileUseCase : IProfileUseCase
-    ){}
-
     profile = async (
         call : ServerUnaryCall<UserProfileRequest,UserProfileResponse>,
         callback : sendUnaryData<UserProfileResponse>
     ) => {
-
-        const startTime = Date.now(); // for latency
-        const method = 'profile'
         try {
-            
             const req = call.request;   
-            const result = await this._profileUseCase.execute(req.userId);
-
+            const result = await this.#_profileUseCase.execute(req.userId);
             if(!result.success){
-
-                grpcMetricsCollector(method,'success',startTime)
-
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
-
-            grpcMetricsCollector(method,'success',startTime)
-
-            return callback(null,{ ...result.data });
-            
+            return callback(null,{ 
+                ...result.data
+             });
 
         } catch (error : any ) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime)
-            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
             },null);
         }
-
     }
 
     /**
