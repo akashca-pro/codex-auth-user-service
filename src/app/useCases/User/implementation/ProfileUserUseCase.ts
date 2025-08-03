@@ -6,7 +6,7 @@ import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
-import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
+
 
 /**
  * Use case for retrieving profile of a user.
@@ -18,6 +18,7 @@ import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 export class ProfileUseCase implements IProfileUseCase {
 
     #_userRepository : IUserRepository
+    
 
     constructor(
         @inject(TYPES.IUserRepository) userRepository : IUserRepository
@@ -43,6 +44,8 @@ export class ProfileUseCase implements IProfileUseCase {
                 success : false
             }
         }
+        const cacheKey = `user:profile:${userId}`
+
 
         const response = UserMapper.toOutDTO(user);
 

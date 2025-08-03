@@ -6,7 +6,6 @@ import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-share
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 
 
 /**
@@ -37,7 +36,7 @@ export class GrpcProfileHandler {
         callback : sendUnaryData<UserProfileResponse>
     ) => {
         try {
-            const req = call.request;   
+            const req = call.request; 
             const result = await this.#_profileUseCase.execute(req.userId);
             if(!result.success){
                 return callback({
