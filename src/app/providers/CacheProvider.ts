@@ -21,7 +21,7 @@ export interface ICacheProvider {
      * @param ttl - The expiry time for the cache.
      * @returns {Promise<void>}
      */
-    set<T>(key : string, value : T, ttl? : number) : Promise<void>
+    set<T>(key : string, value : T, ttl : number) : Promise<void>
 
     /**
      * Deleted the cached data.
