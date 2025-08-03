@@ -44,6 +44,7 @@ export class GrpcProfileHandler {
                     message : result.message
                 },null)
             }
+            console.log(result);
             return callback(null,{ 
                 ...result.data
              });

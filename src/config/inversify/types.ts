@@ -3,6 +3,7 @@ const TYPES = {
   IPasswordHasher: Symbol.for("IPasswordHasher"),
   ITokenProvider: Symbol.for("ITokenProvider"),
   IOtpService: Symbol.for("IOtpService"),
+  ICacheProvider : Symbol.for("ICacheProvider"),
 
   Redis : Symbol.for("Redis"),
   Mailer : Symbol.for("Mailer"),

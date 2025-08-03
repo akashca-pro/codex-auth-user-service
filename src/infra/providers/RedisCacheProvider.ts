@@ -20,11 +20,12 @@ export class RedisCacheProvider implements ICacheProvider {
     }
 
     async set<T>(key: string, value: T, ttl: number): Promise<void> {
-        await this.#_redis.set(key,JSON.stringify(value),"EX",ttl);
+        const randomTtl = Math.floor(ttl + (Math.random() * 60));
+        await this.#_redis.set(key,JSON.stringify(value),"EX",randomTtl);
     }
 
     async del(key: string): Promise<void> {
-        await this.#_redis.del([...key]);
+        await this.#_redis.del(key);
     }
 }
 

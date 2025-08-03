@@ -6,6 +6,8 @@ import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
+import { ICacheProvider } from "@/app/providers/CacheProvider";
+import { config } from "@/config";
 
 
 /**
@@ -18,12 +20,15 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 export class ProfileUseCase implements IProfileUseCase {
 
     #_userRepository : IUserRepository
+    #_cacheProvider : ICacheProvider
     
 
     constructor(
-        @inject(TYPES.IUserRepository) userRepository : IUserRepository
+        @inject(TYPES.IUserRepository) userRepository : IUserRepository,
+        @inject(TYPES.ICacheProvider) cacheProvider : ICacheProvider
     ){
         this.#_userRepository = userRepository;
+        this.#_cacheProvider = cacheProvider
     }
 
     /**
@@ -34,8 +39,19 @@ export class ProfileUseCase implements IProfileUseCase {
      */
     async execute(userId: string): Promise<ResponseDTO> {
 
+        const cacheKey = `user:profile:${userId}`;
+
+        const cached = await this.#_cacheProvider.get(cacheKey);
+        console.log(cached);
+        if(cached){
+            return {
+                data : cached,
+                success : true,
+                message : UserSuccessType.ProfileLoaded
+            }
+        }
+
         const user = await this.#_userRepository.findById(userId);
-        console.log(user);
 
         if(!user){
             return {
@@ -44,11 +60,10 @@ export class ProfileUseCase implements IProfileUseCase {
                 success : false
             }
         }
-        const cacheKey = `user:profile:${userId}`
-
-
+                
         const response = UserMapper.toOutDTO(user);
-
+        await this.#_cacheProvider.set(cacheKey, response, config.PROFILE_CACHE_EXPIRY);
+        
         return { 
             data : response,
             success : true,

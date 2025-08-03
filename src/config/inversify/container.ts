@@ -56,6 +56,8 @@ import { GrpcAdminAuthHandler } from '@/presentation/grpc/handlers/admin/AdminAu
 import { IUpdateUserProfileUseCase } from '@/app/useCases/User/UpdateProfileUseCase';
 import { UpdateUserProfileUseCase } from '@/app/useCases/User/implementation/UpdateProfileUseCase';
 import { GrpcUpdateProfileHandler } from '@/presentation/grpc/handlers/common/UpdateProfileHandler';
+import { ICacheProvider } from '@/app/providers/CacheProvider';
+import { RedisCacheProvider } from '@/infra/providers/RedisCacheProvider';
 
 const container = new Container();
 
@@ -75,6 +77,7 @@ container.bind<IOtpService>(TYPES.IOtpService).toDynamicValue(() => {
 container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 container.bind<IPasswordHasher>(TYPES.IPasswordHasher).to(BcryptPasswordHasher);
 container.bind<ITokenProvider>(TYPES.ITokenProvider).to(JwtTokenProvider);
+container.bind<ICacheProvider>(TYPES.ICacheProvider).to(RedisCacheProvider);
 
 /**
  * UseCases
