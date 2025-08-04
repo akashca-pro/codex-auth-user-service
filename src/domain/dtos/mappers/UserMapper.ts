@@ -26,19 +26,16 @@ export class UserMapper {
 
   }
 
-  static toCreateOAuthUser(
+  static toCreateOAuthUserDTO(
     body : CreateOAuthUserRequestDTO,
     role : UserRole
   ) : ICreateOAuthUserRequestDTO {
 
     return {
-        username : body.username,
         oAuthId : body.oAuthId,
         avatar : body.avatar ?? null,
-        country : body.country,
         email : body.email,
         firstName : body.firstName,
-        lastName : body.lastName ?? null,
         role
     }
 

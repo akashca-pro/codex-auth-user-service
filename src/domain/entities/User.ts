@@ -24,6 +24,7 @@ export interface IUserProps<T extends UserAuthentication = UserAuthentication>{
   createdAt: Date;
   updatedAt: Date;
   isArchived: boolean;
+  isVerified : boolean;
   preferredLanguage : string | null;
   easySolved: number | null;
   mediumSolved: number | null;
@@ -83,11 +84,12 @@ export class User<T extends UserAuthentication = UserAuthentication> {
         createdAt: now,
         updatedAt: now,
         isArchived: false,
+        isVerified : data.authentication.isVerified,
         
         // These values are specific based on role
 
         role: isAdmin ? UserRole.ADMIN : UserRole.USER,
-        preferredLanguage: isAdmin ? null : 'js' ,
+        preferredLanguage: isAdmin ? null : 'javascript' ,
         easySolved: isAdmin ? null : 0,
         mediumSolved: isAdmin ? null : 0,
         hardSolved: isAdmin ? null : 0,
@@ -247,6 +249,7 @@ update(updatedData: IUpdateUserRequestDTO) {
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         isArchived: false,
+        isVerified : data.isVerified,
         
         // These values are specific based on role
 

@@ -42,7 +42,6 @@ export class ProfileUseCase implements IProfileUseCase {
         const cacheKey = `user:profile:${userId}`;
 
         const cached = await this.#_cacheProvider.get(cacheKey);
-        console.log(cached);
         if(cached){
             return {
                 data : cached,

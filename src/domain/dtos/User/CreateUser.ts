@@ -19,12 +19,9 @@ export interface ICreateLocalUserRequestDTO {
 
 export interface ICreateOAuthUserRequestDTO {
   role : UserRole;
-  username : string;
   email : string;
   firstName : string;
-  lastName : string | null;
   avatar : string | null;
-  country: string | null;
   oAuthId : string;
 }
 

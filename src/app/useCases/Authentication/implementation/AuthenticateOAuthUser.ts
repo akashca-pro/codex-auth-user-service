@@ -4,7 +4,6 @@ import { ResponseDTO } from "@/domain/dtos/Response";
 import { IAuthenticateOAuthUserUseCase } from "../AuthenticateOAuthUser";
 import { IUserRepository } from "@/domain/repository/User";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
-import { UserErrorType } from "@/domain/enums/user/ErrorType";
 import { User } from "@/domain/entities/User";
 import { OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
@@ -12,6 +11,8 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { randomUUID } from "node:crypto";
+import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
+import { generateUniqueUsername } from "@/utils/generateRandomUsername";
 
 /**
  * Use case for authenticating a user.
@@ -51,28 +52,42 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
      */ 
     async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
         
-        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email)
+        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
 
-        if(userAlreadyExists){
-            return {
-                data : null,
-                message : UserErrorType.UserAlreadyExists,
-                success : false
-            }
+        let user : IUserInRequestDTO
+
+        if(!userAlreadyExists){
+
+            const generateAvailableUsername = async (): Promise<string> => {
+            let uniqueUsername: string;
+            let usernameExists: boolean;
+
+            do {
+                uniqueUsername = generateUniqueUsername();
+                usernameExists = await this.#_userRepository.findByUsername(uniqueUsername);
+            } while (usernameExists);
+
+            return uniqueUsername;
+            };
+
+            const uniqueUsername = await generateAvailableUsername();
+
+            user = User.create({
+                username : uniqueUsername,
+                email : data.email,
+                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
+                firstName : data.firstName,
+                avatar : data.avatar ?? null,
+                country : null,
+                lastName : null,
+                role : data.role
+            })
+
+            await this.#_userRepository.create(user);
+        }else{
+            user = userAlreadyExists as IUserInRequestDTO
         }
 
-        const user = User.create({
-            username : data.username,
-            email : data.email,
-            authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
-            firstName : data.firstName,
-            avatar : null,
-            country : data.country,
-            lastName : data.lastName,
-            role : data.role
-        })
-
-        await this.#_userRepository.create(user);
 
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
@@ -94,7 +109,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
                     role : user.role
                 }
             },    
-            message : UserSuccessType.SignupSuccess,
+            message : UserSuccessType.GoogleAuthSuccess,
             success : true
         }
     }

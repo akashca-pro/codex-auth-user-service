@@ -46,7 +46,7 @@ export class GrpcOAuthHandler {
     ) : Promise<void> => {
         try {
             const req = call.request;
-            const userData = UserMapper.toCreateOAuthUser(req,UserRole.USER)
+            const userData = UserMapper.toCreateOAuthUserDTO(req,UserRole.USER)
             const result = await this.#_oAuthUseCase.execute(userData);
 
             if(!result.success){

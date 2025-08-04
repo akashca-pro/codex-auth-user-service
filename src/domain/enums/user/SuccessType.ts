@@ -10,9 +10,14 @@ export enum UserSuccessType {
   UserDeleted = 'User deleted with success!',
 
   /**
-   * Success type indicating that the user verified account and sign up successfully
+   * Success type indicating that the account is verified and signed up successfully
    */
   SignupSuccess = 'Sign up success',
+
+  /**
+   * Success type indicating that the account is verified and Google auth successfully
+   */
+  GoogleAuthSuccess = 'Google auth success',
 
   /**
    * Success type indicating that otp is sent to the user's email address

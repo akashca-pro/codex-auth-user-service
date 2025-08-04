@@ -11,12 +11,17 @@ import { AuthProvider } from "../enums/AuthProvider";
  */
 export abstract class UserAuthentication {
   protected _isVerified: boolean = false;
+  protected readonly _authProvider: AuthProvider
 
   /**
    * @constructor
-   * @param {AuthProvider} _authProvider - The authentication provider (LOCAL, GOOGLE, etc.)
+   * @param {AuthProvider} authProvider - The authentication provider (LOCAL, GOOGLE, etc.).
+   * @param {boolean} isVerified - The default verification (OAuth users are verified as default).
    */
-  protected constructor(protected readonly _authProvider: AuthProvider) {}
+   constructor(authProvider : AuthProvider,isVerified = false) {
+    this._isVerified = isVerified,
+    this._authProvider = authProvider
+  }
 
   /**
    * Returns the auth provider used by the user.
@@ -101,7 +106,7 @@ export class OAuthAuthentication extends UserAuthentication {
     authProvider: Exclude<AuthProvider, AuthProvider.LOCAL>,
     oAuthId: string
   ) {
-    super(authProvider);
+    super(authProvider, true);
     this._oAuthId = oAuthId;
   }
 
