@@ -1,16 +1,16 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
-# Set working directory
+
 WORKDIR /app
 
-# Copy only package files first (for caching)
+
 COPY package*.json ./
 
-# Install dependencies (clean and fast)
-RUN npm install
 
-# Copy the rest of your codebase
+RUN npm ci
+
+
 COPY . .
 
 # Include Prisma schema files
