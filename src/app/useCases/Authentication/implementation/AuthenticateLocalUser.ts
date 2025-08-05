@@ -125,8 +125,10 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                 refreshToken, 
                 userInfo : {
                     userId : user.userId,
+                    username : user.username,
                     email : user.email,
-                    role : user.role
+                    role : user.role,
+                    avatar : user.avatar ?? null
                 }
             },
             message : AuthSuccessType.AuthenticationSuccess, 

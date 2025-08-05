@@ -102,9 +102,11 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 accessToken,
                 refreshToken,
                 userInfo : {
-                userId : user.userId,
-                email : user.email,
-                role : user.role
+                    userId : user.userId,
+                    username : user.username,
+                    email : user.email,
+                    role : user.role,
+                    avatar : user.avatar ?? null
                 }
             },
             message : UserSuccessType.SignupSuccess,    
