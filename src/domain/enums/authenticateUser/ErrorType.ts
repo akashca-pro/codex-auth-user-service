@@ -30,5 +30,13 @@ export enum AuthenticateUserErrorType {
    */
   InvalidAuthenticationMethod = 'Invalid authentication method. Expected LocalAuthentication.',
 
-  UnAuthorized = 'Unauthorized'
+  /**
+   * Error type indicating that unauthorized access to role based or protected route.
+   */
+  UnAuthorized = 'Unauthorized',
+
+  /**
+   * Error type indicating that the username already exists.
+   */
+  UsernameAlreadyExists = 'Username already exists'
 }

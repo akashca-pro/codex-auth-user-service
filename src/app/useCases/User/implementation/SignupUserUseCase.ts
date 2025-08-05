@@ -57,11 +57,20 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
     async execute(data: ICreateLocalUserRequestDTO): Promise<ResponseDTO> {
         
         const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
+        const usernameAlreadyExists = await this.#_userRepository.findByUsername(data.username);
 
         if(userAlreadyExists){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
+            }
+        }
+
+        if(usernameAlreadyExists){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.UsernameAlreadyExists,
                 success : false
             }
         }
