@@ -62,7 +62,7 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
         if(userAlreadyExists){
             return {
                 data : null,
-                message : AuthenticateUserErrorType.AccountNotFound,
+                message : AuthenticateUserErrorType.AccountAlreadyExist,
                 success : false
             }
         }

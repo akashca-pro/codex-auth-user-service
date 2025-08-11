@@ -11,6 +11,11 @@ export enum AuthenticateUserErrorType {
   AccountNotFound = 'Account not found',
 
   /**
+   * Error type indicating that the user account already exists.
+   */
+  AccountAlreadyExist = 'Account already exists',
+
+  /**
    * Error type indicating that the provided email or password is incorrect.
    */
   EmailOrPasswordWrong = 'Email or password incorrect',

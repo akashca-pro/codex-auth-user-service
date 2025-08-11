@@ -28,6 +28,7 @@ export const mapMessageToGrpcStatus = (message: string): status => {
     // ====== User Errors ======
 
     case UserErrorType.UserAlreadyExists:
+    case AuthenticateUserErrorType.AccountAlreadyExist:
       return status.ALREADY_EXISTS;
 
     case UserErrorType.UserDoesNotExist:
