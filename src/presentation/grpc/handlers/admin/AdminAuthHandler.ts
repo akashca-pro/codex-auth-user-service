@@ -39,8 +39,6 @@ export class GrpcAdminAuthHandler {
         call : ServerUnaryCall<LoginRequest,LoginResponse>,
         callback : sendUnaryData<LoginResponse>
     ) : Promise<void> => {
-        const startTime = Date.now(); // for latency
-        const method = 'AdminlocalAuthLogin'
         try {
             const req = call.request;
             const result = await this._authenticateLocalAuthUserUseCase.execute({
@@ -50,19 +48,16 @@ export class GrpcAdminAuthHandler {
             })
 
             if(!result.success){
-                grpcMetricsCollector(method,result.data.message,startTime);
                 return callback({
-                    code : mapMessageToGrpcStatus(result.data.message),
-                    message : result.data.message
+                    code : mapMessageToGrpcStatus(result.message),
+                    message : result.message
                 },null)
             }
 
-            grpcMetricsCollector(method,result.data.message,startTime);
             return callback(null,result.data);
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime);
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
