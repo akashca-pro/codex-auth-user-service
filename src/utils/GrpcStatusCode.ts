@@ -16,6 +16,7 @@ export const mapMessageToGrpcStatus = (message: string): status => {
     // ====== Authentication Errors ======
     case AuthenticateUserErrorType.AccountNotFound:
     case AuthenticateUserErrorType.EmailOrPasswordWrong:
+    case UserErrorType.InvalidCountryCode:
       return status.INVALID_ARGUMENT;
 
     case AuthenticateUserErrorType.AuthProviderWrong:

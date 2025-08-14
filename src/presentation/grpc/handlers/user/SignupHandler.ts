@@ -8,6 +8,7 @@ import { SignupRequest, SignupResponse } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { UserErrorType } from "@/domain/enums/user/ErrorType";
 
 /**
  * Class for handling user signup.
@@ -45,8 +46,8 @@ export class GrpcUserSignupHandler {
 
         try {
             const req = call.request;
-            const userData = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
-            const result = await this.#_signupUserUseCase.execute(userData);
+            const dto = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
+            const result = await this.#_signupUserUseCase.execute(dto);
         
             if(!result.success){
                 return callback({
@@ -61,6 +62,12 @@ export class GrpcUserSignupHandler {
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
+            if(error?.message === UserErrorType.InvalidCountryCode){
+                return callback({
+                    code : mapMessageToGrpcStatus(error.message),
+                    message : error.message
+                })
+            }
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

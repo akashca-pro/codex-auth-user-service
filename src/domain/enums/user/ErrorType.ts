@@ -32,5 +32,10 @@ export enum UserErrorType {
   /**
    * Error type indicating that the user already verified
    */
-   AlreadyVerified = 'User already verified'
+   AlreadyVerified = 'User already verified',
+
+   /**
+    * Error type indicating that the country code in not valid.
+    */
+   InvalidCountryCode = 'Invalid country code',
 }

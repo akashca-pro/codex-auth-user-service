@@ -5,6 +5,8 @@ import { UserRole } from "@/domain/enums/UserRole";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
 import { User as PrismaUser } from '@/generated/prisma'
 import { CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/utils/dto/CreateUser";
+import { isValidCountry } from "@/utils/countryCheck";
+import { UserErrorType } from "@/domain/enums/user/ErrorType";
 
 export class UserMapper {
 
@@ -12,6 +14,9 @@ export class UserMapper {
     body : CreateLocalAuthUserRequestDTO,
     role : UserRole
 ) : ICreateLocalUserRequestDTO {
+
+    if(!isValidCountry(body.country)) 
+      throw new Error(UserErrorType.InvalidCountryCode)
 
     return {
         username : body.username,
