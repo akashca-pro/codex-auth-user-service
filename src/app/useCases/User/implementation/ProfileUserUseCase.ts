@@ -8,6 +8,7 @@ import TYPES from "@/config/inversify/types";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ICacheProvider } from "@/app/providers/CacheProvider";
 import { config } from "@/config";
+import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 
 
 /**
@@ -39,7 +40,7 @@ export class ProfileUseCase implements IProfileUseCase {
      */
     async execute(userId: string): Promise<ResponseDTO> {
 
-        const cacheKey = `user:profile:${userId}`;
+        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${userId}`;
 
         const cached = await this.#_cacheProvider.get(cacheKey);
         if(cached){

@@ -8,6 +8,7 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { User } from "@/domain/entities/User";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ICacheProvider } from "@/app/providers/CacheProvider";
+import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 
 /**
  * Implementation of the update user profile use case.
@@ -51,7 +52,7 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         await this.#_userRepository.update(userId, userEntity.getUpdatedFields());
 
-        const cacheKey = `user:profile:${userId}`;
+        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${userId}`;
         await this.#_cacheProvider.del(cacheKey);
 
         return {

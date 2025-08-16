@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
-import { config } from '.';
+import { config } from '..';
 import logger from '@/utils/logger';
-import { RedisEvents } from './enums/redis';
+import { RedisEvents } from '../enums/redis';
 
 class RedisClient {
     private static _instance : Redis
