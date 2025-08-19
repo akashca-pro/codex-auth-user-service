@@ -6,8 +6,6 @@ import { ResendOtpRequest, ResendOtpResponse } from "@akashcapro/codex-shared-ut
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
-
 
 /**
  * Class for handling resend otp.
@@ -50,21 +48,17 @@ export class GrpcUserResendOtpHandler {
             const result = await this.#_resendOtpUseCase.execute(req.email);
 
             if(!result.success){
-                grpcMetricsCollector(method,result.message,startTime)
                 return callback({
                     code : mapMessageToGrpcStatus(result.message),
                     message : result.message
                 },null)
             }
-            grpcMetricsCollector(method,result.message,startTime)
             return callback(null,{
                 message : result.message
             });
 
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
-            grpcMetricsCollector(method,error.message,startTime);
-
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

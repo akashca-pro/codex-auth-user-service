@@ -17,6 +17,7 @@ import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
 import { GrpcProfileHandler } from "./handlers/common/ProfileHandler";
 import { GrpcAdminAuthHandler } from "./handlers/admin/AdminAuthHandler";
 import { GrpcUpdateProfileHandler } from "./handlers/common/UpdateProfileHandler";
+import { grpcMetricsCollector } from "@/config/metrics/grpcMetricsMiddleware";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -35,13 +36,22 @@ const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHa
 // admin
 const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
 
-const adminHandlers = {
+function wrapAll(serviceObj : Record<string,Function> ){
+    return Object.fromEntries(
+        Object.entries(serviceObj).map(([name, fn])=>[
+            name,
+            grpcMetricsCollector(name, fn)
+        ])
+    )
+}
+
+const adminHandlers = wrapAll({
     ...adminAuthHandler.getServiceHandler(),
     ...refreshToken.getServiceHandler(),
     ...updateProfile.getServiceHandler(),
-}
+});
 
-const userHandlers = {
+const userHandlers = wrapAll({
     ...userAuthHandler.getServiceHandler(),
     ...oAuthHandler.getServiceHandler(),
     ...refreshToken.getServiceHandler(),
@@ -54,7 +64,7 @@ const userHandlers = {
     ...userProfileHandler.getServiceHandler(),
     ...updateProfile.getServiceHandler()
 
-}
+})
 
 export const startGrpcServer = () => {
 

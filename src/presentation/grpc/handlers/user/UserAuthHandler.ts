@@ -6,7 +6,6 @@ import { LoginRequest, LoginResponse } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { grpcMetricsCollector } from "@/helpers/grpcMetricsCollector";
 import { UserRole } from "@/domain/enums/UserRole";
 
 

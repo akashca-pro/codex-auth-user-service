@@ -7,7 +7,7 @@ import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
-import { dbMetricsCollector } from "@/helpers/dbMetricsCollector";
+
 
 /**
  * Prisma implementation of the user repository.
@@ -35,16 +35,10 @@ export class UserRepository implements IUserRepository {
      * @param {IUserInRequestDTO} data - The user data.
      */
     async create(data: IUserInRequestDTO): Promise<void> {
-        const startTime = Date.now();
-        const operation = 'create';
         try {
             await this._prisma.user.create({ data });
 
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
             throw error;
         }
 
@@ -58,24 +52,16 @@ export class UserRepository implements IUserRepository {
      * @returns {Promise<IUserInRequestDTO | null>} The found user or null.
      */
     async findByEmail(email: string): Promise<IUserInRequestDTO | null> {
-        const startTime = Date.now();
-        const operation = 'find_by_email';
         try {
             const user = await this._prisma.user.findFirst({
                 where : { email }
             })
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
 
             if(!user) return null;
 
             return UserMapper.mapPrismaUserToDomain(user);
 
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
 
@@ -88,25 +74,18 @@ export class UserRepository implements IUserRepository {
      * @returns {Promse<IUserInRequestDTO | null>} - The found user data or null if not.
      */
     async findByEmailAndRole(email: string, role: UserRole): Promise<IUserInRequestDTO | null> {
-        const startTime = Date.now();
-        const operation = 'find_by_email_and_role';
         try {
-            
             const user = await this._prisma.user.findFirst({
                 where : {
                     email,
                     role
                 }
             })
-
-            dbMetricsCollector(operation,'success',startTime);
-
             if(!user) return null;
 
             return UserMapper.mapPrismaUserToDomain(user);
 
         } catch (error) {
-            dbMetricsCollector(operation, 'error', startTime);
             throw error;
         }
 
@@ -127,17 +106,10 @@ export class UserRepository implements IUserRepository {
             const user = await this._prisma.user.findFirst({
                 where : { userId }
             })
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
-
             if(!user) return null;
 
             return UserMapper.mapPrismaUserToDomain(user);
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
 
@@ -183,10 +155,6 @@ export class UserRepository implements IUserRepository {
             });
 
             const total = await this._prisma.user.count();
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
-
             return {
                 body : users,
                 total,
@@ -194,12 +162,8 @@ export class UserRepository implements IUserRepository {
                 lastPage : Math.ceil((total / perPage))
             } 
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
-
     }
 
     /**
@@ -210,24 +174,13 @@ export class UserRepository implements IUserRepository {
      * @return {boolean} - True if yes or false if not.
      */
     async findByUsername(username: string): Promise<boolean> {
-
-        const startTime = Date.now();
-        const operation = 'find_by_username';
-        
         try {
             const usernameExist = await this._prisma.user.findUnique({
                 where : { username },
                 select : { userId : true } 
             })
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
-
             return !!usernameExist
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
 
@@ -242,10 +195,6 @@ export class UserRepository implements IUserRepository {
      * @returns {Promise<IUserOutRequestDTO>} The updated user.
      */
     async update(userId: string, data: IUpdateUserRequestDTO): Promise<IUserOutRequestDTO> {
-        
-        const startTime = Date.now();
-        const operation = 'update';
-
         try {
             const userUpdated = await this._prisma.user.update({
                 where : {userId},
@@ -268,15 +217,8 @@ export class UserRepository implements IUserRepository {
                     updatedAt : data.updatedAt
                 }
             })
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
-
             return userUpdated
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
 
@@ -290,24 +232,12 @@ export class UserRepository implements IUserRepository {
      * @returns {Promise<void>} A Promise that resolves once the user is deleted.
      */
     async delete(userId: string): Promise<void> {
-
-        const startTime = Date.now();
-        const operation = 'delete';
-
         try {
             await this._prisma.user.delete({
                 where : {userId},
             })
-
-            // Observe successfull duration.
-            dbMetricsCollector(operation,'success',startTime);
         } catch (error) {
-            // Observe failed duration.
-            dbMetricsCollector(operation,'error',startTime);
-
             throw error;
         }
-
     }
-
 }
