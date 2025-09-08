@@ -10,7 +10,7 @@ const TYPES = {
   Logger : Symbol.for("Logger"),
   PrismaClient : Symbol.for("PrismaClient"),
 
-  // Use cases
+  //Use cases
 
   AuthenticateLocalUserUseCase: Symbol.for("AuthenticateLocalUserUseCase"),
   AuthenticateOAuthUserUseCase : Symbol.for("AuthenticateOAuthUserUseCase"),
@@ -22,6 +22,7 @@ const TYPES = {
   ProfileUseCase : Symbol.for("ProfileUseCase"),
   SignUpUserUseCase : Symbol.for("SignUpUserUseCase"),
   UpdateProfileUseCase : Symbol.for("UpdateProfileUseCase"),
+  ListUsersUseCase : Symbol.for("ListUsersUseCase"),
 
   // User handler
 
@@ -38,6 +39,7 @@ const TYPES = {
   // Admin handlers
 
   GrpcAdminAuthHandler : Symbol.for("GrpcAdminAuthHandler"),
+  GrpcAdminListUsersHandler : Symbol.for("GrpcAdminListUsersHandler"),
 
   // Common handlers
 

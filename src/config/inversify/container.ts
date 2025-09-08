@@ -58,6 +58,9 @@ import { UpdateUserProfileUseCase } from '@/app/useCases/User/implementation/Upd
 import { GrpcUpdateProfileHandler } from '@/presentation/grpc/handlers/common/UpdateProfileHandler';
 import { ICacheProvider } from '@/app/providers/CacheProvider';
 import { RedisCacheProvider } from '@/infra/providers/RedisCacheProvider';
+import { IListUsersUseCase } from '@/app/useCases/admin/ListUsersUseCase';
+import { ListUsersUseCase } from '@/app/useCases/admin/implementation/ListUsersUseCase';
+import { GrpcAdminListUsersHandler } from '@/presentation/grpc/handlers/admin/ListUsersHandler';
 
 const container = new Container();
 
@@ -74,82 +77,85 @@ container.bind<IOtpService>(TYPES.IOtpService).toDynamicValue(() => {
 /**
  * Adapters
  */
-container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
-container.bind<IPasswordHasher>(TYPES.IPasswordHasher).to(BcryptPasswordHasher);
-container.bind<ITokenProvider>(TYPES.ITokenProvider).to(JwtTokenProvider);
-container.bind<ICacheProvider>(TYPES.ICacheProvider).to(RedisCacheProvider);
+container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository).inSingletonScope();
+container.bind<IPasswordHasher>(TYPES.IPasswordHasher).to(BcryptPasswordHasher).inSingletonScope();
+container.bind<ITokenProvider>(TYPES.ITokenProvider).to(JwtTokenProvider).inSingletonScope();
+container.bind<ICacheProvider>(TYPES.ICacheProvider).to(RedisCacheProvider).inSingletonScope();
 
 /**
  * UseCases
  */
 container
     .bind<IAuthenticateLocalAuthUserUseCase>(TYPES.AuthenticateLocalUserUseCase)
-    .to(AuthenticateLocalUserUseCase);
+    .to(AuthenticateLocalUserUseCase).inSingletonScope();
 container
     .bind<IAuthenticateOAuthUserUseCase>(TYPES.AuthenticateOAuthUserUseCase)
-    .to(AuthenticateOAuthUserUseCase);
+    .to(AuthenticateOAuthUserUseCase).inSingletonScope();
 container
     .bind<IForgotPasswordUseCase>(TYPES.ForgotPasswordUseCase)
-    .to(ForgotpasswordUseCase);
+    .to(ForgotpasswordUseCase).inSingletonScope();
 container
     .bind<IResetPasswordUseCase>(TYPES.ResetPasswordUseCase)
-    .to(ResetPasswordUseCase);
+    .to(ResetPasswordUseCase).inSingletonScope();
 container
     .bind<IRefreshTokenUseCase>(TYPES.RefreshTokenUseCase)
-    .to(RefreshTokenUseCase);
+    .to(RefreshTokenUseCase).inSingletonScope();
 container
     .bind<IResendOtpUseCase>(TYPES.ResendOtpUseCase)
-    .to(ResendOtpUseCase);
+    .to(ResendOtpUseCase).inSingletonScope();
 container
     .bind<IVerifySignUpOtpUseCase>(TYPES.VerifySignUpOtpUseCase)
-    .to(VerifySignUpOtpUseCase);
+    .to(VerifySignUpOtpUseCase).inSingletonScope();
 container
     .bind<ISignUpUserUseCase>(TYPES.SignUpUserUseCase)
-    .to(SignupUserUseCase);
+    .to(SignupUserUseCase).inSingletonScope();
 container
     .bind<IProfileUseCase>(TYPES.ProfileUseCase)
-    .to(ProfileUseCase);
+    .to(ProfileUseCase).inSingletonScope();
 container
     .bind<IUpdateUserProfileUseCase>(TYPES.UpdateProfileUseCase)
-    .to(UpdateUserProfileUseCase)
+    .to(UpdateUserProfileUseCase).inSingletonScope();
+container
+    .bind<IListUsersUseCase>(TYPES.ListUsersUseCase)
+    .to(ListUsersUseCase).inSingletonScope();
 
 /**
  * Common gRPC handlers.
  */
 container
     .bind<GrpcUserAuthHandler>(TYPES.GrpcUserAuthHandler)
-    .to(GrpcUserAuthHandler);
+    .to(GrpcUserAuthHandler).inSingletonScope();
 container
     .bind<GrpcOAuthHandler>(TYPES.GrpcOAuthHandler)
-    .to(GrpcOAuthHandler);
+    .to(GrpcOAuthHandler).inSingletonScope();
 container
     .bind<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler)
-    .to(GrpcRefreshTokenHandler);
+    .to(GrpcRefreshTokenHandler).inSingletonScope();
 container
     .bind<GrpcUpdateProfileHandler>(TYPES.GrpcUpdateProfileHandler)
-    .to(GrpcUpdateProfileHandler);
+    .to(GrpcUpdateProfileHandler).inSingletonScope();
 
 /**
  * User gRPC handlers.
  */
 container
     .bind<GrpcUserSignupHandler>(TYPES.GrpcUserSignupHandler)
-    .to(GrpcUserSignupHandler);
+    .to(GrpcUserSignupHandler).inSingletonScope();
 container
     .bind<GrpcUserVerifySignupOtpHandler>(TYPES.GrpcUserVerifySignupOtpHandler)
-    .to(GrpcUserVerifySignupOtpHandler);
+    .to(GrpcUserVerifySignupOtpHandler).inSingletonScope();
 container
     .bind<GrpcUserResendOtpHandler>(TYPES.GrpcUserResendOtpHandler)
-    .to(GrpcUserResendOtpHandler);
+    .to(GrpcUserResendOtpHandler).inSingletonScope();
 container   
     .bind<GrpcUserForgotPasswordHandler>(TYPES.GrpcUserForgotPasswordHandler)
-    .to(GrpcUserForgotPasswordHandler);
+    .to(GrpcUserForgotPasswordHandler).inSingletonScope();
 container
     .bind<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler)
-    .to(GrpcUserResetPasswordHandler);
+    .to(GrpcUserResetPasswordHandler).inSingletonScope();
 container
     .bind<GrpcProfileHandler>(TYPES.GrpcProfileHandler)
-    .to(GrpcProfileHandler);
+    .to(GrpcProfileHandler).inSingletonScope();
 
 /**
  * Admin gRPC handlers.
@@ -157,6 +163,9 @@ container
 
 container
     .bind<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler)
-    .to(GrpcAdminAuthHandler);
+    .to(GrpcAdminAuthHandler).inSingletonScope();
+container
+    .bind<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler)
+    .to(GrpcAdminListUsersHandler).inSingletonScope();
 
 export default container;

@@ -2,7 +2,7 @@ import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
-import { UserRole } from "@/generated/prisma";
+import { User, UserRole } from "@/generated/prisma";
 
 /**
  * Interface for the repository handling user data.
@@ -61,8 +61,32 @@ export interface IUserRepository {
      * @param {number} pageNumber - The page number for pagination.
      * @returns {Promise<PaginationDTO>} - The paginated list of users.
      */
-    findAll(pageNumber : number) : Promise<PaginationDTO | null>;
+    // findAll(pageNumber : number) : Promise<PaginationDTO | null>;
 
+    /**
+     * Retrieves paginated users with filters and sorting.
+     * 
+     * @param filter - Key/value filters to apply.
+     * @param skip - Number of records to skip.
+     * @param limit - Max number of records to return.
+     * @param select - Fields to select.
+     * @param sort - Sorting order, Prisma-compatible.
+     * @returns Paginated list of users.
+     */
+    findUsersPaginated(
+        filter: Record<string, any>,
+        skip: number,
+        limit: number,
+        sort: Record<string, "asc" | "desc">,
+        select?: string[],
+    ): Promise<User[]>
+
+    /**
+     * 
+     * @param filter - The filter query.
+     * @returns The count of documents.
+     */
+    countDocuments(filter: Record<string, any>) : Promise<number>
 
     /**
      * Updated the user data with the provided information.

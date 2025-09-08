@@ -2,7 +2,7 @@ import { IUserRepository } from "@/domain/repository/User";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
-import { PrismaClient, UserRole } from "@/generated/prisma";
+import { PrismaClient, User, UserRole } from "@/generated/prisma";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { inject, injectable } from "inversify";
@@ -122,49 +122,102 @@ export class UserRepository implements IUserRepository {
      * @param {number} pageNumber - The page number to retrieve.
      * @returns {Promise<PaginationDTO>} The paginated list of users.
      */
-    async findAll(pageNumber: number): Promise<PaginationDTO | null> {
+    // async findAll(pageNumber: number): Promise<PaginationDTO | null> {
 
-        const startTime = Date.now();
-        const operation = 'find_all';
+    //     const startTime = Date.now();
+    //     const operation = 'find_all';
         
-        try {
-            const perPage = 4;
-            const users : IUserOutRequestDTO[] = await this._prisma.user.findMany({
-                take : perPage,
-                skip : Math.ceil((pageNumber - 1) * perPage),
-                orderBy : {
-                    username : 'asc',
-                },
-                select : {
-                    userId: true,
-                    username: true,
-                    email: true,
-                    firstName: true,
-                    lastName: true,
-                    avatar: true,
-                    country: true,
-                    preferredLanguage: true,
-                    easySolved: true,
-                    mediumSolved: true,
-                    hardSolved: true,
-                    totalSubmission: true,
-                    streak: true,
-                    createdAt: true,
-                    updatedAt: true,
-                }
-            });
+    //     try {
+    //         const perPage = 4;
+    //         const users : IUserOutRequestDTO[] = await this._prisma.user.findMany({
+    //             take : perPage,
+    //             skip : Math.ceil((pageNumber - 1) * perPage),
+    //             orderBy : {
+    //                 username : 'asc',
+    //             },
+    //             select : {
+    //                 userId: true,
+    //                 username: true,
+    //                 email: true,
+    //                 firstName: true,
+    //                 lastName: true,
+    //                 avatar: true,
+    //                 country: true,
+    //                 preferredLanguage: true,
+    //                 easySolved: true,
+    //                 mediumSolved: true,
+    //                 hardSolved: true,
+    //                 totalSubmission: true,
+    //                 streak: true,
+    //                 createdAt: true,
+    //                 updatedAt: true,
+    //             }
+    //         });
 
-            const total = await this._prisma.user.count();
-            return {
-                body : users,
-                total,
-                page : pageNumber,
-                lastPage : Math.ceil((total / perPage))
-            } 
+    //         const total = await this._prisma.user.count();
+    //         return {
+    //             body : users,
+    //             total,
+    //             page : pageNumber,
+    //             lastPage : Math.ceil((total / perPage))
+    //         } 
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
+    /**
+     * Retrieves paginated users with filters and sorting.
+     * 
+     * @param filter - Key/value filters to apply.
+     * @param skip - Number of records to skip.
+     * @param limit - Max number of records to return.
+     * @param select - Fields to select.
+     * @param sort - Sorting order, Prisma-compatible.
+     * @returns Paginated list of users.
+     */
+    async findUsersPaginated(
+    filter: Record<string, any>,
+    skip: number,
+    limit: number,
+    sort: Record<string, "asc" | "desc"> = { createdAt: "desc" },
+    select?: string[],
+    ): Promise<User[]> {
+        try {
+            const users = await this._prisma.user.findMany({
+            where: filter,
+            skip,
+            take: limit,
+            orderBy: sort,
+            select: select?.reduce((acc, field) => {
+                acc[field] = true
+                return acc
+            }, {} as Record<string, boolean>),
+            })
+
+            return users
+
+        } catch (error) {
+            throw error
+        }
+    }
+    
+    /**
+     * 
+     * @param filter - The filter query.
+     * @returns The count of documents.
+     */
+    async countDocuments(filter: Record<string, any>): Promise<number> {
+        try {
+            const count = await this._prisma.user.count({
+                where : filter
+            })
+            return count;
         } catch (error) {
             throw error;
         }
     }
+  
 
     /**
      * Checks if existing user taked the username.

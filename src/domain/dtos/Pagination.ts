@@ -7,20 +7,20 @@ export interface PaginationDTO {
   /**
    * The body of the response, representing the paginated data.
    */
-  body: unknown[]
+  body: any[]
 
   /**
-   * The total number of items in the dataset.
+   * The total number of pages.
    */
-  total: number
+  totalPages: number
 
   /**
    * The current page number.
    */
-  page: number
+  currentPage: number
 
   /**
-   * The last page number in the pagination.
+   * The total items overall
    */
-  lastPage: number
+  totalItems: number
 }

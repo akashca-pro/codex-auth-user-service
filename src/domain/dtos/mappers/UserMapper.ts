@@ -106,4 +106,19 @@ static toUserRole(role: string): UserRole {
   throw new Error('Invalid role: ' + role);
 }
 
+static toValidAuthProvider(authProvider : string) : AuthProvider {
+  const normalized = authProvider?.toUpperCase();
+
+  if(normalized === 'GOOGLE'){
+    return AuthProvider.GOOGLE
+  }
+
+  if(normalized === 'LOCAL'){
+    return AuthProvider.LOCAL
+  }
+
+  throw new Error('Invalid authProvider: ' + authProvider);
+
+}
+
 }
