@@ -25,6 +25,7 @@ export interface IUserProps<T extends UserAuthentication = UserAuthentication>{
   updatedAt: Date;
   isArchived: boolean;
   isVerified : boolean;
+  isBlocked : boolean;
   preferredLanguage : string | null;
   easySolved: number | null;
   mediumSolved: number | null;
@@ -49,6 +50,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
   private _avatar: string | null;
   private _lastName: string | null;
   private _isArchived: boolean;
+  private _isBlocked : boolean;
   private _preferredLanguage : string | null;
   private _easySolved: number | null;
   private _mediumSolved: number | null;
@@ -85,7 +87,7 @@ export class User<T extends UserAuthentication = UserAuthentication> {
         updatedAt: now,
         isArchived: false,
         isVerified : data.authentication.isVerified,
-        
+        isBlocked : false,
         // These values are specific based on role
 
         role: isAdmin ? UserRole.ADMIN : UserRole.USER,
@@ -250,7 +252,7 @@ update(updatedData: IUpdateUserRequestDTO) {
         updatedAt: data.updatedAt,
         isArchived: false,
         isVerified : data.isVerified,
-        
+        isBlocked : data.isBlocked,
         // These values are specific based on role
 
         role: isAdmin ? UserRole.ADMIN : UserRole.USER,
@@ -283,7 +285,8 @@ update(updatedData: IUpdateUserRequestDTO) {
       password : auth instanceof LocalAuthentication ? auth.password : null,
       oAuthId : auth instanceof OAuthAuthentication ? auth.oAuthId : null,
       isVerified : auth.isVerified,
-      isArchived: false,
+      isArchived: this._isArchived,
+      isBlocked : this._isBlocked,
       preferredLanguage: this.preferredLanguage,
       easySolved : this.easySolved,
       mediumSolved: this.mediumSolved,
@@ -325,6 +328,7 @@ update(updatedData: IUpdateUserRequestDTO) {
     this._avatar = props.avatar;
     this._lastName = props.lastName;
     this._isArchived = props.isArchived;
+    this._isBlocked = props.isBlocked;
     this._preferredLanguage = props.preferredLanguage;
     this._easySolved = props.easySolved;
     this._mediumSolved = props.mediumSolved;
@@ -403,6 +407,10 @@ update(updatedData: IUpdateUserRequestDTO) {
 
   get streak(): number | null {
     return this._streak;
+  }
+
+  get isBlocked(): boolean {
+    return this._isBlocked;
   }
 
 }

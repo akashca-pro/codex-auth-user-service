@@ -1,4 +1,4 @@
-import { IListUsersUseCase } from "@/app/useCases/admin/ListUsersUseCase";
+import { IListUsersUseCase } from "@/app/useCases/admin/listUsers.usecase.interface";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import logger from "@/utils/logger";

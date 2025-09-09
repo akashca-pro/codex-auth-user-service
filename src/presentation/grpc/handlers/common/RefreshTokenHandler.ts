@@ -52,14 +52,14 @@ export class GrpcRefreshTokenHandler {
 
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
           
             return callback(null,{
                 accessToken : result.data.accessToken,
-                message : result.message,
+                message : result.message!,
                 userInfo : result.data.userInfo
             });
 

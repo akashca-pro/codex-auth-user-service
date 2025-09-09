@@ -15,7 +15,7 @@ export interface ResponseDTO {
   data: any
 
   /**
-   * The repsonse message.                               .
+   * The response message.                               .
    */
-  message : string
+  message? : string
 }

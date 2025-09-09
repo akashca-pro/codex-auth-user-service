@@ -19,6 +19,7 @@ import { GrpcAdminAuthHandler } from "./handlers/admin/AdminAuthHandler";
 import { GrpcUpdateProfileHandler } from "./handlers/common/UpdateProfileHandler";
 import { grpcMetricsCollector } from "@/config/metrics/grpcMetricsMiddleware";
 import { GrpcAdminListUsersHandler } from "./handlers/admin/ListUsersHandler";
+import { GrpcToggleBlockUserHandler } from "./handlers/admin/ToggleBlockUserHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -37,6 +38,7 @@ const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHa
 // admin
 const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
 const adminListUsersHandler = container.get<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler);
+const toggleBlockUserHandler = container.get<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler);
 
 function wrapAll(serviceObj : Record<string,Function> ){
     return Object.fromEntries(
@@ -52,6 +54,7 @@ const adminHandlers = wrapAll({
     ...refreshToken.getServiceHandler(),
     ...updateProfile.getServiceHandler(),
     ...adminListUsersHandler.getServiceHandler(),
+    ...toggleBlockUserHandler.getServiceHandler(),
 });
 
 const userHandlers = wrapAll({

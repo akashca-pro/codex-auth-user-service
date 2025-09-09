@@ -20,6 +20,7 @@ export interface IUserInRequestDTO {
     country : string | null;
     isVerified : boolean;
     isArchived : boolean;
+    isBlocked : boolean;
     preferredLanguage : string | null;
     easySolved: number | null;
     mediumSolved : number | null;

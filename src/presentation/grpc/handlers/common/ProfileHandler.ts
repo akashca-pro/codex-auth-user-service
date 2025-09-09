@@ -40,7 +40,7 @@ export class GrpcProfileHandler {
             const result = await this.#_profileUseCase.execute(req.userId);
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }

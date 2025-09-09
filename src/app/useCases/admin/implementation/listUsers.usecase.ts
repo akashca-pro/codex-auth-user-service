@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { IListUsersUseCase } from "../ListUsersUseCase";
+import { IListUsersUseCase } from "../listUsers.usecase.interface";
 import { IUserRepository } from "@/domain/repository/User";
 import TYPES from "@/config/inversify/types";
 import { IListUsersDTO } from "@/domain/dtos/admin/ListUsers.dto";
@@ -67,6 +67,7 @@ export class ListUsersUseCase implements IListUsersUseCase {
             "isVerified",
             "preferredLanguage",
             "isArchived",
+            "isBlocked",
             "easySolved",
             "mediumSolved",
             "hardSolved",

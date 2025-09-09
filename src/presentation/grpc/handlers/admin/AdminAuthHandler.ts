@@ -48,7 +48,7 @@ export class GrpcAdminAuthHandler {
 
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }

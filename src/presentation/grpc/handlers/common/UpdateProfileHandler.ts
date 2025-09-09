@@ -46,13 +46,13 @@ export class GrpcUpdateProfileHandler {
 
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
 
             return callback(null,{
-                message : result.message
+                message : result.message!
             });
 
         } catch (error) {

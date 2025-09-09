@@ -51,7 +51,7 @@ export class GrpcUserAuthHandler {
             })
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
@@ -59,7 +59,7 @@ export class GrpcUserAuthHandler {
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
                 userInfo : result.data.userInfo,
-                message : result.message
+                message : result.message!
             })
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);

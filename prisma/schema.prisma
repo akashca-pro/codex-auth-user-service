@@ -33,6 +33,7 @@ model User {
   oAuthId           String?  @unique
   isVerified        Boolean  @default(false)
   isArchived        Boolean  @default(false)
+  isBlocked         Boolean  @default(false)
   preferredLanguage String?
   easySolved        Int?
   mediumSolved      Int?

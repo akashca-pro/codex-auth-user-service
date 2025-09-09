@@ -49,7 +49,7 @@ export class GrpcUserVerifySignupOtpHandler {
 
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
@@ -58,7 +58,7 @@ export class GrpcUserVerifySignupOtpHandler {
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
                 userInfo : result.data.userInfo,
-                message : result.message
+                message : result.message!
             });
 
         } catch (error : any) {

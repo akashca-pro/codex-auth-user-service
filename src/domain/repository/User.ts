@@ -55,15 +55,6 @@ export interface IUserRepository {
     findByUsername(username : string) : Promise<boolean>;
 
     /**
-     * Retrieves a paginated list of all users.
-     * 
-     * @async
-     * @param {number} pageNumber - The page number for pagination.
-     * @returns {Promise<PaginationDTO>} - The paginated list of users.
-     */
-    // findAll(pageNumber : number) : Promise<PaginationDTO | null>;
-
-    /**
      * Retrieves paginated users with filters and sorting.
      * 
      * @param filter - Key/value filters to apply.

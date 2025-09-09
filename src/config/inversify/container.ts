@@ -58,9 +58,12 @@ import { UpdateUserProfileUseCase } from '@/app/useCases/User/implementation/Upd
 import { GrpcUpdateProfileHandler } from '@/presentation/grpc/handlers/common/UpdateProfileHandler';
 import { ICacheProvider } from '@/app/providers/CacheProvider';
 import { RedisCacheProvider } from '@/infra/providers/RedisCacheProvider';
-import { IListUsersUseCase } from '@/app/useCases/admin/ListUsersUseCase';
-import { ListUsersUseCase } from '@/app/useCases/admin/implementation/ListUsersUseCase';
+import { IListUsersUseCase } from '@/app/useCases/admin/listUsers.usecase.interface';
+import { ListUsersUseCase } from '@/app/useCases/admin/implementation/listUsers.usecase';
 import { GrpcAdminListUsersHandler } from '@/presentation/grpc/handlers/admin/ListUsersHandler';
+import { IToggleBlockUserUseCase } from '@/app/useCases/admin/toggleBlockUser.usecase.interface';
+import { ToggleBlockUserUseCase } from '@/app/useCases/admin/implementation/toggleBlockUser.usecase';
+import { GrpcToggleBlockUserHandler } from '@/presentation/grpc/handlers/admin/ToggleBlockUserHandler';
 
 const container = new Container();
 
@@ -118,6 +121,9 @@ container
 container
     .bind<IListUsersUseCase>(TYPES.ListUsersUseCase)
     .to(ListUsersUseCase).inSingletonScope();
+container
+    .bind<IToggleBlockUserUseCase>(TYPES.ToggleBlockUserUseCase)
+    .to(ToggleBlockUserUseCase).inSingletonScope();
 
 /**
  * Common gRPC handlers.
@@ -167,5 +173,8 @@ container
 container
     .bind<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler)
     .to(GrpcAdminListUsersHandler).inSingletonScope();
+container
+    .bind<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler)
+    .to(GrpcToggleBlockUserHandler).inSingletonScope();
 
 export default container;
