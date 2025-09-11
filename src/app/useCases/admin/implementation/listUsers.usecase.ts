@@ -25,7 +25,6 @@ export class ListUsersUseCase implements IListUsersUseCase {
     }
 
     async execute(filters: IListUsersDTO): Promise<PaginationDTO> {
-
         const where: Record<string, any> = {}
         where.role = 'USER'
 
@@ -49,6 +48,10 @@ export class ListUsersUseCase implements IListUsersUseCase {
 
         if (filters.isVerified !== null) {
             where.isVerified = filters.isVerified
+        }
+
+        if(filters.isBlocked !== null) {
+            where.isBlocked = filters.isBlocked
         }
 
         const orderBy: Record<string, "asc" | "desc"> = {

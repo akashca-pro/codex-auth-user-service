@@ -12,4 +12,5 @@ export interface IListUsersDTO {
     authProvider? : string;
     isVerified? : boolean;
     isArchived? : boolean;
+    isBlocked? : boolean;
 }
