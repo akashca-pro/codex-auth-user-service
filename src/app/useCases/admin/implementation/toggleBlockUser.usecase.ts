@@ -6,6 +6,9 @@ import { ToggleBlockUserDTO } from "@/domain/dtos/admin/ToggleBlockUsers.dto";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { User } from "@/domain/entities/User";
+import { ICacheProvider } from "@/app/providers/CacheProvider";
+import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
+import { config } from "@/config";
 
 
 /**
@@ -18,11 +21,14 @@ import { User } from "@/domain/entities/User";
 export class ToggleBlockUserUseCase implements IToggleBlockUserUseCase {
  
     #_userRepository : IUserRepository
+    #_cacheProvider : ICacheProvider
 
     constructor(
-        @inject(TYPES.IUserRepository) userRepository : IUserRepository
+        @inject(TYPES.IUserRepository) userRepository : IUserRepository,
+        @inject(TYPES.ICacheProvider) cacheProvider : ICacheProvider
     ){
-        this.#_userRepository = userRepository
+        this.#_userRepository = userRepository,
+        this.#_cacheProvider = cacheProvider
     }
 
     async execute(data: ToggleBlockUserDTO): Promise<ResponseDTO> {
@@ -43,6 +49,16 @@ export class ToggleBlockUserUseCase implements IToggleBlockUserUseCase {
         })
 
         await this.#_userRepository.update(user.userId, userEntity.getUpdatedFields());
+
+        const cacheKey = `${REDIS_PREFIX.USER_BLOCKED}:${user.userId}`
+        const profileCacheKey = `${REDIS_PREFIX.USER_PROFILE}${user.userId}`
+
+        if(userEntity.isBlocked){
+            await this.#_cacheProvider.set(cacheKey, 1, config.BLOCKED_USER_CACHE_EXPIRY);
+            await this.#_cacheProvider.del(profileCacheKey)
+        }else{
+            await this.#_cacheProvider.del(cacheKey);
+        }
         
         return {
             data : null,

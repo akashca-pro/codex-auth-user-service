@@ -17,6 +17,7 @@ interface Config {
     OTP_EXPIRY_SECONDS : number;
     METRICS_PORT : number;
     PROFILE_CACHE_EXPIRY : number;
+    BLOCKED_USER_CACHE_EXPIRY : number;
 }
 
 export const config : Config = {
@@ -34,5 +35,6 @@ export const config : Config = {
      NODEMAILER_SERVICE : process.env.NODEMAILER_SERVICE || 'gmail',
      OTP_EXPIRY_SECONDS : Number(process.env.OTP_EXPIRY_SECONDS) || 120,
      METRICS_PORT : Number(process.env.METRICS_PORT) || 9101,
-     PROFILE_CACHE_EXPIRY : Number(process.env.PROFILE_CACHE_EXPIRY) || 86400
+     PROFILE_CACHE_EXPIRY : Number(process.env.PROFILE_CACHE_EXPIRY) || 86400,
+     BLOCKED_USER_CACHE_EXPIRY : Number(process.env.BLOCKED_USER_CACHE_EXPIRY) || 900,
 }
