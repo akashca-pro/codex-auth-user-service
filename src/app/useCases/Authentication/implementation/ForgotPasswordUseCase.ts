@@ -44,12 +44,20 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
      */
     async execute(email: string): Promise<ResponseDTO>{
 
-        const user = this.#_userRepository.findByEmail(email);
+        const user = await this.#_userRepository.findByEmail(email);
 
         if(!user){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
+            }
+        }
+
+        if(user.isBlocked){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountBlocked,
                 success : false
             }
         }

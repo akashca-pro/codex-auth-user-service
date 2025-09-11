@@ -81,6 +81,14 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
             }
         }
 
+        if(user.isBlocked){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountBlocked,
+                success : false
+            }
+        }
+
         if(user.authProvider !== AuthProvider.LOCAL || user.password === null){
             return {
                 data : null,

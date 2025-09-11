@@ -6,6 +6,8 @@ import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { injectable, inject } from "inversify";
 import { randomUUID } from "node:crypto";
+import { IUserRepository } from "@/domain/repository/User";
+import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 
 /**
  * Use case for issuing new accessToken.
@@ -17,17 +19,23 @@ import { randomUUID } from "node:crypto";
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
 
     #_tokenProvider : ITokenProvider
+    #_userRepository : IUserRepository
 
     /**
      * Creates an instance of RefreshTokenEndPointUseCase.
      * 
+     * @param {IUserRepository} userRepository - The repository of the user.
      * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor(
         @inject(TYPES.ITokenProvider)
         tokenProvider : ITokenProvider,
+
+        @inject(TYPES.IUserRepository)
+        userRepository : IUserRepository,
     ){
         this.#_tokenProvider = tokenProvider
+        this.#_userRepository = userRepository
     }
 
     /**
@@ -44,6 +52,24 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
             email,
             role,
             tokenId : randomUUID()
+        }
+
+        const user = await this.#_userRepository.findById(userId)
+
+        if(!user){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountNotFound,
+                success : false
+            }
+        }
+
+        if(user.isBlocked){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountBlocked,
+                success : false
+            }
         }
 
         const accessToken = this.#_tokenProvider.generateAccessToken(payload);

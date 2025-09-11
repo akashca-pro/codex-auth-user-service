@@ -43,5 +43,10 @@ export enum AuthenticateUserErrorType {
   /**
    * Error type indicating that the username already exists.
    */
-  UsernameAlreadyExists = 'Username already exists'
+  UsernameAlreadyExists = 'Username already exists',
+
+  /**
+   * Error type indicating that the user is blocked.
+   */
+  AccountBlocked = "Account is blocked"
 }

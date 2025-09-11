@@ -13,6 +13,7 @@ import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { randomUUID } from "node:crypto";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { generateUniqueUsername } from "@/utils/generateRandomUsername";
+import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 
 /**
  * Use case for authenticating a user.
@@ -88,6 +89,13 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             user = userAlreadyExists as IUserInRequestDTO
         }
 
+        if(user.isBlocked){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.AccountBlocked,
+                success : false
+            }
+        }        
 
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
