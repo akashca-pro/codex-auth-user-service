@@ -26,7 +26,7 @@ export class ToggleBlockUserUseCase implements IToggleBlockUserUseCase {
     }
 
     async execute(data: ToggleBlockUserDTO): Promise<ResponseDTO> {
-        
+        console.log(data);
         const user = await this.#_userRepository.findById(data.userId);
 
         if(!user){
@@ -41,8 +41,10 @@ export class ToggleBlockUserUseCase implements IToggleBlockUserUseCase {
         userEntity.update({
             isBlocked : data.block
         })
+        console.log(userEntity);
+        console.log(userEntity.getUpdatedFields());
         await this.#_userRepository.update(user.userId, userEntity.getUpdatedFields());
-
+        
         return {
             data : null,
             success : true

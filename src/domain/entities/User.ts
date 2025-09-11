@@ -209,6 +209,12 @@ update(updatedData: IUpdateUserRequestDTO) {
     }
   }
 
+  if(updatedData.isBlocked !== undefined && 
+    this.trackUpdate(UserField.IsBlocked, this.isBlocked, updatedData.isBlocked)
+  ){
+    this._isBlocked = updatedData.isBlocked
+  }
+
   this._updatedAt = new Date();
   this._updatedFields.updatedAt = this._updatedAt;
 }
@@ -299,7 +305,7 @@ update(updatedData: IUpdateUserRequestDTO) {
   }
 
   getUpdatedFields(): Partial<IUpdateUserRequestDTO> {
-  return this._updatedFields;
+    return this._updatedFields;
   }
 
   private trackUpdate<K extends keyof IUpdateUserRequestDTO>(

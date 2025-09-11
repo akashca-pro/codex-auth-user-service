@@ -116,57 +116,6 @@ export class UserRepository implements IUserRepository {
     }
 
     /**
-     * Retrieves a paginated list of users.
-     *
-     * @async
-     * @param {number} pageNumber - The page number to retrieve.
-     * @returns {Promise<PaginationDTO>} The paginated list of users.
-     */
-    // async findAll(pageNumber: number): Promise<PaginationDTO | null> {
-
-    //     const startTime = Date.now();
-    //     const operation = 'find_all';
-        
-    //     try {
-    //         const perPage = 4;
-    //         const users : IUserOutRequestDTO[] = await this._prisma.user.findMany({
-    //             take : perPage,
-    //             skip : Math.ceil((pageNumber - 1) * perPage),
-    //             orderBy : {
-    //                 username : 'asc',
-    //             },
-    //             select : {
-    //                 userId: true,
-    //                 username: true,
-    //                 email: true,
-    //                 firstName: true,
-    //                 lastName: true,
-    //                 avatar: true,
-    //                 country: true,
-    //                 preferredLanguage: true,
-    //                 easySolved: true,
-    //                 mediumSolved: true,
-    //                 hardSolved: true,
-    //                 totalSubmission: true,
-    //                 streak: true,
-    //                 createdAt: true,
-    //                 updatedAt: true,
-    //             }
-    //         });
-
-    //         const total = await this._prisma.user.count();
-    //         return {
-    //             body : users,
-    //             total,
-    //             page : pageNumber,
-    //             lastPage : Math.ceil((total / perPage))
-    //         } 
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-
-    /**
      * Retrieves paginated users with filters and sorting.
      * 
      * @param filter - Key/value filters to apply.
@@ -261,6 +210,7 @@ export class UserRepository implements IUserRepository {
                     password : data.password,
                     isVerified : data.isVerified,
                     isArchived : data.isArchived,
+                    isBlocked : data.isBlocked,
                     preferredLanguage : data.preferredLanguage,
                     easySolved : data.easySolved,
                     mediumSolved : data.mediumSolved,
