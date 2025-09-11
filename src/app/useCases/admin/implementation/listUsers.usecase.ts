@@ -27,6 +27,7 @@ export class ListUsersUseCase implements IListUsersUseCase {
     async execute(filters: IListUsersDTO): Promise<PaginationDTO> {
 
         const where: Record<string, any> = {}
+        where.role = 'USER'
 
         if (filters.authProvider) {
             where.authProvider = UserMapper.toValidAuthProvider(filters.authProvider)
