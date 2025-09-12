@@ -1,4 +1,4 @@
-import { IUpdateUserProfileUseCase } from "@/app/useCases/User/UpdateProfileUseCase";
+import { IUpdateUserProfileUseCase } from "@/app/useCases/User/UpdateProfileUseCase.interface";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";

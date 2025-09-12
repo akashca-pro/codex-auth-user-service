@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IProfileUseCase } from "../ProfileUserUseCase";
+import { IProfileUseCase } from "../ProfileUserUseCase.interface";
 import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
@@ -50,7 +50,7 @@ export class ProfileUseCase implements IProfileUseCase {
                 message : UserSuccessType.ProfileLoaded
             }
         }
-
+        
         const user = await this.#_userRepository.findById(userId);
 
         if(!user){

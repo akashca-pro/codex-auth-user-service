@@ -198,27 +198,12 @@ export class UserRepository implements IUserRepository {
      */
     async update(userId: string, data: IUpdateUserRequestDTO): Promise<IUserOutRequestDTO> {
         try {
+            const updatedData = Object.fromEntries(
+                Object.entries(data).filter((_, v) => v !== undefined)
+            )
             const userUpdated = await this._prisma.user.update({
                 where : {userId},
-                data : {
-                    username : data.username,
-                    email : data.email,
-                    firstName : data.firstName,
-                    lastName : data.lastName,
-                    avatar : data.avatar,
-                    country : data.country,
-                    password : data.password,
-                    isVerified : data.isVerified,
-                    isArchived : data.isArchived,
-                    isBlocked : data.isBlocked,
-                    preferredLanguage : data.preferredLanguage,
-                    easySolved : data.easySolved,
-                    mediumSolved : data.mediumSolved,
-                    hardSolved : data.hardSolved,
-                    totalSubmission : data.totalSubmission,
-                    streak : data.streak,
-                    updatedAt : data.updatedAt
-                }
+                data : updatedData
             })
             return userUpdated
         } catch (error) {

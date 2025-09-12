@@ -1,5 +1,5 @@
 import { IUserRepository } from "@/domain/repository/User";
-import { ISignUpUserUseCase } from "../SignupUserUseCase";
+import { ISignUpUserUseCase } from "../SignupUserUseCase.interface";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { ResponseDTO } from "@/domain/dtos/Response";

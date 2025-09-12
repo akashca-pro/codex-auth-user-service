@@ -2,7 +2,7 @@ import { IProfileUseCase } from "@/app/useCases/User/ProfileUserUseCase";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-shared-utils";
+import { AdminProfileRequest, AdminProfileResponse } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
@@ -14,7 +14,7 @@ import { inject, injectable } from "inversify";
  * @class
  */
 @injectable()
-export class GrpcProfileHandler {
+export class GrpcAdminProfileHandler {
 
     #_profileUseCase : IProfileUseCase
 
@@ -32,8 +32,8 @@ export class GrpcProfileHandler {
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
     profile = async (
-        call : ServerUnaryCall<UserProfileRequest,UserProfileResponse>,
-        callback : sendUnaryData<UserProfileResponse>
+        call : ServerUnaryCall<AdminProfileRequest,AdminProfileResponse>,
+        callback : sendUnaryData<AdminProfileResponse>
     ) => {
         try {
             const req = call.request; 

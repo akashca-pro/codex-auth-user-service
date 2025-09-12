@@ -1,69 +1,54 @@
-import { IResetPasswordUseCase } from "@/app/useCases/Authentication/ResetPasswordUseCase";
+import { IProfileUseCase } from "@/app/useCases/User/ProfileUserUseCase.interface";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { ResetPasswordRequest, ResetPasswordResponse } from "@akashcapro/codex-shared-utils";
+import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 
 /**
- * Class for handling forgot password.
+ * Class for handling Profile use case.
  * 
  * @class
  */
 @injectable()
-export class GrpcUserResetPasswordHandler {
+export class GrpcProfileHandler {
 
-    #_resetPasswordUseCase : IResetPasswordUseCase
+    #_profileUseCase : IProfileUseCase
 
-    /**
-     * 
-     * @param {IResetPasswordUseCase} resetPasswordUseCase - The Usecase for creation of the user.
-     * @constructor 
-     */
     constructor(
-        @inject(TYPES.ResetPasswordUseCase)
-        resetPasswordUseCase : IResetPasswordUseCase
+        @inject(TYPES.ProfileUseCase) profileUseCase : IProfileUseCase
     ){
-        this.#_resetPasswordUseCase = resetPasswordUseCase
+        this.#_profileUseCase = profileUseCase;
     }
 
     /**
-     * This method handles the resetPassword use case.
+     * This method handles the profile use case.
      * 
      * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
-    ResetPassword = async(
-        call : ServerUnaryCall<ResetPasswordRequest,ResetPasswordResponse>,
-        callback : sendUnaryData<ResetPasswordResponse>
+    profile = async (
+        call : ServerUnaryCall<UserProfileRequest,UserProfileResponse>,
+        callback : sendUnaryData<UserProfileResponse>
     ) => {
-        const startTime = Date.now(); // for latency
-        const method = 'resetPassword'
         try {
-            
-            const req = call.request;
-
-            const result = await this.#_resetPasswordUseCase.execute({
-                email : req.email,
-                newPassword : req.newPassword,
-                otp : req.otp
-            })
-
+            const req = call.request; 
+            const result = await this.#_profileUseCase.execute(req.userId);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-            return callback(null,{
-                message : result.message!
-            });
+            return callback(null,{ 
+                ...result.data
+             });
 
-        } catch (error : any) {
+        } catch (error : any ) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({
                 code : status.INTERNAL,
@@ -76,7 +61,7 @@ export class GrpcUserResetPasswordHandler {
      * Returns the bound handler method for the gRPC service.
      *
      * @remarks
-     * This method ensures that the `changePassword` handler maintains the correct `this` context
+     * This method ensures that the `profile` handler maintains the correct `this` context
      * when passed to the gRPC server. This is especially important since gRPC handlers
      * are called with a different execution context.
      *
@@ -84,7 +69,9 @@ export class GrpcUserResetPasswordHandler {
      */
     getServiceHandler(): object{
         return {
-            resetPassword : this.ResetPassword.bind(this)
+            profile : this.profile.bind(this)
         } 
     }
+
 }
+

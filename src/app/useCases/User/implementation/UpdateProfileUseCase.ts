@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { IUpdateUserProfileUseCase } from "../UpdateProfileUseCase";
+import { IUpdateUserProfileUseCase } from "../UpdateProfileUseCase.interface";
 import { IUserRepository } from "@/domain/repository/User";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { IUpdateUserProfileRequestDTO } from "@/domain/dtos/User/UpdateUserProfile";

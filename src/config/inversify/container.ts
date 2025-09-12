@@ -40,7 +40,7 @@ import { GrpcUserForgotPasswordHandler } from '@/presentation/grpc/handlers/user
 import { GrpcUserResetPasswordHandler } from '@/presentation/grpc/handlers/user/ResetPasswordHandler';
 import { GrpcOAuthHandler } from '@/presentation/grpc/handlers/user/OAuthHandler';
 import { GrpcRefreshTokenHandler } from '@/presentation/grpc/handlers/common/RefreshTokenHandler';
-import { GrpcProfileHandler } from '@/presentation/grpc/handlers/common/ProfileHandler';
+import { GrpcProfileHandler } from '@/presentation/grpc/handlers/user/ProfileHandler';
 
 import Redis from 'ioredis';
 import redis from '@/config/redis'
@@ -48,12 +48,12 @@ import { mailer } from "@/config/mailer";
 import logger from '@/utils/logger';
 import { Logger } from 'winston';
 import { PrismaClient } from '@/generated/prisma';
-import { ISignUpUserUseCase } from '@/app/useCases/User/SignupUserUseCase';
+import { ISignUpUserUseCase } from '@/app/useCases/User/SignupUserUseCase.interface';
 import { SignupUserUseCase } from '@/app/useCases/User/implementation/SignupUserUseCase';
-import { IProfileUseCase } from '@/app/useCases/User/ProfileUserUseCase';
+import { IProfileUseCase } from '@/app/useCases/User/ProfileUserUseCase.interface';
 import { ProfileUseCase } from '@/app/useCases/User/implementation/ProfileUserUseCase';
 import { GrpcAdminAuthHandler } from '@/presentation/grpc/handlers/admin/AdminAuthHandler';
-import { IUpdateUserProfileUseCase } from '@/app/useCases/User/UpdateProfileUseCase';
+import { IUpdateUserProfileUseCase } from '@/app/useCases/User/UpdateProfileUseCase.interface';
 import { UpdateUserProfileUseCase } from '@/app/useCases/User/implementation/UpdateProfileUseCase';
 import { GrpcUpdateProfileHandler } from '@/presentation/grpc/handlers/common/UpdateProfileHandler';
 import { ICacheProvider } from '@/app/providers/CacheProvider';
@@ -64,6 +64,10 @@ import { GrpcAdminListUsersHandler } from '@/presentation/grpc/handlers/admin/Li
 import { IToggleBlockUserUseCase } from '@/app/useCases/admin/toggleBlockUser.usecase.interface';
 import { ToggleBlockUserUseCase } from '@/app/useCases/admin/implementation/toggleBlockUser.usecase';
 import { GrpcToggleBlockUserHandler } from '@/presentation/grpc/handlers/admin/ToggleBlockUserHandler';
+import { GrpcAdminProfileHandler } from '@/presentation/grpc/handlers/admin/ProfileHandler';
+import { IChangePassUseCase } from '@/app/useCases/User/ChangePass.usecase.interface';
+import { ChangePassUseCase } from '@/app/useCases/User/implementation/ChangePass.usecase';
+import { GrpcChangePassHandler } from '@/presentation/grpc/handlers/user/ChangePassHandler';
 
 const container = new Container();
 
@@ -124,6 +128,9 @@ container
 container
     .bind<IToggleBlockUserUseCase>(TYPES.ToggleBlockUserUseCase)
     .to(ToggleBlockUserUseCase).inSingletonScope();
+container
+    .bind<IChangePassUseCase>(TYPES.ChangePassUseCase)
+    .to(ChangePassUseCase).inSingletonScope();
 
 /**
  * Common gRPC handlers.
@@ -162,10 +169,16 @@ container
 container
     .bind<GrpcProfileHandler>(TYPES.GrpcProfileHandler)
     .to(GrpcProfileHandler).inSingletonScope();
+container
+    .bind<GrpcChangePassHandler>(TYPES.GrpcChangePassHandler)
+    .to(GrpcChangePassHandler).inSingletonScope();
 
 /**
  * Admin gRPC handlers.
  */
+container
+    .bind<GrpcAdminProfileHandler>(TYPES.GrpcAdminProfileHandler)
+    .to(GrpcAdminProfileHandler).inSingletonScope();
 
 container
     .bind<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler)

@@ -21,6 +21,6 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/app/useCases/User/ChangePass.usecase.interface.ts", "src/app/useCases/User/SignupUserUseCase.interface.ts"],
   "exclude": ["node_modules", "dist"]
 }

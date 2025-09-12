@@ -1,4 +1,4 @@
-import { ISignUpUserUseCase } from "@/app/useCases/User/SignupUserUseCase";
+import { ISignUpUserUseCase } from "@/app/useCases/User/SignupUserUseCase.interface";
 import TYPES from "@/config/inversify/types";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { SystemErrorType } from "@/domain/enums/ErrorType";

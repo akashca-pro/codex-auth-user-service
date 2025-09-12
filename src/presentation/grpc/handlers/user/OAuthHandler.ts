@@ -51,7 +51,7 @@ export class GrpcOAuthHandler {
 
             if(!result.success){
                 return callback({
-                    code : mapMessageToGrpcStatus(result.message),
+                    code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
@@ -59,7 +59,7 @@ export class GrpcOAuthHandler {
             return callback(null,{
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
-                message : result.message,
+                message : result.message!,
                 userInfo : result.data.userInfo
             });
             

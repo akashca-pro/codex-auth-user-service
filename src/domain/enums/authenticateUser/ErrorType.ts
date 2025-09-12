@@ -48,5 +48,10 @@ export enum AuthenticateUserErrorType {
   /**
    * Error type indicating that the user is blocked.
    */
-  AccountBlocked = "Account is blocked"
+  AccountBlocked = "Account is blocked",
+
+  /**
+   * Error type indicating that the password is incorrect.
+   */
+  IncorrectPassword = "Password is incorrect."
 }

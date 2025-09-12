@@ -14,12 +14,14 @@ import { GrpcUserForgotPasswordHandler } from "./handlers/user/ForgotPasswordHan
 import { GrpcUserResetPasswordHandler } from "./handlers/user/ResetPasswordHandler";
 import { GrpcOAuthHandler } from "./handlers/user/OAuthHandler";
 import { GrpcRefreshTokenHandler } from "./handlers/common/RefreshTokenHandler";
-import { GrpcProfileHandler } from "./handlers/common/ProfileHandler";
+import { GrpcProfileHandler } from "./handlers/user/ProfileHandler";
 import { GrpcAdminAuthHandler } from "./handlers/admin/AdminAuthHandler";
 import { GrpcUpdateProfileHandler } from "./handlers/common/UpdateProfileHandler";
 import { grpcMetricsCollector } from "@/config/metrics/grpcMetricsMiddleware";
 import { GrpcAdminListUsersHandler } from "./handlers/admin/ListUsersHandler";
 import { GrpcToggleBlockUserHandler } from "./handlers/admin/ToggleBlockUserHandler";
+import { GrpcAdminProfileHandler } from "./handlers/admin/ProfileHandler";
+import { GrpcChangePassHandler } from "./handlers/user/ChangePassHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -34,8 +36,10 @@ const userResendOtpHandler = container.get<GrpcUserResendOtpHandler>(TYPES.GrpcU
 const userForgotPasswordHandler = container.get<GrpcUserForgotPasswordHandler>(TYPES.GrpcUserForgotPasswordHandler);
 const userResetPasswordHandler = container.get<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler);
 const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHandler);
+const userChangePassHandler = container.get<GrpcChangePassHandler>(TYPES.GrpcChangePassHandler);
 
 // admin
+const adminProfileHandler = container.get<GrpcAdminProfileHandler>(TYPES.GrpcAdminProfileHandler);
 const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
 const adminListUsersHandler = container.get<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler);
 const toggleBlockUserHandler = container.get<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler);
@@ -55,6 +59,7 @@ const adminHandlers = wrapAll({
     ...updateProfile.getServiceHandler(),
     ...adminListUsersHandler.getServiceHandler(),
     ...toggleBlockUserHandler.getServiceHandler(),
+    ...adminProfileHandler.getServiceHandler(),
 });
 
 const userHandlers = wrapAll({
@@ -66,9 +71,9 @@ const userHandlers = wrapAll({
     ...userResendOtpHandler.getServiceHandler(),
     ...userForgotPasswordHandler.getServiceHandler(),
     ...userResetPasswordHandler.getServiceHandler(),
-
+    ...userChangePassHandler.getServiceHandler(),
     ...userProfileHandler.getServiceHandler(),
-    ...updateProfile.getServiceHandler()
+    ...updateProfile.getServiceHandler(),
 
 })
 
