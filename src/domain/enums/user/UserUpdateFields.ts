@@ -11,6 +11,7 @@ export enum UserField {
   Password = "password",
   IsVerified = "isVerified",
   IsBlocked = "isBlocked",
+  isArchived = "isArchived",
   PreferredLanguage = "preferredLanguage",
   EasySolved = "easySolved",
   MediumSolved = "mediumSolved",

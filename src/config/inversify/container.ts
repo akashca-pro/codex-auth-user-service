@@ -68,6 +68,15 @@ import { GrpcAdminProfileHandler } from '@/presentation/grpc/handlers/admin/Prof
 import { IChangePassUseCase } from '@/app/useCases/User/ChangePass.usecase.interface';
 import { ChangePassUseCase } from '@/app/useCases/User/implementation/ChangePass.usecase';
 import { GrpcChangePassHandler } from '@/presentation/grpc/handlers/user/ChangePassHandler';
+import { IChangeEmailUseCase } from '@/app/useCases/User/ChangeEmail.usecase.interface';
+import { ChangeEmailUseCase } from '@/app/useCases/User/implementation/ChangeEmail.usecase';
+import { GrpcChangeEmailHandler } from '@/presentation/grpc/handlers/user/ChangeEmailHandler';
+import { IVerifyNewEmailUseCase } from '@/app/useCases/User/VerifyNewEmail.usecase.interface';
+import { VerifyNewEmailUseCase } from '@/app/useCases/User/implementation/VerifyNewEmail.usecase';
+import { GrpcVerifyNewEmailHandler } from '@/presentation/grpc/handlers/user/VerifyEmailHandler';
+import { IDeleteAccountUseCase } from '@/app/useCases/User/DeleteAccount.usecase.interface';
+import { DeleteAccountUseCase } from '@/app/useCases/User/implementation/DeleteAccount.usecase';
+import { GrpcDeleteAccountHandler } from '@/presentation/grpc/handlers/user/DeleteAccountHandler';
 
 const container = new Container();
 
@@ -131,6 +140,15 @@ container
 container
     .bind<IChangePassUseCase>(TYPES.ChangePassUseCase)
     .to(ChangePassUseCase).inSingletonScope();
+container
+    .bind<IChangeEmailUseCase>(TYPES.ChangeEmailUseCase)
+    .to(ChangeEmailUseCase).inSingletonScope();
+container
+    .bind<IVerifyNewEmailUseCase>(TYPES.VerifyNewEmailUseCase)
+    .to(VerifyNewEmailUseCase).inSingletonScope();
+container
+    .bind<IDeleteAccountUseCase>(TYPES.DeleteAccountUseCase)
+    .to(DeleteAccountUseCase).inSingletonScope();
 
 /**
  * Common gRPC handlers.
@@ -172,6 +190,15 @@ container
 container
     .bind<GrpcChangePassHandler>(TYPES.GrpcChangePassHandler)
     .to(GrpcChangePassHandler).inSingletonScope();
+container
+    .bind<GrpcChangeEmailHandler>(TYPES.GrpcChangeEmailHandler)
+    .to(GrpcChangeEmailHandler).inSingletonScope();
+container
+    .bind<GrpcVerifyNewEmailHandler>(TYPES.GrpcVerifyNewEmailHandler)
+    .to(GrpcVerifyNewEmailHandler).inSingletonScope();
+container
+    .bind<GrpcDeleteAccountHandler>(TYPES.GrpcDeleteAccountHandler)
+    .to(GrpcDeleteAccountHandler).inSingletonScope();
 
 /**
  * Admin gRPC handlers.

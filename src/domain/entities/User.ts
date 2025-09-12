@@ -111,6 +111,11 @@ export class User<T extends UserAuthentication = UserAuthentication> {
 update(updatedData: IUpdateUserRequestDTO) {
   const isAdmin = this._role === UserRole.ADMIN;
 
+  if(updatedData.email){
+    const updatedEmail = new Email({ address : updatedData.email })
+    this._updatedFields = { email : updatedEmail.address };
+  }
+
   if (
     updatedData.username &&
     this.trackUpdate(UserField.Username, this._username, updatedData.username)
@@ -185,6 +190,13 @@ update(updatedData: IUpdateUserRequestDTO) {
     this.trackUpdate(UserField.TotalSubmission, this._totalSubmission, updatedData.totalSubmission)
   ) {
     this._totalSubmission = updatedData.totalSubmission;
+  }
+
+  if(
+    updatedData.isArchived !== undefined &&
+    this.trackUpdate(UserField.isArchived, this._isArchived, updatedData.isArchived)
+  ){
+    this._isArchived = updatedData.isArchived
   }
 
   if (

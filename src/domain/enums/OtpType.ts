@@ -6,5 +6,5 @@
 export enum OtpType  {
     SIGNUP = 'SIGNUP',
     FORGOT_PASS = 'FORGOT_PASS',
-    CHANGE_PASS = 'CHANGE_PASS'
+    CHANGE_EMAIL = 'CHANGE_EMAIL'
 }

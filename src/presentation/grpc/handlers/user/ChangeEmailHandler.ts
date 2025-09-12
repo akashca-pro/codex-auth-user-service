@@ -1,54 +1,49 @@
-import { IProfileUseCase } from "@/app/useCases/User/ProfileUserUseCase.interface";
+import { IChangeEmailUseCase } from "@/app/useCases/User/ChangeEmail.usecase.interface";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import { AdminProfileRequest, AdminProfileResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from "@/utils/logger";
+import { ChangeEmailRequest } from "@akashcapro/codex-shared-utils";
+import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
-
 /**
- * Class for handling Profile use case.
+ * Class handling the change email usecase.
  * 
  * @class
  */
 @injectable()
-export class GrpcAdminProfileHandler {
+export class GrpcChangeEmailHandler {
 
-    #_profileUseCase : IProfileUseCase
+    #_changeEmailUseCase : IChangeEmailUseCase
 
     constructor(
-        @inject(TYPES.ProfileUseCase) profileUseCase : IProfileUseCase
+        @inject(TYPES.ChangeEmailUseCase) changeEmailUseCase : IChangeEmailUseCase
     ){
-        this.#_profileUseCase = profileUseCase;
+        this.#_changeEmailUseCase = changeEmailUseCase
     }
 
-    /**
-     * This method handles the profile use case.
-     * 
-     * @async
-     * @param {ServerUnaryCall} call - This contain the request from the grpc. 
-     * @param {sendUnaryData} callback - The sends the grpc response.
-     */
-    profile = async (
-        call : ServerUnaryCall<AdminProfileRequest,AdminProfileResponse>,
-        callback : sendUnaryData<AdminProfileResponse>
+    changeEmail = async(
+        call : ServerUnaryCall<ChangeEmailRequest, Empty>,
+        callback : sendUnaryData<Empty>
     ) => {
         try {
-            const req = call.request; 
-            const result = await this.#_profileUseCase.execute(req.userId);
+            const req = call.request;
+            const result = await this.#_changeEmailUseCase.execute(req.userId,{
+                newEmail : req.newEmail,
+                password : req.password
+            })
+
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-            return callback(null,{ 
-                ...result.data
-             });
 
-        } catch (error : any ) {
+            return callback(null,{});
+        } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({
                 code : status.INTERNAL,
@@ -61,7 +56,7 @@ export class GrpcAdminProfileHandler {
      * Returns the bound handler method for the gRPC service.
      *
      * @remarks
-     * This method ensures that the `profile` handler maintains the correct `this` context
+     * This method ensures that the `changeEmail` handler maintains the correct `this` context
      * when passed to the gRPC server. This is especially important since gRPC handlers
      * are called with a different execution context.
      *
@@ -69,9 +64,8 @@ export class GrpcAdminProfileHandler {
      */
     getServiceHandler(): object{
         return {
-            profile : this.profile.bind(this)
+            changeEmail : this.changeEmail.bind(this)
         } 
     }
 
 }
-

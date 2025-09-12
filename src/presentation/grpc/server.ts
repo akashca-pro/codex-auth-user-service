@@ -22,6 +22,9 @@ import { GrpcAdminListUsersHandler } from "./handlers/admin/ListUsersHandler";
 import { GrpcToggleBlockUserHandler } from "./handlers/admin/ToggleBlockUserHandler";
 import { GrpcAdminProfileHandler } from "./handlers/admin/ProfileHandler";
 import { GrpcChangePassHandler } from "./handlers/user/ChangePassHandler";
+import { GrpcChangeEmailHandler } from "./handlers/user/ChangeEmailHandler";
+import { GrpcVerifyNewEmailHandler } from "./handlers/user/VerifyEmailHandler";
+import { GrpcDeleteAccountHandler } from "./handlers/user/DeleteAccountHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -37,6 +40,9 @@ const userForgotPasswordHandler = container.get<GrpcUserForgotPasswordHandler>(T
 const userResetPasswordHandler = container.get<GrpcUserResetPasswordHandler>(TYPES.GrpcUserResetPasswordHandler);
 const userProfileHandler = container.get<GrpcProfileHandler>(TYPES.GrpcProfileHandler);
 const userChangePassHandler = container.get<GrpcChangePassHandler>(TYPES.GrpcChangePassHandler);
+const userChangeEmailHandler = container.get<GrpcChangeEmailHandler>(TYPES.GrpcChangeEmailHandler);
+const userVerifyNewEmailHandler = container.get<GrpcVerifyNewEmailHandler>(TYPES.GrpcVerifyNewEmailHandler);
+const userDeleteAccountHandler = container.get<GrpcDeleteAccountHandler>(TYPES.GrpcDeleteAccountHandler);
 
 // admin
 const adminProfileHandler = container.get<GrpcAdminProfileHandler>(TYPES.GrpcAdminProfileHandler);
@@ -72,6 +78,9 @@ const userHandlers = wrapAll({
     ...userForgotPasswordHandler.getServiceHandler(),
     ...userResetPasswordHandler.getServiceHandler(),
     ...userChangePassHandler.getServiceHandler(),
+    ...userChangeEmailHandler.getServiceHandler(),
+    ...userVerifyNewEmailHandler.getServiceHandler(),
+    ...userDeleteAccountHandler.getServiceHandler(),
     ...userProfileHandler.getServiceHandler(),
     ...updateProfile.getServiceHandler(),
 

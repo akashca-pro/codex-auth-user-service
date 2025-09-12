@@ -25,6 +25,9 @@ const TYPES = {
   ListUsersUseCase : Symbol.for("ListUsersUseCase"),
   ToggleBlockUserUseCase : Symbol.for("ToggleBlockUserUseCase"),
   ChangePassUseCase : Symbol.for("ChangePassUseCase"),
+  ChangeEmailUseCase : Symbol.for("ChangeEmailUseCase"),
+  VerifyNewEmailUseCase : Symbol.for("VerifyNewEmailUseCase"),
+  DeleteAccountUseCase : Symbol.for("DeleteAccountUseCase"),
 
   // User handler
 
@@ -38,6 +41,10 @@ const TYPES = {
   GrpcRefreshTokenHandler : Symbol.for("GrpcRefreshTokenHandler"),
   GrpcProfileHandler : Symbol.for("GrpcProfileHandler"),
   GrpcChangePassHandler : Symbol.for("GrpcChangePassHandler"),
+  GrpcChangeEmailHandler : Symbol.for("GrpcChangeEmailHandler"),
+  GrpcVerifyNewEmailHandler : Symbol.for("GrpcVerifyNewEmailHandler"),
+  GrpcDeleteAccountHandler : Symbol.for("GrpcDeleteAccountHandler"),
+  
 
   // Admin handlers
 

@@ -53,5 +53,11 @@ export enum AuthenticateUserErrorType {
   /**
    * Error type indicating that the password is incorrect.
    */
-  IncorrectPassword = "Password is incorrect."
+  IncorrectPassword = "Password is incorrect.",
+
+  /**
+   * Error type indicating that the email already exists.
+   */
+  EmailAlreadyExists = "Email already exists"
+
 }
