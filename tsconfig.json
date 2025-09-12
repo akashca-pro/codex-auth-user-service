@@ -1,26 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
-    "module": "commonjs",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
-    "lib": ["es5", "es6"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types"],
-    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
 
-    "baseUrl": "./src",               
-    "paths": {
-      "@/*": ["*"]           
-    }
+    "lib": ["es2022", "dom"],
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types"],
 
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/app/useCases/User/ChangePass.usecase.interface.ts", "src/app/useCases/User/SignupUserUseCase.interface.ts"],
   "exclude": ["node_modules", "dist"]
 }
