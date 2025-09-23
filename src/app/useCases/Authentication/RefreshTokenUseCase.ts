@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ITokenPayLoadDTO, IUserInfoPayload } from "@/domain/dtos/TokenPayload";
+import { RefreshTokenRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface for the use case of issuing new access token based on refreshToken.
@@ -15,17 +15,15 @@ export interface IRefreshTokenUseCase {
      * Execute the RefreshTokenEndPointUseCase.
      * 
      * @async
-     * @param {ITokenPayLoadDTO} TokenPayload - Token payload of the user
+     * @param request - Request payload contains id, email, role of the user.
      * @returns {Promise<ResponseDTO>} - The response data.
      * 
      * @remarks
      * This method is responsible for handling the logic of issuing new accessToken
      * based on the decoded token payload from the refreshToken.
      */
-    execute({
-        userId,
-        email,
-        role
-    } : IUserInfoPayload ) : Promise<ResponseDTO>
+    execute(
+        request : RefreshTokenRequest
+    ) : Promise<ResponseDTO>
 
 }

@@ -10,6 +10,7 @@ import { IResetPasswordUseCase } from "../ResetPasswordUseCase";
 import { User } from "@/domain/entities/User";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { inject, injectable } from "inversify";
+import { ResetPasswordRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Use case for reset password.
@@ -53,14 +54,15 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
      * @param {string} email - The email of the user.
      * @returns {ResponseDTO} - Ther response data.
      */
-    async execute({
-        email,
-        otp,
-        newPassword
-    } : IResetPasswordDTO ): Promise<ResponseDTO> {
-
-        const user = await this.#_userRepository.findByEmail(email);
-
+    async execute(
+        request : ResetPasswordRequest
+    ): Promise<ResponseDTO> {
+        const dto : IResetPasswordDTO = {
+            email : request.email,
+            newPassword : request.newPassword,
+            otp : request.otp
+        }
+        const user = await this.#_userRepository.findByEmail(dto.email);
         if(!user){
             return {
                 data : null,
@@ -68,24 +70,23 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
                 success : false
             }
         }
-
-        if(!await this.#_otpService.verifyOtp(email,OtpType.FORGOT_PASS,otp)){
+        if(!await this.#_otpService.verifyOtp(
+            dto.email,
+            OtpType.FORGOT_PASS,
+            dto.otp)
+        ){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.EmailOrPasswordWrong,
                 success : false
             }
         }
-
-        const hashedPassword = await this.#_passwordHasher.hashPassword(newPassword);
-
+        const hashedPassword = await this.#_passwordHasher.hashPassword(dto.newPassword);
         const userEntity = User.rehydrate(user);
         userEntity.update({
             password : hashedPassword
         })
-
         await this.#_userRepository.update(user.userId,userEntity.getUpdatedFields());
-
         return {
             data : null,
             message : UserSuccessType.PasswordChangedSuccessfully,

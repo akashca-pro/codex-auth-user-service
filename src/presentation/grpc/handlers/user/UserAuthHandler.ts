@@ -45,8 +45,7 @@ export class GrpcUserAuthHandler {
         try {
             const req = call.request;
             const result = await this.#_authenticateLocalAuthUserUseCase.execute({
-                email : req.email,
-                password : req.password,
+                ...req,
                 role : UserRole.USER
             })
             if(!result.success){

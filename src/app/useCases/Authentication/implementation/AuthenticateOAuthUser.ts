@@ -14,6 +14,9 @@ import { randomUUID } from "node:crypto";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { generateUniqueUsername } from "@/utils/generateRandomUsername";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
+import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
+import { OAuthLoginRequest } from "@akashcapro/codex-shared-utils";
+import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Use case for authenticating a user.
@@ -51,9 +54,12 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
      * @param {IAuthenticateOAuthUserDTO} data - The user credentials for authentication.
      * @return {Promise<ResponseDTO>} - The response data.
      */ 
-    async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
-        
-        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
+    async execute(
+        request : OAuthLoginRequest
+    ): Promise<ResponseDTO> {
+
+        const userData = UserMapper.toCreateOAuthUserDTO(request,UserRole.USER)
+        const userAlreadyExists = await this.#_userRepository.findByEmail(userData.email);
 
         let user : IUserInRequestDTO
 
@@ -75,13 +81,13 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
 
             user = User.create({
                 username : uniqueUsername,
-                email : data.email,
-                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
-                firstName : data.firstName,
-                avatar : data.avatar ?? null,
+                email : userData.email,
+                authentication : new OAuthAuthentication(AuthProvider.GOOGLE, userData.oAuthId),
+                firstName : userData.firstName,
+                avatar : userData.avatar ?? null,
                 country : null,
                 lastName : null,
-                role : data.role
+                role : userData.role
             })
 
             await this.#_userRepository.create(user);

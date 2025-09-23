@@ -30,19 +30,13 @@ export class GrpcVerifyNewEmailHandler {
         callback : sendUnaryData<Empty>
     ) => {
         try {
-            const req = call.request;
-            const result = await this.#_verifyNewEmailUseCase.execute(req.userId, {
-                email : req.email,
-                otp : req.otp
-            });
-
+            const result = await this.#_verifyNewEmailUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{});
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);

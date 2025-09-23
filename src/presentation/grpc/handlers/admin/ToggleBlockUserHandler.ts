@@ -30,8 +30,7 @@ export class GrpcToggleBlockUserHandler {
         callback : sendUnaryData<Empty>
     ) : Promise<void> => {
         try {
-            const req = call.request;
-            const result = await this.#_toggleBlockUserUseCase.execute(req);
+            const result = await this.#_toggleBlockUserUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),

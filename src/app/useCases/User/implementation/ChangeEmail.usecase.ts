@@ -7,6 +7,8 @@ import { ResponseDTO } from "@/domain/dtos/Response";
 import { IChangeEmailRequestDTO } from "@/domain/dtos/User/ChangeEmail.dto";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { OtpType } from "@/domain/enums/OtpType";
+import { IPasswordHasher } from "@/app/providers/PasswordHasher";
+import { ChangeEmailRequest } from "@akashcapro/codex-shared-utils";
 
 
 /**
@@ -20,22 +22,27 @@ export class ChangeEmailUseCase implements IChangeEmailUseCase {
 
     #_userRepository : IUserRepository
     #_otpService : IOtpService
+    #_passwordHasher : IPasswordHasher
 
     constructor(
         @inject(TYPES.IUserRepository) userRepository : IUserRepository,
         @inject(TYPES.IOtpService) otpService : IOtpService,
+        @inject(TYPES.IPasswordHasher) passwordHasher : IPasswordHasher
     ){
         this.#_userRepository = userRepository
         this.#_otpService = otpService
+        this.#_passwordHasher = passwordHasher
     }
 
     async execute(
-        userId: string, 
-        payload: IChangeEmailRequestDTO
+       request : ChangeEmailRequest
     ): Promise<ResponseDTO> {
-
-        const user = await this.#_userRepository.findById(userId)
-
+        const dto : IChangeEmailRequestDTO = {
+            userId : request.userId,
+            newEmail : request.newEmail,
+            password : request.password
+        }
+        const user = await this.#_userRepository.findById(dto.userId)
         if(!user){
             return {
                 data : null,
@@ -43,9 +50,7 @@ export class ChangeEmailUseCase implements IChangeEmailUseCase {
                 success : false
             }
         }
-
-        const emailExists = await this.#_userRepository.findByEmail(payload.newEmail);
-
+        const emailExists = await this.#_userRepository.findByEmail(dto.newEmail);
         if(emailExists){
             return {
                 data : null,
@@ -53,12 +58,17 @@ export class ChangeEmailUseCase implements IChangeEmailUseCase {
                 success : false
             }
         }
-
+        if(!await this.#_passwordHasher.comparePasswords(dto.password, user.password!)){
+            return {
+                data : null,
+                message : AuthenticateUserErrorType.IncorrectPassword,
+                success : false
+            }
+        }
         await this.#_otpService.generateAndSendOtp(
-            payload.newEmail,
+            dto.newEmail,
             OtpType.CHANGE_EMAIL
         )
-
         return {
             data : null,
             success : true

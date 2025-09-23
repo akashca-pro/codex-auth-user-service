@@ -7,6 +7,7 @@ import { IChangePassRequestDTO } from "@/domain/dtos/User/ChangePass.dto";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { IPasswordHasher } from "@/app/providers/PasswordHasher";
 import { User } from "@/domain/entities/User";
+import { ChangePasswordRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Class representing the implementation of the change password use case.
@@ -29,11 +30,13 @@ export class ChangePassUseCase implements IChangePassUseCase {
     }
 
     async execute(
-        userId: string, 
-        payload: IChangePassRequestDTO
+        request : ChangePasswordRequest
     ): Promise<ResponseDTO> {
-        
-        const user = await this.#_userRepository.findById(userId)
+        const dto : IChangePassRequestDTO = {
+            currPass : request.currPass,
+            newPass : request.newPass
+        }
+        const user = await this.#_userRepository.findById(request.userId)
 
         if(!user){
             return {
@@ -42,22 +45,17 @@ export class ChangePassUseCase implements IChangePassUseCase {
                 success : false
             }
         }
-
-        if(!await this.#_passwordHasher.comparePasswords(payload.currPass, user.password!)){
+        if(!await this.#_passwordHasher.comparePasswords(dto.currPass, user.password!)){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.IncorrectPassword,
                 success : false
             }
         }
-
-        const hashedNewPass = await this.#_passwordHasher.hashPassword(payload.newPass);
-
+        const hashedNewPass = await this.#_passwordHasher.hashPassword(dto.newPass);
         const userEntity = User.rehydrate(user);
         userEntity.update({ password : hashedNewPass });
-        
-        await this.#_userRepository.update(userId, userEntity.getUpdatedFields());
-
+        await this.#_userRepository.update(request.userId, userEntity.getUpdatedFields());
         return {
            data : null,
            success : true     

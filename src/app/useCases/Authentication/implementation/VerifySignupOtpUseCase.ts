@@ -14,6 +14,7 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { inject, injectable } from "inversify";
 import { randomUUID } from "node:crypto";
+import { VerifyOtpRequest } from "@akashcapro/codex-shared-utils";
 
 
 /**
@@ -51,16 +52,14 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
         this.#_userRepository = userRepository 
     }
 
-    /**
-     * Executes the VerifySignupOtp use case.
-     * 
-     * @param  {IVerifySignUpOtp} credentials - The user credentials for veriying otp
-     * @returns {ResponseDTO} - The response data.
-     */
-    async execute({ email, otp }: IVerifySignUpOtp): Promise<ResponseDTO> {
-
-        const user = await this.#_userRepository.findByEmail(email) 
-        
+    async execute(
+        request : VerifyOtpRequest
+    ): Promise<ResponseDTO> {
+        const dto : IVerifySignUpOtp = {
+            email : request.email,
+            otp : request.otp
+        }
+        const user = await this.#_userRepository.findByEmail(dto.email) 
         if(!user){
             return {
                 data : null,
@@ -68,9 +67,11 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 success : false
             }
         }
-
-        const isOtpVerified = await this.#_otpService.verifyOtp(email,OtpType.SIGNUP,otp);
-
+        const isOtpVerified = await this.#_otpService.verifyOtp(
+            dto.email,
+            OtpType.SIGNUP,
+            dto.otp
+        );
         if(!isOtpVerified){
             return {
                 data : null,
@@ -78,25 +79,26 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
                 success : false
             }
         }
-
         const userEntity = User.rehydrate(user);
         userEntity.update({isVerified : true});
-        await this.#_userRepository.update(user.userId,userEntity.getUpdatedFields());
-        await this.#_otpService.clearOtp(email,OtpType.SIGNUP);
-
+        await this.#_userRepository.update(
+            user.userId,
+            userEntity.getUpdatedFields()
+        );
+        await this.#_otpService.clearOtp(
+            dto.email,
+            OtpType.SIGNUP
+        );
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
             role : UserRole.USER,
             tokenId : randomUUID()
         }
-
         const accessToken = this.#_tokenProvider.generateAccessToken(payload);
         const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
-
         if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
         if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
-
         return { 
             data : { 
                 accessToken,

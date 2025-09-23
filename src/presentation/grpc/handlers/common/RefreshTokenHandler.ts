@@ -42,27 +42,18 @@ export class GrpcRefreshTokenHandler {
     ) => {
 
         try {
-            
-            const req = call.request;
-            const result = await this.#_refreshTokenUseCase.execute({
-                userId : req.userId,
-                email : req.email,
-                role : req.role
-            });
-
+            const result = await this.#_refreshTokenUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-          
             return callback(null,{
                 accessToken : result.data.accessToken,
                 message : result.message!,
                 userInfo : result.data.userInfo
             });
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({

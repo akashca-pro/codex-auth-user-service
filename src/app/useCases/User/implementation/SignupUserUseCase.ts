@@ -11,6 +11,9 @@ import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
+import { SignupRequest } from "@akashcapro/codex-shared-utils";
+import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
+import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Use case for Creating a user.
@@ -47,18 +50,15 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
         this.#_userRepository = userRepository 
     }
 
-    /**
-     * Execute the create user use case.
-     * 
-     * @async
-     * @param {ICreateUserRequestDTO} data - The user creation request data.
-     * @return {ResponseDTO} - The response data.
-     */
-    async execute(data: ICreateLocalUserRequestDTO): Promise<ResponseDTO> {
-        
-        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
-        const usernameAlreadyExists = await this.#_userRepository.findByUsername(data.username);
-
+    async execute(
+       request : SignupRequest
+    ): Promise<ResponseDTO> {
+        const dto = UserMapper.toCreateLocalAuthUserDTO(
+            request,
+            UserRole.USER
+        ); 
+        const userAlreadyExists = await this.#_userRepository.findByEmail(dto.email);
+        const usernameAlreadyExists = await this.#_userRepository.findByUsername(dto.username);
         if(userAlreadyExists){
             return {
                 data : null,
@@ -66,7 +66,6 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
                 success : false
             }
         }
-
         if(usernameAlreadyExists){
             return {
                 data : null,
@@ -74,18 +73,13 @@ export class SignupUserUseCase implements ISignUpUserUseCase {
                 success : false
             }
         }
-
-        const hashedPassword = await this.#_passwordHasher.hashPassword(data.password);
-
-
+        const hashedPassword = await this.#_passwordHasher.hashPassword(dto.password);
         const userEntity = User.create({
-            ...data,
+            ...dto,
             authentication : new LocalAuthentication(hashedPassword)
         })
         await this.#_userRepository.create(userEntity);
-
-        await this.#_otpService.generateAndSendOtp(data.email,OtpType.SIGNUP);
-
+        await this.#_otpService.generateAndSendOtp(dto.email,OtpType.SIGNUP);
         return {
             data : null,
             message : UserSuccessType.OtpSendSuccess,

@@ -1,6 +1,6 @@
 import TYPES from "@/config/inversify/types";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ITokenPayLoadDTO, IUserInfoPayload } from "@/domain/dtos/TokenPayload";
+import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { IRefreshTokenUseCase } from "../RefreshTokenUseCase";
 import { ITokenProvider } from "@/app/providers/GenerateTokens";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
@@ -8,6 +8,8 @@ import { injectable, inject } from "inversify";
 import { randomUUID } from "node:crypto";
 import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
+import { RefreshTokenRequest } from "@akashcapro/codex-shared-utils";
+import { IRefreshTokenRequestDTO } from "@/domain/dtos/RefreshTokenRequest.dto";
 
 /**
  * Use case for issuing new accessToken.
@@ -38,24 +40,21 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
         this.#_userRepository = userRepository
     }
 
-    /**
-     * Executes the RefreshTokenEndPointUseCase use case.
-     * 
-     * @async
-     * @param {ITokenPayLoadDTO} credentials - The credentials include decoded data from refreshToken.
-     * @returns {ResponseDTO} - The response data.
-     */
-    async execute({ userId, email, role }: IUserInfoPayload ): Promise<ResponseDTO> {
-        
-        const payload : ITokenPayLoadDTO = {
-            userId,
-            email,
-            role,
+    async execute(
+        request : RefreshTokenRequest
+    ): Promise<ResponseDTO> {
+        const dto : IRefreshTokenRequestDTO = {
+            email : request.email,
+            role : request.role,
+            userId : request.userId
+        }
+        const tokenPayload : ITokenPayLoadDTO = {
+            userId : dto.userId,
+            email : dto.email,
+            role : dto.role,
             tokenId : randomUUID()
         }
-
-        const user = await this.#_userRepository.findById(userId)
-
+        const user = await this.#_userRepository.findById(dto.userId)
         if(!user){
             return {
                 data : null,
@@ -63,7 +62,6 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 success : false
             }
         }
-
         if(user.isBlocked){
             return {
                 data : null,
@@ -71,18 +69,10 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 success : false
             }
         }
-
-        const accessToken = this.#_tokenProvider.generateAccessToken(payload);
-
+        const accessToken = this.#_tokenProvider.generateAccessToken(tokenPayload);
         return { 
-            data : { 
-                accessToken,
-                userInfo : {
-                    userId,
-                    email,
-                    role 
-                }
-                },
+            data : { accessToken,
+                    userInfo : dto },
             message : UserSuccessType.TokenIssued,   
             success : true
         }

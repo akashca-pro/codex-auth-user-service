@@ -45,24 +45,19 @@ export class GrpcOAuthHandler {
         callback : sendUnaryData<OAuthLoginResponse>
     ) : Promise<void> => {
         try {
-            const req = call.request;
-            const userData = UserMapper.toCreateOAuthUserDTO(req,UserRole.USER)
-            const result = await this.#_oAuthUseCase.execute(userData);
-
+            const result = await this.#_oAuthUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
                 message : result.message!,
                 userInfo : result.data.userInfo
             });
-            
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({

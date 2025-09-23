@@ -41,18 +41,8 @@ export class GrpcUserResetPasswordHandler {
         call : ServerUnaryCall<ResetPasswordRequest,ResetPasswordResponse>,
         callback : sendUnaryData<ResetPasswordResponse>
     ) => {
-        const startTime = Date.now(); // for latency
-        const method = 'resetPassword'
         try {
-            
-            const req = call.request;
-
-            const result = await this.#_resetPasswordUseCase.execute({
-                email : req.email,
-                newPassword : req.newPassword,
-                otp : req.otp
-            })
-
+            const result = await this.#_resetPasswordUseCase.execute(call.request)
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
@@ -62,7 +52,6 @@ export class GrpcUserResetPasswordHandler {
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({

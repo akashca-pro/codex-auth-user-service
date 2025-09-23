@@ -30,19 +30,13 @@ export class GrpcDeleteAccountHandler {
         callback : sendUnaryData<Empty>
     ) => {
         try {
-            const req = call.request;
-            const result = await this.#_deleteAccountUseCase.execute(
-                req.userId,
-                req.password
-            )
-
+            const result = await this.#_deleteAccountUseCase.execute(call.request)
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{});
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);

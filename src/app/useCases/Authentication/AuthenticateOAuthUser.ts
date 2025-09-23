@@ -1,5 +1,6 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
+import { OAuthLoginRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface for the use case of authenticating an oAuth user.
@@ -15,13 +16,13 @@ export interface IAuthenticateOAuthUserUseCase {
      * Execute the authenticate oauth usecase.
      * 
      * @async
-     * @param {IAuthenticateOAuthUserDTO} data 
+     * @param request - The request payload contains user data from oAuth provider.
      * @returns {Promise<ResponseDTO>} - The response data. 
      * 
      * @remarks
      * This method is responsible for handling the logic of authenticating an oAuth user
      * based on the provided credentials.
      */
-    execute(data : ICreateOAuthUserRequestDTO ) : Promise<ResponseDTO>;
+    execute(request : OAuthLoginRequest) : Promise<ResponseDTO>;
 
 }

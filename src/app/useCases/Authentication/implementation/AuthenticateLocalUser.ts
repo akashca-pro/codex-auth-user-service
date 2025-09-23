@@ -56,31 +56,20 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
         this.#_otpService = otpService
     }
 
-    /**
-     * Executes the local authentication use case.
-     * 
-     * @param {IAuthenticateLocalAuthUserDTO} credentials - The user credentials for authentication.
-     * @returns {Promise<ResponseDTO>} - The response data. 
-     */
-    async execute({
-        email,
-        password,
-        role
-    } : IAuthenticateLocalAuthUserDTO) : Promise<ResponseDTO> {
-
+    async execute(
+        request : IAuthenticateLocalAuthUserDTO
+    ) : Promise<ResponseDTO> {  
         const user = await this.#_userRepository.findByEmailAndRole(
-            email,
-            role
+            request.email,
+            request.role
         )
-
-        if(!user){
+        if(!user || user.isArchived){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.EmailOrPasswordWrong,
                 success : false,
             }
         }
-
         if(user.isBlocked){
             return {
                 data : null,
@@ -88,7 +77,6 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                 success : false
             }
         }
-
         if(user.authProvider !== AuthProvider.LOCAL || user.password === null){
             return {
                 data : null,
@@ -96,9 +84,10 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                 success : false,
             }
         }
-
-        const passwordMatch = await this.#_passwordHasher.comparePasswords(password,user.password);
-
+        const passwordMatch = await this.#_passwordHasher.comparePasswords(
+            request.password,
+            user.password
+        );
         if(!passwordMatch){
             return {
                 data : null,
@@ -106,27 +95,29 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                 success : false,
             }
         }
-
         if(!user.isVerified){
-            await this.#_otpService.clearOtp(email, OtpType.SIGNUP);
-            await this.#_otpService.generateAndSendOtp(email, OtpType.SIGNUP);
+            await this.#_otpService.clearOtp(
+                request.email, 
+                OtpType.SIGNUP
+            );
+            await this.#_otpService.generateAndSendOtp(
+                request.email, 
+                OtpType.SIGNUP
+            );
             return {
                 data : null,
                 message : AuthSuccessType.VerificationOtpSend,
                 success : false
             }
         }
-
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
             role : user.role,
             tokenId : randomUUID()
         }
-
         const accessToken = this.#_tokenProvider.generateAccessToken(payload);
         const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
-
         return { 
             data : { 
                 accessToken, 

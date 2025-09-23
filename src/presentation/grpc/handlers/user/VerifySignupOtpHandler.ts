@@ -41,26 +41,19 @@ export class GrpcUserVerifySignupOtpHandler {
         callback : sendUnaryData<VerifyOtpResponse>
     ) : Promise<void> => {
         try {
-            const req = call.request;
-            const result = await this.#_verifySignupOtpUseCase.execute({
-                email : req.email,
-                otp : req.otp
-            });
-
+            const result = await this.#_verifySignupOtpUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
                 userInfo : result.data.userInfo,
                 message : result.message!
             });
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({

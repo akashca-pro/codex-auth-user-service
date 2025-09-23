@@ -24,7 +24,9 @@ export class ListUsersUseCase implements IListUsersUseCase {
         this.#_userRepository = userRepository
     }
 
-    async execute(filters: IListUsersDTO): Promise<PaginationDTO> {
+    async execute(
+        filters: IListUsersDTO
+    ): Promise<PaginationDTO> {
         const where: Record<string, any> = {}
         where.role = 'USER'
 

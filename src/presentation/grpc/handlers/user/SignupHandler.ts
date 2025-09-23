@@ -45,21 +45,16 @@ export class GrpcUserSignupHandler {
     ) : Promise<void> => {
 
         try {
-            const req = call.request;
-            const dto = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
-            const result = await this.#_signupUserUseCase.execute(dto);
-        
+            const result = await this.#_signupUserUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             if(error?.message === UserErrorType.InvalidCountryCode){

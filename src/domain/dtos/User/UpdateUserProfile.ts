@@ -4,7 +4,6 @@
  * @interface
  */
 export interface IUpdateUserProfileRequestDTO {
-    
     username? : string;
     firstName? : string;
     lastName? : string;

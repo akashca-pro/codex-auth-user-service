@@ -2,12 +2,10 @@ import TYPES from "@/config/inversify/types";
 import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { IResendOtpUseCase } from "../ResendOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IUserRepository } from "@/domain/repository/User";
-import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
-import { UserErrorType } from "@/domain/enums/user/ErrorType";
-import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { inject, injectable } from "inversify";
+import { ResendOtpRequest } from "@akashcapro/codex-shared-utils";
+import { validateOtpType } from "@/dto/resendOtp.dto";
 
 /**
  * Use case for resend otp.
@@ -18,55 +16,30 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class ResendOtpUseCase implements IResendOtpUseCase {
 
-    #_userRepository : IUserRepository
     #_otpService : IOtpService
-    /**
-     * Creates an instance of ResendOtpUseCase.
-     * 
-     * @param {IUserRepository} userRepository - The repository of the user.
-     * @param {IOtpService} otpService - Otp service provider for re-issuing otp.
-     */
-    constructor(
-        @inject(TYPES.IUserRepository)
-        userRepository : IUserRepository,
 
+    constructor(
         @inject(TYPES.IOtpService)
         otpService : IOtpService
     ){
-        this.#_userRepository = userRepository,
         this.#_otpService = otpService
     }
 
-    /**
-     * Executes the ResendOtpUseCase use case.
-     * 
-     * @async
-     * @param {string} email - Email of the user.
-     * @returns {Promise<ResponseDTO>} - The response data.
-     */
-    async execute(email: string): Promise<ResponseDTO> {
-
-        const user = await this.#_userRepository.findByEmail(email);
-        
-        if(!user){
-            return {
-                data : null,
-                message : AuthenticateUserErrorType.AccountNotFound,
-                success : false
-            }
+    async execute(
+        request : ResendOtpRequest
+    ): Promise<ResponseDTO> {
+        const dto = {
+            email : request.email,
+            otpType : validateOtpType(request.otpType)
         }
-
-        if(user.isVerified){
-            return {
-                data : null,
-                message : UserErrorType.AlreadyVerified,
-                success : false
-            }
-        }
-
-        await this.#_otpService.clearOtp(email,OtpType.SIGNUP);
-        await this.#_otpService.generateAndSendOtp(email,OtpType.SIGNUP);
-
+        await this.#_otpService.clearOtp(
+            dto.email,
+            dto.otpType
+        );
+        await this.#_otpService.generateAndSendOtp(
+            dto.email,
+            dto.otpType
+        );
         return {
             data : null,
             message : UserSuccessType.OtpSendSuccess,

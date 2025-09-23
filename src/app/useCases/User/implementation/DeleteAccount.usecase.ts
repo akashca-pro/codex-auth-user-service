@@ -6,7 +6,8 @@ import TYPES from "@/config/inversify/types";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { User } from "@/domain/entities/User";
-
+import { DeleteAccountRequest } from "@akashcapro/codex-shared-utils";
+import { IDeleteAccountRequestDTO } from "@/domain/dtos/User/DeleteAccount.dto";
 
 /**
  * Class representing the implementation of the change email use case.
@@ -29,11 +30,13 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
     }
 
     async execute(
-        userId: string,
-        password: string
+        request : DeleteAccountRequest
     ): Promise<ResponseDTO> {
-        
-        const user = await this.#_userRepository.findById(userId)
+        const dto : IDeleteAccountRequestDTO = {
+            userId : request.userId,
+            password : request.password
+        }
+        const user = await this.#_userRepository.findById(dto.userId)
 
         if(!user){
             return {
@@ -43,7 +46,7 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
             }
         }
         
-        if(!await this.#_passwordHasher.comparePasswords(password, user.password!)){
+        if(!await this.#_passwordHasher.comparePasswords(dto.password, user.password!)){
             return {
                 data : null,
                 message : AuthenticateUserErrorType.IncorrectPassword,
@@ -54,7 +57,7 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
         const userEntity = User.rehydrate(user);
         userEntity.update({ isArchived : true });
 
-        await this.#_userRepository.update(userId, userEntity.getUpdatedFields());
+        await this.#_userRepository.update(dto.userId, userEntity.getUpdatedFields());
 
         return {
             data : null,

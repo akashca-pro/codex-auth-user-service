@@ -29,19 +29,13 @@ export class GrpcChangePassHandler {
         callback : sendUnaryData<Empty>
     ) => {
         try {
-            const req = call.request;
-            const result = await this.#_changePassUseCase.execute(req.userId,{
-                currPass : req.currPass,
-                newPass : req.newPass
-            })
-
+            const result = await this.#_changePassUseCase.execute(call.request)
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{});
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);

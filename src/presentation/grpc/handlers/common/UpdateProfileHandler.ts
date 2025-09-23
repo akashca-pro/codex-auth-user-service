@@ -34,30 +34,18 @@ export class GrpcUpdateProfileHandler {
     ) => {
 
         try {
-            const req = call.request;
-            const result = await this.#updateProfileUseCase.execute(req.userId,{
-                username : req.username,
-                firstName : req.firstName,
-                lastName : req.lastName,
-                avatar : req.avatar,
-                country : req.country,
-                preferredLanguage : req.preferredLanguage
-            });
-
+            const result = await this.#updateProfileUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);
-            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

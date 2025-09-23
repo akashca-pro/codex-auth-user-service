@@ -17,15 +17,19 @@ import { UserRole } from "@/domain/enums/UserRole";
 @injectable()
 export class GrpcAdminAuthHandler {
 
+    #_authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
+
     /**
      * 
-     * @param {IAuthenticateLocalAuthUserUseCase} _authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
+     * @param {IAuthenticateLocalAuthUserUseCase} authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
      * @constructor
      */
     constructor(
         @inject(TYPES.AuthenticateLocalUserUseCase)
-        private _authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
-    ){}
+        authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
+    ){
+        this.#_authenticateLocalAuthUserUseCase = authenticateLocalAuthUserUseCase
+    }
 
     /**
      * This method handles the Admin local authentication use case.
@@ -40,21 +44,18 @@ export class GrpcAdminAuthHandler {
     ) : Promise<void> => {
         try {
             const req = call.request;
-            const result = await this._authenticateLocalAuthUserUseCase.execute({
+            const result = await this.#_authenticateLocalAuthUserUseCase.execute({
                 email : req.email,
                 password : req.password,
                 role : UserRole.ADMIN
             })
-
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,result.data);
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({

@@ -1,4 +1,6 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
+import { OtpType } from "@/domain/enums/OtpType";
+import { ResendOtpRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface for the usecase of resent otp during signup.
@@ -14,13 +16,15 @@ export interface IResendOtpUseCase {
      * Executes the usecase of re-issuing and sending another otp to provided email.
      * 
      * @async
-     * @param {string} email - Email address of the user.
+     * @param request - The request payload contains email and otp.
      * @returns {Promise<ResponseDTO>}
      * 
      * @remarks
      * This method is responsible for handling the logic of Resend Otp
      * based on the user email
      */
-    execute(email : string) : Promise<ResponseDTO>
+    execute(
+        request : ResendOtpRequest
+    ) : Promise<ResponseDTO>
 
 }

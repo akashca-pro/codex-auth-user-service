@@ -28,8 +28,7 @@ export class GrpcAdminListUsersHandler {
         callback : sendUnaryData<ListUsersResponse>
     ) : Promise<void> => {
         try {
-            const req = call.request;
-            const result = await this.#_listUsersUseCase.execute(req);
+            const result = await this.#_listUsersUseCase.execute(call.request);
             return callback(null,{
                 users : result.body,
                 currentPage : result.currentPage,

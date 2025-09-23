@@ -10,6 +10,7 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { User } from "@/domain/entities/User";
 import { ICacheProvider } from "@/app/providers/CacheProvider";
 import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
+import { VerifyNewEmailRequest } from "@akashcapro/codex-shared-utils";
 
 
 /**
@@ -36,12 +37,14 @@ export class VerifyNewEmailUseCase implements IVerifyNewEmailUseCase {
     }
 
     async execute(
-        userId : string,
-        payload: IVerifyNewEmailRequestDTO
+        request : VerifyNewEmailRequest
     ): Promise<ResponseDTO> {
-
-        const user = await this.#_userRepository.findById(userId)
-
+        const dto : IVerifyNewEmailRequestDTO = {
+            userId : request.userId,
+            email : request.email,
+            otp : request.otp
+        }
+        const user = await this.#_userRepository.findById(dto.userId)
         if(!user){
             return {
                 data : null,
@@ -49,13 +52,11 @@ export class VerifyNewEmailUseCase implements IVerifyNewEmailUseCase {
                 success : false
             }
         }
-        
         const isVerified = await this.#_otpService.verifyOtp(
-            payload.email,
+            dto.email,
             OtpType.CHANGE_EMAIL,
-            payload.otp
+            dto.otp
         )
-
         if(!isVerified){
             return {
                 data : null,
@@ -63,24 +64,18 @@ export class VerifyNewEmailUseCase implements IVerifyNewEmailUseCase {
                 success : false
             }
         }
-
         await this.#_otpService.clearOtp(
-            payload.email,
+            dto.email,
             OtpType.CHANGE_EMAIL
         )
-
         const userEntity = User.rehydrate(user);
-        userEntity.update({ email : payload.email });
-        
+        userEntity.update({ email : dto.email });
         await this.#_userRepository.update(
-            userId,
+            dto.userId,
             userEntity.getUpdatedFields()
         )
-
-        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${userId}`
-
+        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${dto.userId}`
         await this.#_cacheProvider.del(cacheKey);
-
         return {
             data : null,
             success : true

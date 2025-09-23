@@ -29,19 +29,13 @@ export class GrpcChangeEmailHandler {
         callback : sendUnaryData<Empty>
     ) => {
         try {
-            const req = call.request;
-            const result = await this.#_changeEmailUseCase.execute(req.userId,{
-                newEmail : req.newEmail,
-                password : req.password
-            })
-
+            const result = await this.#_changeEmailUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-
             return callback(null,{});
         } catch (error) {
             logger.error(SystemErrorType.InternalServerError,error);

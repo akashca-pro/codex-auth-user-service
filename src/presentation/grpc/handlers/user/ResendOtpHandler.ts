@@ -6,6 +6,8 @@ import { ResendOtpRequest, ResendOtpResponse } from "@akashcapro/codex-shared-ut
 import logger from '@/utils/logger';
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
+import { OtpType } from "@/domain/enums/OtpType";
+import { validateOtpType } from "@/dto/resendOtp.dto";
 
 /**
  * Class for handling resend otp.
@@ -40,13 +42,8 @@ export class GrpcUserResendOtpHandler {
         call : ServerUnaryCall<ResendOtpRequest,ResendOtpResponse>,
         callback : sendUnaryData<ResendOtpResponse>
     ) => {
-        const startTime = Date.now(); // for latency
-        const method = 'resendOtp'
         try {
-            const req = call.request;
-
-            const result = await this.#_resendOtpUseCase.execute(req.email);
-
+            const result = await this.#_resendOtpUseCase.execute(call.request);
             if(!result.success){
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
@@ -56,7 +53,6 @@ export class GrpcUserResendOtpHandler {
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error : any) {
             logger.error(SystemErrorType.InternalServerError,error);
             return callback({
