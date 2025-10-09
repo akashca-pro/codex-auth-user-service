@@ -8,7 +8,7 @@ dotenv.config();
 const startServer = () => {
     try {
         // Start prometheus metrics server.
-        startMetricsServer(config.METRICS_PORT);
+        startMetricsServer(config.AUTH_USER_SERVICE_METRICS_PORT);
 
         // start gRPC server.
         startGrpcServer();

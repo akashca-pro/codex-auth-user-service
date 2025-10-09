@@ -127,7 +127,8 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                     username : user.username,
                     email : user.email,
                     role : user.role,
-                    avatar : user.avatar ?? null
+                    avatar : user.avatar ?? null,
+                    country : user.country ?? null
                 }
             },
             message : AuthSuccessType.AuthenticationSuccess, 

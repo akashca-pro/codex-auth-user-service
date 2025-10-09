@@ -97,7 +97,7 @@ export const startGrpcServer = () => {
         AuthUserServiceService, userHandlers);
 
     server.bindAsync(
-        config.GRPC_SERVER_URL,
+        config.GRPC_AUTH_USER_SERVICE_SERVER_URL,
         ServerCredentials.createInsecure(),
         (err,port) => {
             if(err) {
