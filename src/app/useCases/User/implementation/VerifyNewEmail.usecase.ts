@@ -11,12 +11,12 @@ import { User } from "@/domain/entities/User";
 import { ICacheProvider } from "@/app/providers/CacheProvider";
 import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 import { VerifyNewEmailRequest } from "@akashcapro/codex-shared-utils";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 
 /**
  * Class representing the implementation of the verify new email use case.
- * 
- * @class
+ * * @class
  * @implements {IVerifyNewEmailUseCase}
  */
 @injectable()
@@ -44,38 +44,66 @@ export class VerifyNewEmailUseCase implements IVerifyNewEmailUseCase {
             email : request.email,
             otp : request.otp
         }
-        const user = await this.#_userRepository.findById(dto.userId)
+        const { userId, email } = dto;
+        
+        // Log 1: Execution start
+        logger.info('VerifyNewEmailUseCase execution started', { userId, newEmail: email });
+
+        const user = await this.#_userRepository.findById(userId)
+        
         if(!user){
+            // Log 2A: User not found
+            logger.warn('Email verification failed: account not found', { userId });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
                 success : false
             }
         }
+        
+        // Log 2B: Verifying OTP
+        logger.debug('Attempting to verify OTP for new email', { userId, email });
         const isVerified = await this.#_otpService.verifyOtp(
-            dto.email,
+            email,
             OtpType.CHANGE_EMAIL,
             dto.otp
         )
+        
         if(!isVerified){
+            // Log 2C: OTP verification failed
+            logger.warn('Email verification failed: invalid or expired OTP', { userId, email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.InvalidOrExpiredOtp,
                 success : false
             }
         }
+
+        // Log 3: OTP verified, updating user record
+        logger.info('OTP verified. Updating user email address.', { userId, oldEmail: user.email, newEmail: email });
+        
+        // Clearing OTP after successful verification
         await this.#_otpService.clearOtp(
-            dto.email,
+            email,
             OtpType.CHANGE_EMAIL
-        )
+        );
+
         const userEntity = User.rehydrate(user);
-        userEntity.update({ email : dto.email });
+        userEntity.update({ email : email });
+        
         await this.#_userRepository.update(
-            dto.userId,
+            userId,
             userEntity.getUpdatedFields()
-        )
-        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${dto.userId}`
+        );
+        
+        // Log 4: Cache invalidation
+        const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${userId}`
+        logger.info('Email successfully updated in database. Invalidating profile cache key.', { userId, cacheKey });
         await this.#_cacheProvider.del(cacheKey);
+
+        // Log 5: Execution successful
+        logger.info('VerifyNewEmailUseCase completed successfully: Email address changed', { userId, newEmail: email });
+        
         return {
             data : null,
             success : true

@@ -2,7 +2,7 @@ import { IVerifyNewEmailUseCase } from "@/app/useCases/User/VerifyNewEmail.useca
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import logger from "@/utils/logger";
+import logger from "@/utils/logger"; // baseLogger imported as logger
 import { VerifyNewEmailRequest } from "@akashcapro/codex-shared-utils";
 import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
@@ -11,8 +11,7 @@ import { inject, injectable } from "inversify";
 
 /**
  * Class handling the verify new email usecase.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcVerifyNewEmailHandler {
@@ -29,17 +28,41 @@ export class GrpcVerifyNewEmailHandler {
         call : ServerUnaryCall<VerifyNewEmailRequest, Empty>,
         callback : sendUnaryData<Empty>
     ) => {
+        const { userId } = call.request; // Extract userId for context
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received verify new email request', { userId });
+
             const result = await this.#_verifyNewEmailUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., invalid OTP, expired OTP)
+                logger.warn('Verify new email UseCase failed', { 
+                    userId, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success
+            logger.info('Verify new email UseCase succeeded', { 
+                userId, 
+                message: result.message || 'Email verification successful' 
+            });
+
             return callback(null,{});
-        } catch (error) {
-            logger.error(SystemErrorType.InternalServerError,error);
+        } catch (error : any) {
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during new email verification', { 
+                userId, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

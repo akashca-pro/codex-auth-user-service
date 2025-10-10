@@ -8,11 +8,11 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { User } from "@/domain/entities/User";
 import { DeleteAccountRequest } from "@akashcapro/codex-shared-utils";
 import { IDeleteAccountRequestDTO } from "@/domain/dtos/User/DeleteAccount.dto";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Class representing the implementation of the change email use case.
- * 
- * @class
+ * * @class
  * @implements {IDeleteAccountUseCase}
  */
 @injectable()
@@ -36,9 +36,15 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
             userId : request.userId,
             password : request.password
         }
+
+        // Log 1: Execution start
+        logger.info('DeleteAccountUseCase execution started (Account Archival)', { userId: dto.userId });
+
         const user = await this.#_userRepository.findById(dto.userId)
 
         if(!user){
+            // Log 2A: User not found
+            logger.warn('Account deletion failed: account not found', { userId: dto.userId });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
@@ -46,7 +52,10 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
             }
         }
         
-        if(!await this.#_passwordHasher.comparePasswords(dto.password, user.password!)){
+        // Log 2B: Verifying password
+        if(!user.password || !await this.#_passwordHasher.comparePasswords(dto.password, user.password)){
+            // Log 2C: Incorrect password
+            logger.warn('Account deletion failed: incorrect password provided', { userId: dto.userId });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.IncorrectPassword,
@@ -54,10 +63,16 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
             }
         }
 
+        // Log 3: Password verified, proceeding to archive
+        logger.info('Password verified. Archiving user account (soft delete)', { userId: dto.userId });
+
         const userEntity = User.rehydrate(user);
         userEntity.update({ isArchived : true });
 
         await this.#_userRepository.update(dto.userId, userEntity.getUpdatedFields());
+
+        // Log 4: Execution successful
+        logger.info('DeleteAccountUseCase completed successfully: User account archived', { userId: dto.userId });
 
         return {
             data : null,

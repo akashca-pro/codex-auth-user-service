@@ -1,5 +1,4 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IUpdateUserProfileRequestDTO } from "@/domain/dtos/User/UpdateUserProfile";
 import { UpdateProfileRequest } from "@akashcapro/codex-shared-utils";
 
 /**

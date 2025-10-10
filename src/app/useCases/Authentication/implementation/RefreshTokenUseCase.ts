@@ -10,11 +10,11 @@ import { IUserRepository } from "@/domain/repository/User";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
 import { RefreshTokenRequest } from "@akashcapro/codex-shared-utils";
 import { IRefreshTokenRequestDTO } from "@/domain/dtos/RefreshTokenRequest.dto";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Use case for issuing new accessToken.
- * 
- * @class
+ * * @class
  * @implements {IRefreshTokenUseCase}
  */
 @injectable()
@@ -25,8 +25,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
 
     /**
      * Creates an instance of RefreshTokenEndPointUseCase.
-     * 
-     * @param {IUserRepository} userRepository - The repository of the user.
+     * * @param {IUserRepository} userRepository - The repository of the user.
      * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      */
     constructor(
@@ -43,33 +42,56 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
     async execute(
         request : RefreshTokenRequest
     ): Promise<ResponseDTO> {
+        // Log 1: Execution start
+        logger.info('RefreshTokenUseCase execution started', { userId: request.userId, email: request.email });
+
         const dto : IRefreshTokenRequestDTO = {
             email : request.email,
             role : request.role,
             userId : request.userId
         }
-        const tokenPayload : ITokenPayLoadDTO = {
-            userId : dto.userId,
-            email : dto.email,
-            role : dto.role,
-            tokenId : randomUUID()
-        }
+        
+        // Note: The token refresh flow often includes a separate validation step 
+        // for the refresh token itself, which is assumed to have passed before
+        // this execute method is called (e.g., in a middleware or gRPC interceptor).
+
         const user = await this.#_userRepository.findById(dto.userId)
+        
         if(!user){
+            // Log 2A: User not found
+            logger.warn('RefreshTokenUseCase failed: account not found', { userId: dto.userId, email: dto.email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
                 success : false
             }
         }
+
         if(user.isBlocked){
+            // Log 2B: Account blocked
+            logger.warn('RefreshTokenUseCase failed: account is blocked', { userId: dto.userId, email: dto.email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountBlocked,
                 success : false
             }
         }
+        
+        // Log 3: Generating new access token
+        logger.info('User validated, generating new access token', { userId: dto.userId, email: dto.email });
+
+        const tokenPayload : ITokenPayLoadDTO = {
+            userId : dto.userId,
+            email : dto.email,
+            role : dto.role,
+            tokenId : randomUUID() // New tokenId ensures old access tokens are invalidated if a token blacklist is used
+        }
+        
         const accessToken = this.#_tokenProvider.generateAccessToken(tokenPayload);
+
+        // Log 4: Execution successful
+        logger.info('RefreshTokenUseCase completed successfully: New access token issued', { userId: dto.userId });
+
         return { 
             data : { accessToken,
                     userInfo : dto },
@@ -78,4 +100,3 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
         }
     }
 }
-

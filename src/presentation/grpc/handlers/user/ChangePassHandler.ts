@@ -2,7 +2,7 @@ import { IChangePassUseCase } from "@/app/useCases/User/ChangePass.usecase.inter
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import logger from "@/utils/logger";
+import logger from "@/utils/logger"; // baseLogger imported as logger
 import { ChangePasswordRequest } from "@akashcapro/codex-shared-utils";
 import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
@@ -10,8 +10,7 @@ import { inject, injectable } from "inversify";
 
 /**
  * Class handling the change password usecase.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcChangePassHandler {
@@ -28,17 +27,41 @@ export class GrpcChangePassHandler {
         call : ServerUnaryCall<ChangePasswordRequest, Empty>,
         callback : sendUnaryData<Empty>
     ) => {
+        const { userId } = call.request; // Destructure userId for context
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received change password request', { userId });
+
             const result = await this.#_changePassUseCase.execute(call.request)
+            
             if(!result.success){
+                // Log 2A: UseCase failure
+                logger.warn('Change password UseCase failed', { 
+                    userId, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success
+            logger.info('Change password UseCase succeeded', { 
+                userId, 
+                message: result.message || 'Password changed successfully'
+            });
+
             return callback(null,{});
-        } catch (error) {
-            logger.error(SystemErrorType.InternalServerError,error);
+        } catch (error : any) {
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during change password', { 
+                userId, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

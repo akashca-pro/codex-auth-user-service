@@ -1,4 +1,3 @@
-import { IAuthenticateLocalAuthUserDTO } from "@/domain/dtos/Authenticate/AuthenticateUser";
 import { ResponseDTO } from "@/domain/dtos/Response";
 import { LoginRequest } from "@akashcapro/codex-shared-utils";
 

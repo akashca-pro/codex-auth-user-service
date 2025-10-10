@@ -6,11 +6,11 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { inject, injectable } from "inversify";
 import { ResendOtpRequest } from "@akashcapro/codex-shared-utils";
 import { validateOtpType } from "@/dto/resendOtp.dto";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Use case for resend otp.
- * 
- * @class
+ * * @class
  * @implements {IResendOtpUseCase}
  */
 @injectable()
@@ -32,14 +32,28 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
             email : request.email,
             otpType : validateOtpType(request.otpType)
         }
+        const { email, otpType } = dto;
+        
+        // Log 1: Execution start
+        logger.info('ResendOtpUseCase execution started', { email, otpType });
+        
+        // Log 2: Clearing existing OTP
+        logger.debug('Clearing existing OTP', { email, otpType });
         await this.#_otpService.clearOtp(
-            dto.email,
-            dto.otpType
+            email,
+            otpType
         );
+        
+        // Log 3: Generating and sending new OTP
+        logger.debug('Generating and sending new OTP', { email, otpType });
         await this.#_otpService.generateAndSendOtp(
-            dto.email,
-            dto.otpType
+            email,
+            otpType
         );
+        
+        // Log 4: Execution successful
+        logger.info('ResendOtpUseCase completed successfully: new OTP sent', { email, otpType });
+
         return {
             data : null,
             message : UserSuccessType.OtpSendSuccess,

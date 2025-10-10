@@ -7,11 +7,11 @@ import { IOtpService } from "@/app/providers/GenerateAndSendOtp";
 import { OtpType } from "@/domain/enums/OtpType";
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { injectable, inject } from "inversify";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Use case of Forgotpassword use case.
- *  
- * @class
+ * * @class
  * @implements {IForgotPasswordUseCase}
  */
 @injectable()
@@ -22,9 +22,7 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
 
     /**
      * Creates an instance of ForgotpasswordUseCase.
-     * 
-     * 
-     * @param {IUserRepository} userRepository - The repository of the user.
+     * * * @param {IUserRepository} userRepository - The repository of the user.
      * @param {IOtpService} otpService - Otp service provider for generate and sent otp.
      */
     constructor(
@@ -43,10 +41,14 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
      * @param {string} email 
      */
     async execute(email: string): Promise<ResponseDTO>{
+        // Log 1: Execution start
+        logger.info('ForgotpasswordUseCase execution started', { email });
 
         const user = await this.#_userRepository.findByEmail(email);
 
         if(!user){
+            // Log 2A: User not found
+            logger.warn('ForgotpasswordUseCase failed: account not found', { email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
@@ -55,6 +57,8 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
         }
 
         if(user.isBlocked){
+            // Log 2B: Account blocked
+            logger.warn('ForgotpasswordUseCase failed: account is blocked', { userId: user.userId, email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountBlocked,
@@ -62,7 +66,13 @@ export class ForgotpasswordUseCase implements IForgotPasswordUseCase {
             }
         }
 
+        // Log 3: Generating and sending OTP
+        logger.info('User found, generating and sending OTP for password reset', { userId: user.userId, email });
+
         await this.#_otpService.generateAndSendOtp(email, OtpType.FORGOT_PASS);
+
+        // Log 4: Execution successful
+        logger.info('ForgotpasswordUseCase completed successfully: OTP sent', { userId: user.userId, email });
 
         return {
             data : null,

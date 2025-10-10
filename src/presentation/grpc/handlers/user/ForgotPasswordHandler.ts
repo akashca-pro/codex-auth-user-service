@@ -3,14 +3,13 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { ForgotPasswordRequest, ForgotPasswordResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 /**
  * Class for handling forgot password.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserForgotPasswordHandler {
@@ -18,8 +17,7 @@ export class GrpcUserForgotPasswordHandler {
     #_forgotPasswordUseCase : IForgotPasswordUseCase
 
     /**
-     * 
-     * @param {IForgotPasswordUseCase} forgotPasswordUseCase - The use case for forgot password for the user.
+     * * @param {IForgotPasswordUseCase} forgotPasswordUseCase - The use case for forgot password for the user.
      * @constructor
      */
     constructor(
@@ -31,8 +29,7 @@ export class GrpcUserForgotPasswordHandler {
 
     /**
      * This method handles the forgot password use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -40,23 +37,45 @@ export class GrpcUserForgotPasswordHandler {
         call : ServerUnaryCall<ForgotPasswordRequest,ForgotPasswordResponse>,
         callback : sendUnaryData<ForgotPasswordResponse>
     ) => {
+        const req = call.request;
+        const email = req.email; // Extract email for context
+
         try {
-            const req = call.request;
+            // Log 1: Request received
+            logger.info('gRPC handler received forgot password request', { email });
+
             const result = await this.#_forgotPasswordUseCase.execute(req.email);
 
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., user not found, rate limit)
+                logger.warn('Forgot password UseCase failed', { 
+                    email, 
+                    message: result.message 
+                });
+                
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
 
+            // Log 2B: UseCase success (OTP issued)
+            logger.info('Forgot password UseCase succeeded', { 
+                email, 
+                message: result.message || 'OTP issued' 
+            });
+
             return callback(null,{
                 message : result.message!
             });
 
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during forgot password', { 
+                email, 
+                error 
+            });
+            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

@@ -1,5 +1,4 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IChangePassRequestDTO } from "@/domain/dtos/User/ChangePass.dto";
 import { ChangePasswordRequest } from "@akashcapro/codex-shared-utils";
 
 

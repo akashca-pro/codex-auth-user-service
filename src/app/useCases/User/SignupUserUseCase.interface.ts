@@ -1,5 +1,4 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { ICreateLocalUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { SignupRequest } from "@akashcapro/codex-shared-utils";
 
 /**

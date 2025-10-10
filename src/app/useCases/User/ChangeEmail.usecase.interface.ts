@@ -1,5 +1,4 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IChangeEmailRequestDTO } from "@/domain/dtos/User/ChangeEmail.dto";
 import { ChangeEmailRequest } from "@akashcapro/codex-shared-utils";
 
 /**

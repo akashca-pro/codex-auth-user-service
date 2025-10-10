@@ -1,19 +1,16 @@
 import { IAuthenticateOAuthUserUseCase } from "@/app/useCases/Authentication/AuthenticateOAuthUser";
 import TYPES from "@/config/inversify/types";
-import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
-import { UserRole } from "@/domain/enums/UserRole";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { OAuthLoginRequest, OAuthLoginResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 
 /**
  * Class for handling oAuth login.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcOAuthHandler {
@@ -22,8 +19,7 @@ export class GrpcOAuthHandler {
     #_oAuthUseCase : IAuthenticateOAuthUserUseCase
 
     /**
-     * 
-     * @param {IAuthenticateOAuthUserUseCase} oAuthUseCase - The use case for register o auth user.
+     * * @param {IAuthenticateOAuthUserUseCase} oAuthUseCase - The use case for register o auth user.
      * @constructor
      */
     constructor(
@@ -35,8 +31,7 @@ export class GrpcOAuthHandler {
 
     /**
      * This method handles the o auth authentication use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -44,14 +39,36 @@ export class GrpcOAuthHandler {
         call : ServerUnaryCall<OAuthLoginRequest,OAuthLoginResponse>,
         callback : sendUnaryData<OAuthLoginResponse>
     ) : Promise<void> => {
+        const { oAuthId, email } = call.request; // Destructure context fields
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received OAuth login request', { oAuthId, email });
+
             const result = await this.#_oAuthUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure
+                logger.warn('OAuth authentication UseCase failed', { 
+                    oAuthId, 
+                    email,
+                    message: result.message 
+                });
+                
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+            
+            // Log 2B: UseCase success
+            logger.info('OAuth authentication UseCase succeeded', { 
+                oAuthId, 
+                email,
+                userId: result.data.userInfo.userId,
+                message: result.message 
+            });
+
             return callback(null,{
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
@@ -59,7 +76,13 @@ export class GrpcOAuthHandler {
                 userInfo : result.data.userInfo
             });
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during OAuth login', { 
+                oAuthId, 
+                email, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

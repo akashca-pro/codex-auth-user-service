@@ -1,6 +1,6 @@
 import TYPES from "@/config/inversify/types";
 import container from "@/config/inversify/container";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger';
 import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/codex-shared-utils";
 import { Server, ServerCredentials } from "@grpc/grpc-js"
 import { config } from "@/config";

@@ -2,7 +2,7 @@ import { IDeleteAccountUseCase } from "@/app/useCases/User/DeleteAccount.usecase
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import logger from "@/utils/logger";
+import logger from "@/utils/logger"; // baseLogger imported as logger
 import { DeleteAccountRequest } from "@akashcapro/codex-shared-utils";
 import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
@@ -11,8 +11,7 @@ import { inject, injectable } from "inversify";
 
 /**
  * Class handling the delete account usecase.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcDeleteAccountHandler {
@@ -29,17 +28,41 @@ export class GrpcDeleteAccountHandler {
         call : ServerUnaryCall<DeleteAccountRequest, Empty>,
         callback : sendUnaryData<Empty>
     ) => {
+        const { userId } = call.request; // Destructure userId for context
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received delete account request', { userId });
+
             const result = await this.#_deleteAccountUseCase.execute(call.request)
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., wrong password, user not found)
+                logger.warn('Delete account UseCase failed', { 
+                    userId, 
+                    message: result.message 
+                });
+                
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success
+            logger.info('Delete account UseCase succeeded', { 
+                userId, 
+                message: result.message || 'Account deleted successfully' 
+            });
+
             return callback(null,{});
-        } catch (error) {
-            logger.error(SystemErrorType.InternalServerError,error);
+        } catch (error : any) {
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during account deletion', { 
+                userId, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

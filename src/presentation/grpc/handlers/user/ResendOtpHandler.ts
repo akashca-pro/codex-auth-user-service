@@ -3,16 +3,13 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { ResendOtpRequest, ResendOtpResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
-import { OtpType } from "@/domain/enums/OtpType";
-import { validateOtpType } from "@/dto/resendOtp.dto";
 
 /**
  * Class for handling resend otp.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserResendOtpHandler {
@@ -20,8 +17,7 @@ export class GrpcUserResendOtpHandler {
     #_resendOtpUseCase : IResendOtpUseCase
 
     /**
-     * 
-     * @param {IResendOtpUseCase} resendOtpUseCase - The use case for resend otp to user.
+     * * @param {IResendOtpUseCase} resendOtpUseCase - The use case for resend otp to user.
      * @constructor
      */
     constructor(
@@ -33,8 +29,7 @@ export class GrpcUserResendOtpHandler {
 
     /**
      * This method handles the resend otp use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -42,19 +37,46 @@ export class GrpcUserResendOtpHandler {
         call : ServerUnaryCall<ResendOtpRequest,ResendOtpResponse>,
         callback : sendUnaryData<ResendOtpResponse>
     ) => {
+        const { email, otpType } = call.request; // Destructure context fields
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received resend OTP request', { email, otpType });
+
             const result = await this.#_resendOtpUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., rate limit, user not found)
+                logger.warn('Resend OTP UseCase failed', { 
+                    email, 
+                    otpType,
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success (New OTP issued)
+            logger.info('Resend OTP UseCase succeeded', { 
+                email, 
+                otpType,
+                message: result.message || 'New OTP issued'
+            });
+
             return callback(null,{
                 message : result.message!
             });
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during resend OTP', { 
+                email, 
+                otpType, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
