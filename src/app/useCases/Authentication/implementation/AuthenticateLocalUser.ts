@@ -131,11 +131,12 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
         }
         
         // Log 3: Authentication success, generating tokens
-        logger.info('Authentication successful, generating tokens', { userId: user.userId, email: user.email, role: user.role });
+        logger.info('Authentication successful, generating tokens', { userId: user.userId, email: user.email, role: user.role, username : user.username });
 
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
+            username : user.username,
             role : user.role,
             tokenId : randomUUID()
         }

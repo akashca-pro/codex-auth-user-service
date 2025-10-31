@@ -113,10 +113,11 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
         }        
 
         // Log 4: Authentication successful, generating tokens
-        logger.info('OAuth authentication successful, generating tokens', { userId: user.userId, email: user.email, role: user.role, isNewUser });
+        logger.info('OAuth authentication successful, generating tokens', { userId: user.userId, email: user.email, username : user.username, role: user.role, isNewUser });
 
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
+            username : user.username,
             email : user.email,
             role : user.role,
             tokenId : randomUUID()

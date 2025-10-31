@@ -15,6 +15,11 @@ export interface ITokenPayLoadDTO {
     email : string;
 
     /**
+     * The username of the user
+     */
+    username? : string;
+
+    /**
      * The role of the user.
      */
     role : string;

@@ -47,13 +47,10 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
 
         const dto : IRefreshTokenRequestDTO = {
             email : request.email,
+            username : request.username,
             role : request.role,
             userId : request.userId
         }
-        
-        // Note: The token refresh flow often includes a separate validation step 
-        // for the refresh token itself, which is assumed to have passed before
-        // this execute method is called (e.g., in a middleware or gRPC interceptor).
 
         const user = await this.#_userRepository.findById(dto.userId)
         
@@ -82,9 +79,10 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
 
         const tokenPayload : ITokenPayLoadDTO = {
             userId : dto.userId,
+            username : dto.username,
             email : dto.email,
             role : dto.role,
-            tokenId : randomUUID() // New tokenId ensures old access tokens are invalidated if a token blacklist is used
+            tokenId : randomUUID() 
         }
         
         const accessToken = this.#_tokenProvider.generateAccessToken(tokenPayload);
