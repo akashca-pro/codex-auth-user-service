@@ -150,6 +150,7 @@ export class AuthenticateLocalUserUseCase implements IAuthenticateLocalAuthUserU
                 userInfo : {
                     userId : user.userId,
                     username : user.username,
+                    firstName : user.firstName,
                     email : user.email,
                     role : user.role,
                     avatar : user.avatar ?? null,
