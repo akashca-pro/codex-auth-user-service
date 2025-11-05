@@ -10,7 +10,8 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ICacheProvider } from "@/app/providers/CacheProvider";
 import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 import { UpdateProfileRequest } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/pinoLogger'; // Import the logger
+import logger from '@/utils/pinoLogger';
+import grpcSubmissionClient from "@/infra/gRPC/SubmissionServices";
 
 /**
  * Implementation of the update user profile use case.
@@ -67,6 +68,18 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
         logger.debug('User found. Applying updates to profile data.', { userId, updates: Object.keys(updatedData).filter(key => updatedData[key as keyof IUpdateUserProfileRequestDTO] !== undefined) });
 
         const userEntity = User.rehydrate(user);
+        if(updatedData.country){
+            try {
+                await grpcSubmissionClient.updateCountryInLeaderboard({
+                    userId,
+                    country : updatedData.country
+                })
+                logger.info('Country updated in the leaderboard');
+            } catch (error) {
+                // publish the update to kafka.
+                logger.error('Country not updated in the leaderboard',error)
+            }
+        }
         userEntity.update(updatedData);
         const fieldsToUpdate = userEntity.getUpdatedFields();
 

@@ -8,7 +8,8 @@ import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/Error
 import { User } from "@/domain/entities/User";
 import { DeleteAccountRequest } from "@akashcapro/codex-shared-utils";
 import { IDeleteAccountRequestDTO } from "@/domain/dtos/User/DeleteAccount.dto";
-import logger from '@/utils/pinoLogger'; // Import the logger
+import logger from '@/utils/pinoLogger'; 
+import grpcSubmissionClient from "@/infra/gRPC/SubmissionServices";
 
 /**
  * Class representing the implementation of the change email use case.
@@ -65,6 +66,14 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
 
         // Log 3: Password verified, proceeding to archive
         logger.info('Password verified. Archiving user account (soft delete)', { userId: dto.userId });
+
+        try {
+            await grpcSubmissionClient.removeUserInLeaderboard({userId : user.userId})
+            logger.info('User removed from the leaderboard')
+        } catch (error) {
+            // publish the update to kafka.
+            logger.error('User not removed from the leaderboard',error)
+        }
 
         const userEntity = User.rehydrate(user);
         userEntity.update({ isArchived : true });

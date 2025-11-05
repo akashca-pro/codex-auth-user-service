@@ -17,6 +17,8 @@ interface Config {
     AUTH_USER_SERVICE_METRICS_PORT : number;
     PROFILE_CACHE_EXPIRY : number;
     BLOCKED_USER_CACHE_EXPIRY : number;
+    DEFAULT_GRPC_TIMEOUT: number;
+    GRPC_PROBLEM_SERVICE_URL: string;
 }
 
 export const config : Config = {
@@ -35,4 +37,6 @@ export const config : Config = {
      AUTH_USER_SERVICE_METRICS_PORT : Number(process.env.AUTH_USER_SERVICE_METRICS_PORT)!,
      PROFILE_CACHE_EXPIRY : Number(process.env.PROFILE_CACHE_EXPIRY)!,
      BLOCKED_USER_CACHE_EXPIRY : Number(process.env.BLOCKED_USER_CACHE_EXPIRY)!,
+     DEFAULT_GRPC_TIMEOUT : Number(process.env.DEFAULT_GRPC_TIMEOUT)!,
+     GRPC_PROBLEM_SERVICE_URL : process.env.GRPC_PROBLEM_SERVICE_URL!
 }
