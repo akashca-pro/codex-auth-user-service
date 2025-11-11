@@ -12,6 +12,7 @@ import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 import { UpdateProfileRequest } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/pinoLogger';
 import grpcSubmissionClient from "@/infra/gRPC/SubmissionServices";
+import { AuthProvider } from "@/domain/enums/AuthProvider";
 
 /**
  * Implementation of the update user profile use case.
@@ -68,11 +69,16 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
         logger.debug('User found. Applying updates to profile data.', { userId, updates: Object.keys(updatedData).filter(key => updatedData[key as keyof IUpdateUserProfileRequestDTO] !== undefined) });
 
         const userEntity = User.rehydrate(user);
-        if(updatedData.country){
+        userEntity.update(updatedData);
+        const fieldsToUpdate = userEntity.getUpdatedFields();
+
+        const updatedDataRepo = await this.#_userRepository.update(userId, fieldsToUpdate);
+        if(updatedDataRepo.country && user.country){
             try {
+                logger.info('Updating country in the leaderboard, gRPC call to submission service');
                 await grpcSubmissionClient.updateCountryInLeaderboard({
                     userId,
-                    country : updatedData.country
+                    country : updatedDataRepo.country,
                 })
                 logger.info('Country updated in the leaderboard');
             } catch (error) {
@@ -80,10 +86,6 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
                 logger.error('Country not updated in the leaderboard',error)
             }
         }
-        userEntity.update(updatedData);
-        const fieldsToUpdate = userEntity.getUpdatedFields();
-
-        await this.#_userRepository.update(userId, fieldsToUpdate);
 
         const cacheKey = `${REDIS_PREFIX.USER_PROFILE}${userId}`;
         
@@ -95,7 +97,7 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
         logger.info('UpdateUserProfileUseCase completed successfully', { userId });
 
         return {
-            data : null,
+            data : updatedDataRepo,
             message : UserSuccessType.ProfileUpdated,
             success : true
         }

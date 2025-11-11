@@ -90,7 +90,7 @@ export interface IUserRepository {
     update(
         userId : string, 
         data : IUpdateUserRequestDTO,
-    ) : Promise<IUserOutRequestDTO>;
+    ) : Promise<Partial<IUpdateUserRequestDTO>>;
 
     /**
      * Delete a user by their id

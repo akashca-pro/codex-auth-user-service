@@ -54,8 +54,8 @@ export class GrpcUpdateProfileHandler {
             logger.info('Update profile UseCase succeeded', { 
                 message: result.message || 'Profile updated successfully'
             });
-
             return callback(null,{
+                updatedData : result.data ? result.data : null,
                 message : result.message!
             });
         } catch (error : any) {

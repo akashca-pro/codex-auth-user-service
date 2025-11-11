@@ -227,7 +227,7 @@ export class UserRepository implements IUserRepository {
      * @param {IUpdateUserRequestDTO} data - The updated user data.
      * @returns {Promise<IUserOutRequestDTO>} The updated user.
      */
-    async update(userId: string, data: IUpdateUserRequestDTO): Promise<IUserOutRequestDTO> {
+    async update(userId: string, data: IUpdateUserRequestDTO): Promise<Partial<IUpdateUserRequestDTO>> {
         const startTime = Date.now();
         const operation = 'update';
         try {
@@ -237,9 +237,13 @@ export class UserRepository implements IUserRepository {
             logger.debug(`[REPO] Executing ${operation}`, { userId, fields: Object.keys(updatedData) });
             
             const userUpdated = await this._prisma.user.update({
-                where : {userId},
-                data : updatedData
-            })
+                where: { userId },
+                data: updatedData,
+                select: Object.keys(updatedData).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {} as Record<string, boolean>),
+            });
             logger.info(`[REPO] ${operation} successful`, { userId, duration: Date.now() - startTime });
             return userUpdated
         } catch (error) {

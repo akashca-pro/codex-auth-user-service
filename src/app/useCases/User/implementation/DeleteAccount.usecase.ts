@@ -68,6 +68,7 @@ export class DeleteAccountUseCase implements IDeleteAccountUseCase {
         logger.info('Password verified. Archiving user account (soft delete)', { userId: dto.userId });
 
         try {
+            logger.info('Removing user from the leaderboard, gRPC call to submission service');
             await grpcSubmissionClient.removeUserInLeaderboard({userId : user.userId})
             logger.info('User removed from the leaderboard')
         } catch (error) {
