@@ -7,6 +7,7 @@ import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { inject, injectable } from "inversify";
 import TYPES from "@/config/inversify/types";
 import logger from '@/utils/pinoLogger'; // Import the logger
+import { IUserStats } from "@/dto/userStats.dto";
 
 /**
  * Prisma implementation of the user repository.
@@ -251,6 +252,43 @@ export class UserRepository implements IUserRepository {
             throw error;
         }
 
+    }
+
+    async getUserStats(): Promise<IUserStats> {
+        const startTime = Date.now();
+        const operation = 'getUserStats';
+
+        try {
+            logger.debug(`[REPO] Executing ${operation}`);
+
+            const todayStart = new Date();
+            todayStart.setUTCHours(0, 0, 0, 0);
+
+            const [totalUsers, todaysUsers] = await Promise.all([
+                this._prisma.user.count(),
+                this._prisma.user.count({
+                    where: {
+                        createdAt: {
+                            gte: todayStart,
+                        },
+                    },
+                })
+            ])
+
+            logger.info(`[REPO] ${operation} successful`, {
+                totalUsers,
+                todaysUsers,
+                duration: Date.now() - startTime,
+            });
+
+            return { totalUsers, todaysUsers };
+        } catch (error) {
+            logger.error(`[REPO] ${operation} failed`, {
+                error,
+                duration: Date.now() - startTime,
+            });
+            throw error;
+        }
     }
 
     /**

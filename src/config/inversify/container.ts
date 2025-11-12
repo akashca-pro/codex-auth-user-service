@@ -77,6 +77,9 @@ import { GrpcVerifyNewEmailHandler } from '@/presentation/grpc/handlers/user/Ver
 import { IDeleteAccountUseCase } from '@/app/useCases/User/DeleteAccount.usecase.interface';
 import { DeleteAccountUseCase } from '@/app/useCases/User/implementation/DeleteAccount.usecase';
 import { GrpcDeleteAccountHandler } from '@/presentation/grpc/handlers/user/DeleteAccountHandler';
+import { IUserStatUseCase } from '@/app/useCases/admin/userStat.usecase.interface';
+import { UserStatsUseCase } from '@/app/useCases/admin/implementation/userStat.usecase';
+import { GrpcAdminUserStats } from '@/presentation/grpc/handlers/admin/UserStatsHandler';
 
 const container = new Container();
 
@@ -149,6 +152,9 @@ container
 container
     .bind<IDeleteAccountUseCase>(TYPES.DeleteAccountUseCase)
     .to(DeleteAccountUseCase).inSingletonScope();
+container
+    .bind<IUserStatUseCase>(TYPES.UserStatsUseCase)
+    .to(UserStatsUseCase).inSingletonScope()
 
 /**
  * Common gRPC handlers.
@@ -216,5 +222,9 @@ container
 container
     .bind<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler)
     .to(GrpcToggleBlockUserHandler).inSingletonScope();
+container
+    .bind<GrpcAdminUserStats>(TYPES.GrpcAdminUserStats)
+    .to(GrpcAdminUserStats).inSingletonScope();
+
 
 export default container;

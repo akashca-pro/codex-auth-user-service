@@ -25,6 +25,7 @@ import { GrpcChangePassHandler } from "./handlers/user/ChangePassHandler";
 import { GrpcChangeEmailHandler } from "./handlers/user/ChangeEmailHandler";
 import { GrpcVerifyNewEmailHandler } from "./handlers/user/VerifyEmailHandler";
 import { GrpcDeleteAccountHandler } from "./handlers/user/DeleteAccountHandler";
+import { GrpcAdminUserStats } from "./handlers/admin/UserStatsHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -49,6 +50,8 @@ const adminProfileHandler = container.get<GrpcAdminProfileHandler>(TYPES.GrpcAdm
 const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
 const adminListUsersHandler = container.get<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler);
 const toggleBlockUserHandler = container.get<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler);
+const userStatsHandler = container.get<GrpcAdminUserStats>(TYPES.GrpcAdminUserStats);
+
 
 function wrapAll(serviceObj : Record<string,Function> ){
     return Object.fromEntries(
@@ -66,6 +69,7 @@ const adminHandlers = wrapAll({
     ...adminListUsersHandler.getServiceHandler(),
     ...toggleBlockUserHandler.getServiceHandler(),
     ...adminProfileHandler.getServiceHandler(),
+    ...userStatsHandler.getServiceHandler(),
 });
 
 const userHandlers = wrapAll({

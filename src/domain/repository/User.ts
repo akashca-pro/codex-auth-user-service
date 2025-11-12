@@ -2,6 +2,7 @@ import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { IUpdateUserRequestDTO } from "@/domain/dtos/User/UpdateUser";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { IUserOutRequestDTO } from "@/domain/dtos/User/UserOut";
+import { IUserStats } from "@/dto/userStats.dto";
 import { User, UserRole } from "@/generated/prisma";
 
 /**
@@ -91,6 +92,8 @@ export interface IUserRepository {
         userId : string, 
         data : IUpdateUserRequestDTO,
     ) : Promise<Partial<IUpdateUserRequestDTO>>;
+
+    getUserStats() : Promise<IUserStats>;
 
     /**
      * Delete a user by their id
