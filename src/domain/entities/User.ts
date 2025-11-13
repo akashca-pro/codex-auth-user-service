@@ -113,7 +113,7 @@ update(updatedData: IUpdateUserRequestDTO) {
 
   if(updatedData.email){
     const updatedEmail = new Email({ address : updatedData.email })
-    this._updatedFields = { email : updatedEmail.address };
+    this._updatedFields.email = updatedEmail.address;
   }
 
   if (

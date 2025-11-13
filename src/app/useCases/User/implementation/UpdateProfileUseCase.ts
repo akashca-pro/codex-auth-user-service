@@ -12,7 +12,6 @@ import { REDIS_PREFIX } from "@/config/redis/prefixKeys";
 import { UpdateProfileRequest } from "@akashcapro/codex-shared-utils";
 import logger from '@/utils/pinoLogger';
 import grpcSubmissionClient from "@/infra/gRPC/SubmissionServices";
-import { AuthProvider } from "@/domain/enums/AuthProvider";
 
 /**
  * Implementation of the update user profile use case.

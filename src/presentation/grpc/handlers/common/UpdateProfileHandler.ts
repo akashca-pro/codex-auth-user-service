@@ -2,7 +2,7 @@ import { IUpdateUserProfileUseCase } from "@/app/useCases/User/UpdateProfileUseC
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import logger from "@/utils/logger"; // baseLogger imported as logger
+import logger from "@/utils/logger"; 
 import { UpdateProfileRequest, UpdateProfileResponse } from "@akashcapro/codex-shared-utils";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";

@@ -29,6 +29,8 @@ const TYPES = {
   VerifyNewEmailUseCase : Symbol.for("VerifyNewEmailUseCase"),
   DeleteAccountUseCase : Symbol.for("DeleteAccountUseCase"),
   UserStatsUseCase : Symbol.for("UserStatsUseCase"),
+  UpdateUserProgressUseCase : Symbol.for("UpdateUserProgressUseCase"),
+
 
   // User handler
 
@@ -46,6 +48,7 @@ const TYPES = {
   GrpcVerifyNewEmailHandler : Symbol.for("GrpcVerifyNewEmailHandler"),
   GrpcDeleteAccountHandler : Symbol.for("GrpcDeleteAccountHandler"),
   GrpcAdminUserStats : Symbol.for("GrpcAdminUserStats"),
+  GrpcUpdateUserProgressHandler : Symbol.for("GrpcUpdateUserProgressHandler"),
   
 
   // Admin handlers

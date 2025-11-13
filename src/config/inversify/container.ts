@@ -80,6 +80,9 @@ import { GrpcDeleteAccountHandler } from '@/presentation/grpc/handlers/user/Dele
 import { IUserStatUseCase } from '@/app/useCases/admin/userStat.usecase.interface';
 import { UserStatsUseCase } from '@/app/useCases/admin/implementation/userStat.usecase';
 import { GrpcAdminUserStats } from '@/presentation/grpc/handlers/admin/UserStatsHandler';
+import { IUpdateUserProgressUsecase } from '@/app/useCases/User/UpdateUserProgress.usecase.interface';
+import { UpdateUserProgressUseCase } from '@/app/useCases/User/implementation/UpdateUserProgress.usecase';
+import { GrpcUpdateUserProgressHandler } from '@/presentation/grpc/handlers/user/UpdateUserProgressHandler';
 
 const container = new Container();
 
@@ -155,6 +158,10 @@ container
 container
     .bind<IUserStatUseCase>(TYPES.UserStatsUseCase)
     .to(UserStatsUseCase).inSingletonScope()
+container
+    .bind<IUpdateUserProgressUsecase>(TYPES.UpdateUserProgressUseCase)
+    .to(UpdateUserProgressUseCase).inSingletonScope()
+
 
 /**
  * Common gRPC handlers.
@@ -205,6 +212,9 @@ container
 container
     .bind<GrpcDeleteAccountHandler>(TYPES.GrpcDeleteAccountHandler)
     .to(GrpcDeleteAccountHandler).inSingletonScope();
+container
+    .bind<GrpcUpdateUserProgressHandler>(TYPES.GrpcUpdateUserProgressHandler)
+    .to(GrpcUpdateUserProgressHandler).inSingletonScope();
 
 /**
  * Admin gRPC handlers.

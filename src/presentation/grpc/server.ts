@@ -26,6 +26,7 @@ import { GrpcChangeEmailHandler } from "./handlers/user/ChangeEmailHandler";
 import { GrpcVerifyNewEmailHandler } from "./handlers/user/VerifyEmailHandler";
 import { GrpcDeleteAccountHandler } from "./handlers/user/DeleteAccountHandler";
 import { GrpcAdminUserStats } from "./handlers/admin/UserStatsHandler";
+import { GrpcUpdateUserProgressHandler } from "./handlers/user/UpdateUserProgressHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -44,6 +45,9 @@ const userChangePassHandler = container.get<GrpcChangePassHandler>(TYPES.GrpcCha
 const userChangeEmailHandler = container.get<GrpcChangeEmailHandler>(TYPES.GrpcChangeEmailHandler);
 const userVerifyNewEmailHandler = container.get<GrpcVerifyNewEmailHandler>(TYPES.GrpcVerifyNewEmailHandler);
 const userDeleteAccountHandler = container.get<GrpcDeleteAccountHandler>(TYPES.GrpcDeleteAccountHandler);
+const userUpdateProgressHandler = container.get<GrpcUpdateUserProgressHandler>(TYPES.GrpcUpdateUserProgressHandler);
+
+
 
 // admin
 const adminProfileHandler = container.get<GrpcAdminProfileHandler>(TYPES.GrpcAdminProfileHandler);
@@ -87,7 +91,7 @@ const userHandlers = wrapAll({
     ...userDeleteAccountHandler.getServiceHandler(),
     ...userProfileHandler.getServiceHandler(),
     ...updateProfile.getServiceHandler(),
-
+    ...userUpdateProgressHandler.getServiceHandler(),
 })
 
 export const startGrpcServer = () => {
