@@ -1,7 +1,7 @@
 import { IListUsersUseCase } from "@/app/useCases/admin/listUsers.usecase.interface";
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
-import logger from "@/utils/logger";
+import logger from "@/utils/logger"; // baseLogger imported as logger
 import { ListUsersRequest, ListUsersResponse } from "@akashcapro/codex-shared-utils";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
@@ -9,8 +9,7 @@ import { inject, injectable } from "inversify";
 
 /**
  * Class for handling list users.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcAdminListUsersHandler {
@@ -27,17 +26,36 @@ export class GrpcAdminListUsersHandler {
         call : ServerUnaryCall<ListUsersRequest,ListUsersResponse>,
         callback : sendUnaryData<ListUsersResponse>
     ) : Promise<void> => {
+        const { page, limit } = call.request; // Extract pagination/filter info for context
+
         try {
-            const req = call.request;
-            const result = await this.#_listUsersUseCase.execute(req);
+            // Log 1: Request received
+            logger.info('gRPC Admin handler received list users request', { page, limit });
+
+            const result = await this.#_listUsersUseCase.execute(call.request);
+
+            // Log 2: UseCase success
+            logger.info('List users UseCase succeeded', { 
+                page: result.currentPage, 
+                limit: limit, 
+                totalItems: result.totalItems,
+                totalPages: result.totalPages
+            });
+
             return callback(null,{
                 users : result.body,
                 currentPage : result.currentPage,
                 totalItems : result.totalItems,
                 totalPage : result.totalPages
             })
-        } catch (error) {
-            logger.error(SystemErrorType.InternalServerError,error);
+        } catch (error : any) {
+            // Log 3: Uncaught internal error
+            logger.error('gRPC Admin handler failed with internal error during user listing', { 
+                page, 
+                limit, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

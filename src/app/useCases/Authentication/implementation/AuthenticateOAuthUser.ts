@@ -9,16 +9,18 @@ import { OAuthAuthentication } from "@/domain/valueObjects/UserAuthentication";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
 import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
-import { ICreateOAuthUserRequestDTO } from "@/domain/dtos/User/CreateUser";
 import { randomUUID } from "node:crypto";
 import { IUserInRequestDTO } from "@/domain/dtos/User/UserIn";
 import { generateUniqueUsername } from "@/utils/generateRandomUsername";
 import { AuthenticateUserErrorType } from "@/domain/enums/authenticateUser/ErrorType";
+import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
+import { OAuthLoginRequest } from "@akashcapro/codex-shared-utils";
+import { UserRole } from "@/domain/enums/UserRole";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Use case for authenticating a user.
- * 
- * @class
+ * * @class
  * @implements {IAuthenticateOAuthUserUseCase}
  */
 @injectable()
@@ -29,8 +31,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
 
     /**
      * Creates an instance of AuthenticateOAuthUserUseCase.
-     * 
-     * @param {IUserRepository} userRepository - The repository of the user.
+     * * @param {IUserRepository} userRepository - The repository of the user.
      * @param {ITokenProvider} tokenProvider - Token service provider for generating token.
      * @contructor
      */
@@ -47,17 +48,25 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
 
     /**
      * Executes the oauth authentication use case.
-     * 
-     * @param {IAuthenticateOAuthUserDTO} data - The user credentials for authentication.
+     * * @param {IAuthenticateOAuthUserDTO} data - The user credentials for authentication.
      * @return {Promise<ResponseDTO>} - The response data.
      */ 
-    async execute( data : ICreateOAuthUserRequestDTO): Promise<ResponseDTO> {
-        
-        const userAlreadyExists = await this.#_userRepository.findByEmail(data.email);
+    async execute(
+        request : OAuthLoginRequest
+    ): Promise<ResponseDTO> {
+        // Log 1: Execution start
+        logger.info('AuthenticateOAuthUserUseCase execution started', { email: request.email, role: UserRole.USER });
 
-        let user : IUserInRequestDTO
+        const userData = UserMapper.toCreateOAuthUserDTO(request,UserRole.USER)
+        const userAlreadyExists = await this.#_userRepository.findByEmail(userData.email);
+
+        let user : IUserInRequestDTO;
+        let isNewUser = false;
 
         if(!userAlreadyExists){
+            isNewUser = true;
+            // Log 2A: New user detected, initiating account creation
+            logger.info('OAuth user not found, proceeding with account creation', { email: userData.email, provider: userData.oAuthId });
 
             const generateAvailableUsername = async (): Promise<string> => {
             let uniqueUsername: string;
@@ -75,21 +84,27 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
 
             user = User.create({
                 username : uniqueUsername,
-                email : data.email,
-                authentication : new OAuthAuthentication(AuthProvider.GOOGLE,data.oAuthId),
-                firstName : data.firstName,
-                avatar : data.avatar ?? null,
+                email : userData.email,
+                authentication : new OAuthAuthentication(AuthProvider.GOOGLE, userData.oAuthId),
+                firstName : userData.firstName,
+                avatar : userData.avatar ?? null,
                 country : null,
                 lastName : null,
-                role : data.role
+                role : userData.role
             })
 
             await this.#_userRepository.create(user);
+            // Log 2B: Account created successfully
+            logger.info('New OAuth user account created successfully', { userId: user.userId, email: user.email, username: user.username });
         }else{
             user = userAlreadyExists as IUserInRequestDTO
+            // Log 2C: Existing user logging in
+            logger.info('Existing OAuth user logging in', { userId: user.userId, email: user.email });
         }
 
         if(user.isBlocked){
+            // Log 3: Account blocked
+            logger.warn('OAuth authentication failed: account is blocked', { userId: user.userId, email: user.email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountBlocked,
@@ -97,8 +112,12 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
             }
         }        
 
+        // Log 4: Authentication successful, generating tokens
+        logger.info('OAuth authentication successful, generating tokens', { userId: user.userId, email: user.email, username : user.username, role: user.role, isNewUser });
+
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
+            username : user.username,
             email : user.email,
             role : user.role,
             tokenId : randomUUID()
@@ -114,6 +133,7 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
                 userInfo : {
                     userId : user.userId,
                     username : user.username,
+                    firstName : user.firstName,
                     email : user.email,
                     role : user.role,
                     avatar : user.avatar ?? null
@@ -124,4 +144,3 @@ export class AuthenticateOAuthUserUseCase implements IAuthenticateOAuthUserUseCa
         }
     }
 }
-

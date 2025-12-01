@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IUpdateUserProfileRequestDTO } from "@/domain/dtos/User/UpdateUserProfile";
+import { UpdateProfileRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface for the usecase for updating user profile details.
@@ -11,12 +11,9 @@ export interface IUpdateUserProfileUseCase {
     /**
      * Executes the Update user profile use case.
      * 
-     * @param {string} userId - The id of the user.
-     * @param {IUpdateUserProfileRequestDTO} data - The profile details to be updated.
+     * @param request - Request payload contain userId and updated data.
      */
     execute(
-        userId : string,
-        data : IUpdateUserProfileRequestDTO
+        request : UpdateProfileRequest
     ) : Promise<ResponseDTO>
-
 }

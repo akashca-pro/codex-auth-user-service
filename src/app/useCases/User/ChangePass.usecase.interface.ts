@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IChangePassRequestDTO } from "@/domain/dtos/User/ChangePass.dto";
+import { ChangePasswordRequest } from "@akashcapro/codex-shared-utils";
 
 
 /**
@@ -12,9 +12,8 @@ export interface IChangePassUseCase {
     /**
      * Executes the change password use case.
      * 
-     * @param {userId} userId - The unique userId
-     * @param {IChangePassRequestDTO} payload - This payload contains currpass and newpass.
+     * @param request - The request payload contain current and new password.
      */
-    execute(userId : string, payload : IChangePassRequestDTO) : Promise<ResponseDTO>
+    execute(request : ChangePasswordRequest) : Promise<ResponseDTO>
 
 }

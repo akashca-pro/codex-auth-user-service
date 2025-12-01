@@ -1,5 +1,5 @@
-import { IResetPasswordDTO } from "@/domain/dtos/Authenticate/ResetPassword";
 import { ResponseDTO } from "@/domain/dtos/Response";
+import { ResetPasswordRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface for the use case of Reset password.
@@ -15,17 +15,12 @@ export interface IResetPasswordUseCase {
      * Executes the Reset password use case.
      * 
      * @async
-     * @param {IResetPasswordDTO} credentials
+     * @param request - Request payload contains email, new password and otp.
      * @returns {Promise<ResponseDTO>} - The response data.
      * 
      * @remarks
      * This method is responsible for handling the logic of validating otp
      * and reset the current password.
      */
-    execute({
-        email,
-        newPassword,
-        otp
-    } : IResetPasswordDTO) : Promise<ResponseDTO>
-
+    execute(request : ResetPasswordRequest) : Promise<ResponseDTO>
 }

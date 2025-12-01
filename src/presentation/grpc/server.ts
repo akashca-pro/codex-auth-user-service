@@ -1,6 +1,6 @@
 import TYPES from "@/config/inversify/types";
 import container from "@/config/inversify/container";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger';
 import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/codex-shared-utils";
 import { Server, ServerCredentials } from "@grpc/grpc-js"
 import { config } from "@/config";
@@ -25,6 +25,8 @@ import { GrpcChangePassHandler } from "./handlers/user/ChangePassHandler";
 import { GrpcChangeEmailHandler } from "./handlers/user/ChangeEmailHandler";
 import { GrpcVerifyNewEmailHandler } from "./handlers/user/VerifyEmailHandler";
 import { GrpcDeleteAccountHandler } from "./handlers/user/DeleteAccountHandler";
+import { GrpcAdminUserStats } from "./handlers/admin/UserStatsHandler";
+import { GrpcUpdateUserProgressHandler } from "./handlers/user/UpdateUserProgressHandler";
 
 // common
 const refreshToken = container.get<GrpcRefreshTokenHandler>(TYPES.GrpcRefreshTokenHandler);
@@ -43,12 +45,17 @@ const userChangePassHandler = container.get<GrpcChangePassHandler>(TYPES.GrpcCha
 const userChangeEmailHandler = container.get<GrpcChangeEmailHandler>(TYPES.GrpcChangeEmailHandler);
 const userVerifyNewEmailHandler = container.get<GrpcVerifyNewEmailHandler>(TYPES.GrpcVerifyNewEmailHandler);
 const userDeleteAccountHandler = container.get<GrpcDeleteAccountHandler>(TYPES.GrpcDeleteAccountHandler);
+const userUpdateProgressHandler = container.get<GrpcUpdateUserProgressHandler>(TYPES.GrpcUpdateUserProgressHandler);
+
+
 
 // admin
 const adminProfileHandler = container.get<GrpcAdminProfileHandler>(TYPES.GrpcAdminProfileHandler);
 const adminAuthHandler = container.get<GrpcAdminAuthHandler>(TYPES.GrpcAdminAuthHandler);
 const adminListUsersHandler = container.get<GrpcAdminListUsersHandler>(TYPES.GrpcAdminListUsersHandler);
 const toggleBlockUserHandler = container.get<GrpcToggleBlockUserHandler>(TYPES.GrpcToggleBlockUserHandler);
+const userStatsHandler = container.get<GrpcAdminUserStats>(TYPES.GrpcAdminUserStats);
+
 
 function wrapAll(serviceObj : Record<string,Function> ){
     return Object.fromEntries(
@@ -66,6 +73,7 @@ const adminHandlers = wrapAll({
     ...adminListUsersHandler.getServiceHandler(),
     ...toggleBlockUserHandler.getServiceHandler(),
     ...adminProfileHandler.getServiceHandler(),
+    ...userStatsHandler.getServiceHandler(),
 });
 
 const userHandlers = wrapAll({
@@ -83,7 +91,7 @@ const userHandlers = wrapAll({
     ...userDeleteAccountHandler.getServiceHandler(),
     ...userProfileHandler.getServiceHandler(),
     ...updateProfile.getServiceHandler(),
-
+    ...userUpdateProgressHandler.getServiceHandler(),
 })
 
 export const startGrpcServer = () => {
@@ -97,7 +105,7 @@ export const startGrpcServer = () => {
         AuthUserServiceService, userHandlers);
 
     server.bindAsync(
-        config.GRPC_SERVER_URL,
+        config.GRPC_AUTH_USER_SERVICE_SERVER_URL,
         ServerCredentials.createInsecure(),
         (err,port) => {
             if(err) {

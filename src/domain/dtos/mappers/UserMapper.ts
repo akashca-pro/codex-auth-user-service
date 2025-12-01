@@ -4,9 +4,11 @@ import { IUserOutRequestDTO } from "../User/UserOut";
 import { UserRole } from "@/domain/enums/UserRole";
 import { AuthProvider } from "@/domain/enums/AuthProvider"; 
 import { User as PrismaUser } from '@/generated/prisma'
-import { CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/utils/dto/CreateUser";
+import { CreateLocalAuthUserRequestDTO, CreateOAuthUserRequestDTO } from "@/dto/CreateUser";
 import { isValidCountry } from "@akashcapro/codex-shared-utils/dist/enums/countryCode.enum";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
+import { LoginRequest } from "@akashcapro/codex-shared-utils";
+import { IAuthenticateLocalAuthUserDTO } from "../Authenticate/AuthenticateUser";
 
 export class UserMapper {
 

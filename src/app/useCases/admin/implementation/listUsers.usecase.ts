@@ -5,15 +5,14 @@ import TYPES from "@/config/inversify/types";
 import { IListUsersDTO } from "@/domain/dtos/admin/ListUsers.dto";
 import { PaginationDTO } from "@/domain/dtos/Pagination";
 import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
-
+import logger from '@/utils/pinoLogger';
 
 /**
  * Use case for listing users.
- * 
- * @class
+ * * @class
  * @implements {IListUsersUseCase}
  */
-injectable()
+@injectable() // Corrected: Moved injectable decorator to before the class definition
 export class ListUsersUseCase implements IListUsersUseCase {
 
     #_userRepository : IUserRepository
@@ -24,7 +23,12 @@ export class ListUsersUseCase implements IListUsersUseCase {
         this.#_userRepository = userRepository
     }
 
-    async execute(filters: IListUsersDTO): Promise<PaginationDTO> {
+    async execute(
+        filters: IListUsersDTO
+    ): Promise<PaginationDTO> {
+        // Log 1: UseCase execution started
+        logger.info('ListUsersUseCase execution started', { initialFilters: filters });
+
         const where: Record<string, any> = {}
         where.role = 'USER'
 
@@ -42,15 +46,15 @@ export class ListUsersUseCase implements IListUsersUseCase {
             ]
         }
 
-        if (filters.isArchived !== null) {
+        if (filters.isArchived !== null && filters.isArchived !== undefined) { // Added undefined check for robustness
             where.isArchived = filters.isArchived
         }
 
-        if (filters.isVerified !== null) {
+        if (filters.isVerified !== null && filters.isVerified !== undefined) { // Added undefined check for robustness
             where.isVerified = filters.isVerified
         }
 
-        if(filters.isBlocked !== null) {
+        if(filters.isBlocked !== null && filters.isBlocked !== undefined) { // Added undefined check for robustness
             where.isBlocked = filters.isBlocked
         }
 
@@ -80,6 +84,14 @@ export class ListUsersUseCase implements IListUsersUseCase {
             "createdAt",
             "updatedAt",
         ]
+        
+        // Log 2: Final filters before repository call
+        logger.debug('ListUsersUseCase executing repository calls', { 
+            where, 
+            orderBy, 
+            skip, 
+            limit: filters.limit 
+        });
 
         const [totalItems, users] = await Promise.all([
             await this.#_userRepository.countDocuments(where),
@@ -93,6 +105,14 @@ export class ListUsersUseCase implements IListUsersUseCase {
         ]);
 
         const totalPages = Math.ceil(totalItems/ filters.limit);
+
+        // Log 3: UseCase execution completed successfully
+        logger.info('ListUsersUseCase execution completed successfully', {
+            currentPage: filters.page,
+            totalItems,
+            totalPages,
+            usersCount: users.length
+        });
 
         return {
             body : users || [],

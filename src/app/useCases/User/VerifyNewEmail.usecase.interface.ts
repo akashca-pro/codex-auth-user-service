@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IVerifyNewEmailRequestDTO } from "@/domain/dtos/User/VerifyNewEmail.dto";
+import { VerifyNewEmailRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface defines the contract for the verify new email use case.
@@ -11,11 +11,9 @@ export interface IVerifyNewEmailUseCase {
     /**
      * Executes the verify new email usecase.
      * 
-     * @param {IVerifyNewEmailRequestDTO} payload - The payload contain email and otp.
+     * @param request - The Request payload contain email and otp.
      */
     execute(
-        userId : string,
-        payload : IVerifyNewEmailRequestDTO
+        request : VerifyNewEmailRequest
     ) : Promise<ResponseDTO>
-
 }

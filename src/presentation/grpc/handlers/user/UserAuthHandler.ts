@@ -3,7 +3,7 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { LoginRequest, LoginResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 import { UserRole } from "@/domain/enums/UserRole";
@@ -11,8 +11,7 @@ import { UserRole } from "@/domain/enums/UserRole";
 
 /**
  * Class for handling User login.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserAuthHandler {
@@ -20,8 +19,7 @@ export class GrpcUserAuthHandler {
     #_authenticateLocalAuthUserUseCase : IAuthenticateLocalAuthUserUseCase
 
     /**
-     * 
-     * @param {IAuthenticateLocalAuthUserUseCase} authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
+     * * @param {IAuthenticateLocalAuthUserUseCase} authenticateLocalAuthUserUseCase - The Usecase for authenticate user.
      * @constructor
      */
     constructor(
@@ -33,8 +31,7 @@ export class GrpcUserAuthHandler {
 
     /**
      * This method handles the user local authentication use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -42,19 +39,38 @@ export class GrpcUserAuthHandler {
         call : ServerUnaryCall<LoginRequest,LoginResponse>,
         callback : sendUnaryData<LoginResponse>
     ) : Promise<void> => {
+        const req = call.request;
+        const email = req.email; // Extract email for context
+
         try {
-            const req = call.request;
+            // Log 1: Request received (Start of process)
+            logger.info('gRPC handler received login request', { email, role: UserRole.USER });
+
             const result = await this.#_authenticateLocalAuthUserUseCase.execute({
-                email : req.email,
-                password : req.password,
+                ...req,
                 role : UserRole.USER
             })
+
             if(!result.success){
+                // Log 2A: UseCase failure
+                logger.warn('Authentication UseCase failed', { 
+                    email, 
+                    message: result.message 
+                });
+                
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success
+            logger.info('Authentication UseCase succeeded', { 
+                email, 
+                userId: result.data.userInfo.userId,
+                message: result.message 
+            });
+
             return callback(null,{
                 accessToken : result.data.accessToken,
                 refreshToken : result.data.refreshToken,
@@ -62,7 +78,12 @@ export class GrpcUserAuthHandler {
                 message : result.message!
             })
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error', { 
+                email, 
+                error 
+            });
+            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

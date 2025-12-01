@@ -3,14 +3,13 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { RefreshTokenRequest, RefreshTokenResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 /**
  * Class for handling Refresh token.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcRefreshTokenHandler {
@@ -18,8 +17,7 @@ export class GrpcRefreshTokenHandler {
     #_refreshTokenUseCase : IRefreshTokenUseCase
 
     /**
-     * 
-     * @param {IRefreshTokenUseCase} refreshTokenUseCase - The use case of refresh token.
+     * * @param {IRefreshTokenUseCase} refreshTokenUseCase - The use case of refresh token.
      * @constructor
      */
     constructor(
@@ -31,8 +29,7 @@ export class GrpcRefreshTokenHandler {
 
     /**
      * This method handles the refreshToken use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -40,31 +37,41 @@ export class GrpcRefreshTokenHandler {
         call : ServerUnaryCall<RefreshTokenRequest,RefreshTokenResponse>,
         callback : sendUnaryData<RefreshTokenResponse>
     ) => {
-
         try {
-            
-            const req = call.request;
-            const result = await this.#_refreshTokenUseCase.execute({
-                userId : req.userId,
-                email : req.email,
-                role : req.role
-            });
+            // Log 1: Request received
+            logger.info('gRPC handler received refresh token request');
 
+            const result = await this.#_refreshTokenUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., invalid or expired refresh token)
+                logger.warn('Refresh token UseCase failed', {
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
-          
+
+            // Log 2B: UseCase success
+            logger.info('Refresh token UseCase succeeded', { 
+                userId: result.data.userInfo.userId,
+                message: result.message || 'Token successfully refreshed' 
+            });
+
             return callback(null,{
                 accessToken : result.data.accessToken,
                 message : result.message!,
                 userInfo : result.data.userInfo
             });
-
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during token refresh', { 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

@@ -1,5 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
-import { IChangeEmailRequestDTO } from "@/domain/dtos/User/ChangeEmail.dto";
+import { ChangeEmailRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface defines the contract for the change email use case.
@@ -11,7 +11,9 @@ export interface IChangeEmailUseCase {
     /**
      * Executes the change email use case.
      * 
-     * @param {userId} userId - The unique userId
+     * @param request - Request payload contain userId, newEmail, password
      */
-    execute(userId : string, payload : IChangeEmailRequestDTO) : Promise<ResponseDTO>
+    execute(
+        request : ChangeEmailRequest
+    ) : Promise<ResponseDTO>
 }

@@ -3,14 +3,13 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { VerifyOtpRequest, VerifyOtpResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 /**
  * Class for handling verify otp after signup.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserVerifySignupOtpHandler {
@@ -18,8 +17,7 @@ export class GrpcUserVerifySignupOtpHandler {
     #_verifySignupOtpUseCase : IVerifySignUpOtpUseCase
     
     /**
-     * 
-     * @param {IVerifySignUpOtpUseCase} verifySignupOtpUseCase - The Usecase for verify otp of the user.
+     * * @param {IVerifySignUpOtpUseCase} verifySignupOtpUseCase - The Usecase for verify otp of the user.
      * @constructor
      */
     constructor(
@@ -31,8 +29,7 @@ export class GrpcUserVerifySignupOtpHandler {
 
     /**
      * This method handles the verify sign otp use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -40,19 +37,33 @@ export class GrpcUserVerifySignupOtpHandler {
         call : ServerUnaryCall<VerifyOtpRequest,VerifyOtpResponse>,
         callback : sendUnaryData<VerifyOtpResponse>
     ) : Promise<void> => {
-        try {
-            const req = call.request;
-            const result = await this.#_verifySignupOtpUseCase.execute({
-                email : req.email,
-                otp : req.otp
-            });
+        const { email } = call.request; // Extract email for context
 
+        try {
+            // Log 1: Request received
+            logger.info('gRPC handler received signup OTP verification request', { email });
+
+            const result = await this.#_verifySignupOtpUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., invalid OTP, expired OTP)
+                logger.warn('Signup OTP verification UseCase failed', { 
+                    email, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+
+            // Log 2B: UseCase success (User activated, tokens issued)
+            logger.info('Signup OTP verification UseCase succeeded', { 
+                email, 
+                userId: result.data.userInfo.userId,
+                message: result.message || 'User successfully verified and authenticated'
+            });
 
             return callback(null,{
                 accessToken : result.data.accessToken,
@@ -60,9 +71,13 @@ export class GrpcUserVerifySignupOtpHandler {
                 userInfo : result.data.userInfo,
                 message : result.message!
             });
-
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during signup OTP verification', { 
+                email, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

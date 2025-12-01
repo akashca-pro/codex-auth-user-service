@@ -1,5 +1,6 @@
 import { IVerifySignUpOtp } from "@/domain/dtos/Authenticate/VerifyOtp";
 import { ResponseDTO } from "@/domain/dtos/Response";
+import { VerifyOtpRequest } from "@akashcapro/codex-shared-utils";
 
 
 /**
@@ -16,12 +17,14 @@ export interface IVerifySignUpOtpUseCase {
      * Executes the usecase of verifying signup otp.
      * 
      * @async
-     * @param {IVerifySignUpOtp} credentials - The user credentials for verification.
+     * @param request - Request payload contains email and otp.
      * @returns {Promise<ResponseDTO>} - The response data.
      * 
      * @remarks
      * This method is responsible for handling the logic of verifying the signup otp
      * based on the provided credentials.
      */
-    execute({email, otp} : IVerifySignUpOtp) : Promise<ResponseDTO>;
+    execute(
+        request : VerifyOtpRequest
+    ) : Promise<ResponseDTO>;
 }

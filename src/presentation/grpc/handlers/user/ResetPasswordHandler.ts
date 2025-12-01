@@ -3,15 +3,14 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { ResetPasswordRequest, ResetPasswordResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 
 /**
  * Class for handling forgot password.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserResetPasswordHandler {
@@ -19,8 +18,7 @@ export class GrpcUserResetPasswordHandler {
     #_resetPasswordUseCase : IResetPasswordUseCase
 
     /**
-     * 
-     * @param {IResetPasswordUseCase} resetPasswordUseCase - The Usecase for creation of the user.
+     * * @param {IResetPasswordUseCase} resetPasswordUseCase - The Usecase for creation of the user.
      * @constructor 
      */
     constructor(
@@ -32,8 +30,7 @@ export class GrpcUserResetPasswordHandler {
 
     /**
      * This method handles the resetPassword use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -41,30 +38,43 @@ export class GrpcUserResetPasswordHandler {
         call : ServerUnaryCall<ResetPasswordRequest,ResetPasswordResponse>,
         callback : sendUnaryData<ResetPasswordResponse>
     ) => {
-        const startTime = Date.now(); // for latency
-        const method = 'resetPassword'
+        const { email } = call.request; // Extract email for context
+
         try {
+            // Log 1: Request received
+            logger.info('gRPC handler received password reset request', { email });
+
+            const result = await this.#_resetPasswordUseCase.execute(call.request)
             
-            const req = call.request;
-
-            const result = await this.#_resetPasswordUseCase.execute({
-                email : req.email,
-                newPassword : req.newPassword,
-                otp : req.otp
-            })
-
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., invalid OTP, user not found)
+                logger.warn('Password reset UseCase failed', { 
+                    email, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+            
+            // Log 2B: UseCase success
+            logger.info('Password reset UseCase succeeded', { 
+                email, 
+                message: result.message || 'Password successfully reset'
+            });
+
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during password reset', { 
+                email, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

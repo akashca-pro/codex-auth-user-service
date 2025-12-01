@@ -14,12 +14,12 @@ import { UserSuccessType } from "@/domain/enums/user/SuccessType";
 import { ITokenPayLoadDTO } from "@/domain/dtos/TokenPayload";
 import { inject, injectable } from "inversify";
 import { randomUUID } from "node:crypto";
-
+import { VerifyOtpRequest } from "@akashcapro/codex-shared-utils";
+import logger from '@/utils/pinoLogger'; // Import the logger
 
 /**
  * Use case for verifying user signup otp.
- * 
- * @class
+ * * @class
  * @implements {IVerifySignUpOtpUseCase}
  */
 @injectable()
@@ -31,8 +31,7 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
 
     /**
      * Creates an instance of SignupUserUseCase.
-     * 
-     * @param {IUserRepository} userRepository - The repository of the user.
+     * * @param {IUserRepository} userRepository - The repository of the user.
      * @param {ITokenProvider} tokenProvider - The token provider for issueing access and refresh token.
      * @param {IOtpService} otpService - Otp service provider for verification.
      */
@@ -51,51 +50,89 @@ export class VerifySignUpOtpUseCase implements IVerifySignUpOtpUseCase {
         this.#_userRepository = userRepository 
     }
 
-    /**
-     * Executes the VerifySignupOtp use case.
-     * 
-     * @param  {IVerifySignUpOtp} credentials - The user credentials for veriying otp
-     * @returns {ResponseDTO} - The response data.
-     */
-    async execute({ email, otp }: IVerifySignUpOtp): Promise<ResponseDTO> {
+    async execute(
+        request : VerifyOtpRequest
+    ): Promise<ResponseDTO> {
+        const dto : IVerifySignUpOtp = {
+            email : request.email,
+            otp : request.otp
+        }
 
-        const user = await this.#_userRepository.findByEmail(email) 
+        // Log 1: Execution start
+        logger.info('VerifySignUpOtpUseCase execution started', { email: dto.email });
+
+        const user = await this.#_userRepository.findByEmail(dto.email) 
         
         if(!user){
+            // Log 2A: User not found
+            logger.warn('OTP verification failed: account not found', { email: dto.email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.AccountNotFound,
                 success : false
             }
         }
-
-        const isOtpVerified = await this.#_otpService.verifyOtp(email,OtpType.SIGNUP,otp);
+        
+        // Log 2B: Attempting OTP verification
+        logger.debug('Attempting to verify sign-up OTP', { userId: user.userId, email: dto.email });
+        const isOtpVerified = await this.#_otpService.verifyOtp(
+            dto.email,
+            OtpType.SIGNUP,
+            dto.otp
+        );
 
         if(!isOtpVerified){
+            // Log 2C: OTP verification failed
+            logger.warn('OTP verification failed: invalid OTP provided', { userId: user.userId, email: dto.email });
             return {
                 data : null,
                 message : AuthenticateUserErrorType.EmailOrPasswordWrong,
                 success : false
             }
         }
-
+        
+        // Log 3: OTP verified, updating user status
+        logger.info('OTP successfully verified. Marking user as verified', { userId: user.userId });
+        
         const userEntity = User.rehydrate(user);
         userEntity.update({isVerified : true});
-        await this.#_userRepository.update(user.userId,userEntity.getUpdatedFields());
-        await this.#_otpService.clearOtp(email,OtpType.SIGNUP);
-
+        
+        await this.#_userRepository.update(
+            user.userId,
+            userEntity.getUpdatedFields()
+        );
+        
+        // Log 4: Clearing OTP
+        logger.debug('Clearing sign-up OTP after successful verification', { userId: user.userId });
+        await this.#_otpService.clearOtp(
+            dto.email,
+            OtpType.SIGNUP
+        );
+        
+        // Log 5: Generating tokens
+        logger.info('User successfully verified. Generating access and refresh tokens.', { userId: user.userId });
+        
         const payload : ITokenPayLoadDTO = {
             userId : user.userId,
             email : user.email,
             role : UserRole.USER,
             tokenId : randomUUID()
         }
-
+        
         const accessToken = this.#_tokenProvider.generateAccessToken(payload);
         const refreshToken = this.#_tokenProvider.generateRefreshToken(payload);
+        
+        if(!accessToken) {
+            logger.error('Token generation error: Access token could not be issued.', { userId: user.userId });
+            throw new Error(UserErrorType.AccessTokenIssueError);
+        }
+        if(!refreshToken) {
+            logger.error('Token generation error: Refresh token could not be issued.', { userId: user.userId });
+            throw new Error(UserErrorType.RefreshTokenIssueError);
+        }
 
-        if(!accessToken) throw new Error(UserErrorType.AccessTokenIssueError);
-        if(!refreshToken) throw new Error(UserErrorType.RefreshTokenIssueError);
+        // Log 6: Execution successful
+        logger.info('VerifySignUpOtpUseCase completed successfully.', { userId: user.userId });
 
         return { 
             data : { 

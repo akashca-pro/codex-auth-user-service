@@ -1,19 +1,16 @@
 import { ISignUpUserUseCase } from "@/app/useCases/User/SignupUserUseCase.interface";
 import TYPES from "@/config/inversify/types";
-import { UserMapper } from "@/domain/dtos/mappers/UserMapper";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
-import { UserRole } from "@/domain/enums/UserRole";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { SignupRequest, SignupResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 import { UserErrorType } from "@/domain/enums/user/ErrorType";
 
 /**
  * Class for handling user signup.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcUserSignupHandler {
@@ -21,8 +18,7 @@ export class GrpcUserSignupHandler {
     #_signupUserUseCase : ISignUpUserUseCase
 
     /**
-     * 
-     * @param {ISignUpUserUseCase} signupUserUseCase - The Usecase for creation of the user.
+     * * @param {ISignUpUserUseCase} signupUserUseCase - The Usecase for creation of the user.
      * @constructor
      */
     constructor(
@@ -34,8 +30,7 @@ export class GrpcUserSignupHandler {
 
     /**
      * This method handles the signup user use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -43,31 +38,56 @@ export class GrpcUserSignupHandler {
         call : ServerUnaryCall<SignupRequest,SignupResponse>,
         callback : sendUnaryData<SignupResponse>
     ) : Promise<void> => {
+        const { email } = call.request; // Extract email for context
 
         try {
-            const req = call.request;
-            const dto = UserMapper.toCreateLocalAuthUserDTO(req,UserRole.USER);
-            const result = await this.#_signupUserUseCase.execute(dto);
-        
+            // Log 1: Request received
+            logger.info('gRPC handler received signup request', { email });
+
+            const result = await this.#_signupUserUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., email already exists, invalid data)
+                logger.warn('User signup UseCase failed', { 
+                    email, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
 
+            // Log 2B: UseCase success (User created, OTP sent)
+            logger.info('User signup UseCase succeeded', { 
+                email, 
+                message: result.message || 'User created, OTP sent' 
+            });
+
             return callback(null,{
                 message : result.message!
             });
-
         } catch (error : any) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            
+            // Handle specific known error (InvalidCountryCode)
             if(error?.message === UserErrorType.InvalidCountryCode){
+                logger.warn('Signup failed due to invalid country code', { 
+                    email, 
+                    error: error.message 
+                });
                 return callback({
                     code : mapMessageToGrpcStatus(error.message),
                     message : error.message
                 })
             }
+
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with uncaught internal error during signup', { 
+                email, 
+                error 
+            });
+            
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

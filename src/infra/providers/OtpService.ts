@@ -123,7 +123,7 @@ export class OtpService implements IOtpService {
         from: config.NODEMAILER_EMAIL,
         to: email,
         subject: 'Your OTP Code',
-        text: `Your OTP code is ${otp}. It will expire in 1 minute.`,
+        text: `Your OTP code is ${otp}. It will expire in 2 minute.`,
         };
 
         try {

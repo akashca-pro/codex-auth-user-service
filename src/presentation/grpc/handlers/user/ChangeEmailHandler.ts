@@ -2,7 +2,7 @@ import { IChangeEmailUseCase } from "@/app/useCases/User/ChangeEmail.usecase.int
 import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
-import logger from "@/utils/logger";
+import logger from "@/utils/logger"; // baseLogger imported as logger
 import { ChangeEmailRequest } from "@akashcapro/codex-shared-utils";
 import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
@@ -10,8 +10,7 @@ import { inject, injectable } from "inversify";
 
 /**
  * Class handling the change email usecase.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcChangeEmailHandler {
@@ -28,23 +27,44 @@ export class GrpcChangeEmailHandler {
         call : ServerUnaryCall<ChangeEmailRequest, Empty>,
         callback : sendUnaryData<Empty>
     ) => {
-        try {
-            const req = call.request;
-            const result = await this.#_changeEmailUseCase.execute(req.userId,{
-                newEmail : req.newEmail,
-                password : req.password
-            })
+        const { userId, newEmail } = call.request; // Destructure context fields
 
+        try {
+            // Log 1: Request received
+            logger.info('gRPC handler received change email request', { userId, newEmail });
+
+            const result = await this.#_changeEmailUseCase.execute(call.request);
+            
             if(!result.success){
+                // Log 2A: UseCase failure
+                logger.warn('Change email UseCase failed', { 
+                    userId, 
+                    newEmail,
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
 
+            // Log 2B: UseCase success
+            logger.info('Change email UseCase succeeded', { 
+                userId, 
+                newEmail,
+                message: 'OTP issued for verification'
+            });
+            
             return callback(null,{});
-        } catch (error) {
-            logger.error(SystemErrorType.InternalServerError,error);
+        } catch (error : any) {
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error', { 
+                userId, 
+                newEmail, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError

@@ -15,6 +15,11 @@ export interface ITokenPayLoadDTO {
     email : string;
 
     /**
+     * The username of the user
+     */
+    username? : string;
+
+    /**
      * The role of the user.
      */
     role : string;
@@ -23,26 +28,4 @@ export interface ITokenPayLoadDTO {
      * Unique id for token.
      */
     tokenId : string;
-}
-
-/**
- * Data Transfer Object (DTO) representing userInfo for token payload
- * 
- * @interface
- */
-export interface IUserInfoPayload {
-    /**
-     * The id of the user.
-     */
-    userId : string;
-
-    /**
-     * The email address of the user for authentication.
-     */
-    email : string;
-
-    /**
-     * The role of the user.
-     */
-    role : string;
 }

@@ -12,8 +12,10 @@ export interface IListUsersUseCase {
     /**
      * Executes the List user use case.
      * 
-     * @param {IListUsersDTO} filter - The filter to be applied for listing users.
+     * @param {IListUsersDTO} filters - The filters to be applied for listing users.
      */
-    execute(filter : IListUsersDTO) : Promise<PaginationDTO>
+    execute(
+        filters : IListUsersDTO
+    ) : Promise<PaginationDTO>
 
 }

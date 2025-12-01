@@ -3,15 +3,14 @@ import TYPES from "@/config/inversify/types";
 import { SystemErrorType } from "@/domain/enums/ErrorType";
 import { mapMessageToGrpcStatus } from "@/utils/GrpcStatusCode";
 import { UserProfileRequest, UserProfileResponse } from "@akashcapro/codex-shared-utils";
-import logger from '@/utils/logger';
+import logger from '@/utils/pinoLogger'; // baseLogger imported as logger
 import { sendUnaryData, ServerUnaryCall, status } from "@grpc/grpc-js";
 import { inject, injectable } from "inversify";
 
 
 /**
  * Class for handling Profile use case.
- * 
- * @class
+ * * @class
  */
 @injectable()
 export class GrpcProfileHandler {
@@ -26,8 +25,7 @@ export class GrpcProfileHandler {
 
     /**
      * This method handles the profile use case.
-     * 
-     * @async
+     * * @async
      * @param {ServerUnaryCall} call - This contain the request from the grpc. 
      * @param {sendUnaryData} callback - The sends the grpc response.
      */
@@ -35,21 +33,45 @@ export class GrpcProfileHandler {
         call : ServerUnaryCall<UserProfileRequest,UserProfileResponse>,
         callback : sendUnaryData<UserProfileResponse>
     ) => {
+        const req = call.request; 
+        const userId = req.userId; // Extract userId for context
+
         try {
-            const req = call.request; 
-            const result = await this.#_profileUseCase.execute(req.userId);
+            // Log 1: Request received
+            logger.info('gRPC handler received user profile request', { userId });
+
+            const result = await this.#_profileUseCase.execute(userId);
+
             if(!result.success){
+                // Log 2A: UseCase failure (e.g., user not found)
+                logger.warn('User profile UseCase failed', { 
+                    userId, 
+                    message: result.message 
+                });
+
                 return callback({
                     code : mapMessageToGrpcStatus(result.message!),
                     message : result.message
                 },null)
             }
+            
+            // Log 2B: UseCase success
+            logger.info('User profile UseCase succeeded', { 
+                userId, 
+                username: result.data.username
+            });
+
             return callback(null,{ 
                 ...result.data
              });
 
         } catch (error : any ) {
-            logger.error(SystemErrorType.InternalServerError,error);
+            // Log 3: Uncaught internal error
+            logger.error('gRPC handler failed with internal error during profile fetch', { 
+                userId, 
+                error 
+            });
+
             return callback({
                 code : status.INTERNAL,
                 message : SystemErrorType.InternalServerError
@@ -74,4 +96,3 @@ export class GrpcProfileHandler {
     }
 
 }
-

@@ -16,6 +16,7 @@ export const mapMessageToGrpcStatus = (message: string): status => {
     // ====== Authentication Errors ======
     case AuthenticateUserErrorType.AccountNotFound:
     case AuthenticateUserErrorType.EmailOrPasswordWrong:
+    case AuthenticateUserErrorType.IncorrectPassword:
     case UserErrorType.InvalidCountryCode:
       return status.INVALID_ARGUMENT;
 
@@ -30,6 +31,7 @@ export const mapMessageToGrpcStatus = (message: string): status => {
 
     case UserErrorType.UserAlreadyExists:
     case AuthenticateUserErrorType.AccountAlreadyExist:
+    case AuthenticateUserErrorType.EmailAlreadyExists:
       return status.ALREADY_EXISTS;
 
     case UserErrorType.UserDoesNotExist:

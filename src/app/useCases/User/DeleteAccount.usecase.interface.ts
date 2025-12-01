@@ -1,4 +1,5 @@
 import { ResponseDTO } from "@/domain/dtos/Response";
+import { DeleteAccountRequest } from "@akashcapro/codex-shared-utils";
 
 /**
  * Interface defines the contract for the delete user account use case.
@@ -10,12 +11,10 @@ export interface IDeleteAccountUseCase {
     /**
      * Executes the delete account use case.
      * 
-     * @param userId - The unique id of the user.
-     * @param password - The password of the requested user.
+     * @param request - Request payload contains userId and password.
      */
     execute(
-        userId : string, 
-        password : string
+        request : DeleteAccountRequest
     ) : Promise<ResponseDTO>
 
 }
