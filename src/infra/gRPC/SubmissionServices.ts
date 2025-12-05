@@ -7,6 +7,11 @@ import { GrpcBaseService } from "./GrpcBaseService";
 import { config } from "@/config";
 import { credentials } from "@grpc/grpc-js";
 import { Empty } from "@akashcapro/codex-shared-utils/dist/proto/compiled/google/protobuf/empty";
+import fs from "fs";
+
+const caCert = fs.readFileSync("/secrets/ca/ca.pem");
+const clientKey = fs.readFileSync("/secrets/key/auth-user.key");
+const clientCert = fs.readFileSync("/secrets/cert/auth-user.pem");
 
 /**
  * Class implementing the submission grpc client call.
@@ -22,7 +27,7 @@ export class GrpcSubmissionService extends GrpcBaseService {
         super();
         this.#_client = new SubmissionServiceClient(
             config.GRPC_PROBLEM_SERVICE_URL!,
-            credentials.createInsecure()
+            credentials.createSsl(caCert, clientKey, clientCert)
         )
     }
 
