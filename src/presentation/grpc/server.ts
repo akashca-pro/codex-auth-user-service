@@ -4,7 +4,6 @@ import logger from '@/utils/pinoLogger';
 import { AuthAdminServiceService, AuthUserServiceService } from "@akashcapro/codex-shared-utils";
 import { Server, ServerCredentials } from "@grpc/grpc-js"
 import { config } from "@/config";
-import fs from "fs";
 
 import { GrpcUserAuthHandler } from "./handlers/user/UserAuthHandler";
 
@@ -95,19 +94,6 @@ const userHandlers = wrapAll({
     ...userUpdateProgressHandler.getServiceHandler(),
 })
 
-const caCert = fs.readFileSync("/secrets/ca/ca.pem");
-const serverCert = fs.readFileSync("/secrets/cert/auth-user.pem");
-const serverKey = fs.readFileSync("/secrets/key/auth-user.key");
-
-const creds = ServerCredentials.createSsl(
-  caCert,
-  [{
-    cert_chain: serverCert,
-    private_key: serverKey,
-  }],
-  true   
-);
-
 export const startGrpcServer = () => {
 
     const server = new Server();
@@ -120,7 +106,7 @@ export const startGrpcServer = () => {
 
     server.bindAsync(
         config.GRPC_AUTH_USER_SERVICE_SERVER_URL,
-        creds,
+        ServerCredentials.createInsecure(),
         (err,port) => {
             if(err) {
                 logger.error('gRPC Server failed to start : ', err);

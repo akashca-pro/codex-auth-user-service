@@ -33,5 +33,4 @@ jobs:
             --region ${{ secrets.GCP_REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --service-account ${{ secrets.AUTH_USER_SA_EMAIL }} \
-            --set-secrets=/secrets/ca/ca.pem=codex-ca:latest,/secrets/key/auth-user.key=auth-user-tls-key:latest,/secrets/cert/auth-user.pem=auth-user-tls-cert:latest
+            --service-account ${{ secrets.AUTH_USER_SA_EMAIL }} 
