@@ -23,7 +23,7 @@ export class GrpcSubmissionService extends GrpcBaseService {
         super();
         this.#_client = new SubmissionServiceClient(
             config.GRPC_PROBLEM_SERVICE_URL!,
-            credentials.createSsl()
+            credentials.createInsecure()
         )
     }
 
